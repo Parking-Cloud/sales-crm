@@ -27,7 +27,7 @@ export default async function PartyPage({ params }: { params: Promise<{ id: stri
 
   const [locations, contacts, distances] = await Promise.all([listLocations(id), listContacts(id), listDistances(id)]);
   const contactIds = contacts.map((contact) => contact.id);
-  const [provenance, history] = await Promise.all([listProvenance(id, contactIds), listHistory(id, contactIds)]);
+  const [provenance, history] = await Promise.all([listProvenance(id, contactIds), listHistory(id, contactIds, locations.map((location) => location.id))]);
 
   return (
     <PartyDetail

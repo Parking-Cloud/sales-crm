@@ -196,14 +196,19 @@ export async function listDataSources(): Promise<DataSource[]> {
   return data;
 }
 
-// Latest changes to the party and its contacts, with the author's name.
-export async function listHistory(partyId: string, contactIds: string[], limit = 50): Promise<HistoryEntry[]> {
+// Latest changes to the party, its contacts and its locations, with the author's name.
+export async function listHistory(
+  partyId: string,
+  contactIds: string[],
+  locationIds: string[] = [],
+  limit = 50,
+): Promise<HistoryEntry[]> {
   const supabase = await createClient();
-  const ids = [partyId, ...contactIds];
+  const ids = [partyId, ...contactIds, ...locationIds];
   const { data, error } = await supabase
     .from("audit_logs")
     .select("id, quando, utente_id, entita, azione, prima, dopo")
-    .in("entita", ["parties", "contacts"])
+    .in("entita", ["parties", "contacts", "party_locations"])
     .in("entita_id", ids)
     .order("quando", { ascending: false })
     .limit(limit);
