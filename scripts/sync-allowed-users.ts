@@ -7,8 +7,9 @@
  * - Users no longer listed are deactivated, never deleted.
  * - A listed user who already signed in is linked to their auth.users id.
  *
- * Connects with SUPABASE_DB_URL through the Supabase CLI (`supabase db query`).
- * Prints counts only: emails never appear in the output, not even in errors.
+ * Runs through the Supabase Management API when SUPABASE_ACCESS_TOKEN is set,
+ * otherwise connects with SUPABASE_DB_URL through the Supabase CLI
+ * (`supabase db query`). Prints counts only: emails never appear in the output, not even in errors.
  *
  * Run with `npm run users:sync` after the migrations are applied.
  */
@@ -16,6 +17,7 @@ import { execFile } from "node:child_process";
 import { mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
+import { hasManagementApi, redact, runSql, sqlLiteral } from "./supabase-api";
 
 const ALLOWED_DOMAIN = "@parkingcloud.eu";
 const ROLES = ["admin", "operatore"] as const;
@@ -76,11 +78,7 @@ function parseAllowedUsers(raw: string): AllowedUser[] {
 }
 
 // Values are validated by parseAllowedUsers (no quotes possible), and quoted
-// defensively anyway.
-function sqlLiteral(value: string): string {
-  return `'${value.replace(/'/g, "''")}'`;
-}
-
+// with sqlLiteral anyway.
 function buildSyncSql(users: AllowedUser[]): string {
   const values = users
     .map((user) => `(${sqlLiteral(user.email)}, ${sqlLiteral(user.role)}::public.user_role)`)
@@ -132,16 +130,7 @@ select json_build_object(
 `;
 }
 
-// Hides connection strings, passwords and email addresses in CLI messages.
-function redact(message: string): string {
-  return message
-    .replace(/postgres(ql)?:\/\/\S+/gi, "<connessione>")
-    .replace(/password=\S+/gi, "password=<nascosta>")
-    .replace(/[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}/gi, "<email>")
-    .trim();
-}
-
-function runQuery(dbUrl: string, sqlFile: string): Promise<string> {
+function runQueryWithCli(dbUrl: string, sqlFile: string): Promise<string> {
   return new Promise((resolve, reject) => {
     execFile(
       "npx",
@@ -166,34 +155,45 @@ function extractCounts(output: string): SyncCounts {
   return JSON.parse(match[0].replace(/\\"/g, '"')) as SyncCounts;
 }
 
-async function main(): Promise<void> {
-  const rawList = process.env.CRM_ALLOWED_USERS;
-  const dbUrl = process.env.SUPABASE_DB_URL;
-  if (!rawList) throw new ConfigError("variabile CRM_ALLOWED_USERS mancante.");
-  if (!dbUrl) throw new ConfigError("variabile SUPABASE_DB_URL mancante.");
+async function syncWithApi(sql: string): Promise<SyncCounts> {
+  const rows = await runSql<{ sync_counts: SyncCounts }>(sql);
+  if (!rows[0]?.sync_counts) throw new Error("risposta del database non riconosciuta.");
+  return rows[0].sync_counts;
+}
 
-  const users = parseAllowedUsers(rawList);
+async function syncWithCli(sql: string): Promise<SyncCounts> {
+  const dbUrl = process.env.SUPABASE_DB_URL;
+  if (!dbUrl) throw new ConfigError("variabile SUPABASE_DB_URL mancante.");
 
   // The SQL contains the emails: write it to a private temp file instead of
   // the command line, and delete it right after.
   const dir = mkdtempSync(join(tmpdir(), "crm-users-"));
   const sqlFile = join(dir, "sync.sql");
   try {
-    writeFileSync(sqlFile, buildSyncSql(users), { mode: 0o600 });
-    const counts = extractCounts(await runQuery(dbUrl, sqlFile));
-    console.log("Sincronizzazione utenti completata.");
-    console.log(`In elenco: ${counts.in_elenco}`);
-    console.log(`Inseriti: ${counts.inseriti}`);
-    console.log(`Aggiornati o riattivati: ${counts.aggiornati}`);
-    console.log(`Disattivati: ${counts.disattivati}`);
-    console.log(`Con accesso Google già collegato: ${counts.con_accesso_google}`);
+    writeFileSync(sqlFile, sql, { mode: 0o600 });
+    return extractCounts(await runQueryWithCli(dbUrl, sqlFile));
   } finally {
     rmSync(dir, { recursive: true, force: true });
   }
 }
 
+async function main(): Promise<void> {
+  const rawList = process.env.CRM_ALLOWED_USERS;
+  if (!rawList) throw new ConfigError("variabile CRM_ALLOWED_USERS mancante.");
+
+  const sql = buildSyncSql(parseAllowedUsers(rawList));
+  const counts = hasManagementApi() ? await syncWithApi(sql) : await syncWithCli(sql);
+
+  console.log("Sincronizzazione utenti completata.");
+  console.log(`In elenco: ${counts.in_elenco}`);
+  console.log(`Inseriti: ${counts.inseriti}`);
+  console.log(`Aggiornati o riattivati: ${counts.aggiornati}`);
+  console.log(`Disattivati: ${counts.disattivati}`);
+  console.log(`Con accesso Google già collegato: ${counts.con_accesso_google}`);
+}
+
 main().catch((error: unknown) => {
-  const message = error instanceof Error ? error.message : "errore sconosciuto.";
+  const message = error instanceof Error ? redact(error.message) : "errore sconosciuto.";
   console.error(`Sincronizzazione non riuscita: ${message}`);
   process.exitCode = 1;
 });

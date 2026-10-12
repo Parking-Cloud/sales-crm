@@ -7,7 +7,10 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "users:sync": "tsc -p scripts/tsconfig.json && node scripts/dist/sync-allowed-users.js"
+    "users:sync": "npm run scripts:build && node scripts/dist/sync-allowed-users.js",
+    "scripts:build": "tsc -p scripts/tsconfig.json",
+    "db:migrate": "npm run scripts:build && node scripts/dist/apply-migrations.js",
+    "db:test": "npm run scripts:build && node scripts/dist/run-db-tests.js"
   },
   "dependencies": {
     "@supabase/ssr": "0.12.7",
