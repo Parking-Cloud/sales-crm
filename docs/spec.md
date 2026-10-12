@@ -142,7 +142,7 @@ Trentuno requisiti in nove moduli; ogni riga è una storia per l'agente di svilu
 | CRM-12 | Caricare un file | .xlsx e .csv; scelta del foglio e del parcheggio di destinazione | 1a | PROMPT |
 | CRM-13 | Mappare le colonne | Mappatura proposta in automatico per il file Zuretti (tabella in Analisi AS-IS), modificabile e salvabile | 1a | PROMPT |
 | CRM-14 | Vedere l'anteprima prima di importare | Righe valide, con avvisi, duplicate, scartate; il diario delle note già diviso in attività | 1a | PROMPT |
-| CRM-15 | Importare in modo reversibile | Ogni import ha un ID; "annulla import" cancella solo ciò che ha creato; report errori scaricabile | 1a | PROP |
+| CRM-15 | Importare in modo reversibile | Ogni import ha un ID; "annulla import" cancella solo ciò che ha creato; report errori scaricabile. Nota (blocco 1a-1, 12 ottobre 2026): import\_batches è in sola scrittura, quindi annullato\_il non si può ancora valorizzare, e le righe importate non hanno ancora il riferimento al batch; entrambi rinviati al blocco 1a-4 | 1a | PROP |
 | **E. Pipeline e attività** |  |  |  |  |
 | CRM-16 | Seguire ogni opportunità | Vista kanban e tabella per fase (sezione Modello dati); filtri per parcheggio, responsabile, fase, prossima attività | 1a | PROMPT |
 | CRM-17 | Chiudere un'opportunità persa | Motivo obbligatorio dalla lista (mezzi pubblici, ha già parcheggio, trasloco, prezzo, nessun bisogno, non raggiungibile, altro) + prezzo del concorrente se noto | 1a | DOC + PROP |

@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { createClient } from "@supabase/supabase-js";
+import type { Database } from "@/lib/supabase/types";
 
 export const metadata: Metadata = { title: "Stato" };
 
@@ -35,6 +37,27 @@ async function checkSupabase(url: string, anonKey: string): Promise<Health> {
   }
 }
 
+// Light query with the anon key and no session: row level security returns
+// zero rows, so no data leaves the database. Only reachability is reported.
+async function checkDatabase(url: string, anonKey: string): Promise<Health> {
+  try {
+    const supabase = createClient<Database>(url, anonKey, {
+      auth: { persistSession: false, autoRefreshToken: false },
+      global: {
+        fetch: (input, init) =>
+          fetch(input, { ...init, cache: "no-store", signal: AbortSignal.timeout(5000) }),
+      },
+    });
+    // A plain GET: with a HEAD request a missing table (404, empty body)
+    // would be reported as success by supabase-js.
+    const { error } = await supabase.from("parking_facilities").select("id").limit(1);
+    if (!error) return { kind: "ok" };
+    return { kind: "error", detail: error.code ? `codice ${error.code}` : "richiesta non riuscita" };
+  } catch {
+    return { kind: "error", detail: "richiesta non riuscita" };
+  }
+}
+
 function StatusBadge({ ok, label }: { ok: boolean; label: string }) {
   return (
     <span
@@ -59,8 +82,10 @@ export default async function StatusPage() {
 
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-  const health: Health =
-    url && anonKey ? await checkSupabase(url, anonKey) : { kind: "skipped" };
+  const [health, database]: Health[] =
+    url && anonKey
+      ? await Promise.all([checkSupabase(url, anonKey), checkDatabase(url, anonKey)])
+      : [{ kind: "skipped" }, { kind: "skipped" }];
 
   return (
     <main className="mx-auto max-w-(--funnel-max) px-4 py-8 lg:py-12">
@@ -103,6 +128,18 @@ export default async function StatusPage() {
             "Variabili assenti: aggiungi URL e chiave anonima in .env.local per verificare la connessione."}
           {health.kind === "ok" && "Il servizio di autenticazione risponde."}
           {health.kind === "error" && `Il servizio di autenticazione non risponde: ${health.detail}.`}
+        </p>
+
+        <div className="mt-6 flex flex-wrap items-center justify-between gap-2 border-t border-grey-60 pt-6">
+          <span className="text-body">Database raggiungibile</span>
+          {database.kind === "ok" && <StatusBadge ok label="Sì" />}
+          {database.kind === "error" && <StatusBadge ok={false} label="No" />}
+          {database.kind === "skipped" && <StatusBadge ok={false} label="Non verificato" />}
+        </div>
+        <p className="mt-2 text-caption text-black-60">
+          {database.kind === "skipped" && "Variabili assenti: connessione al database non verificata."}
+          {database.kind === "ok" && "Il database risponde. Senza accesso non restituisce dati."}
+          {database.kind === "error" && `Il database non risponde: ${database.detail}.`}
         </p>
       </section>
     </main>
