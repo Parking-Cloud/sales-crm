@@ -28,6 +28,7 @@ select
   + (select count(*) from public.parking_products where nome like '%Esempio%' or note like '%di prova%')
   + (select count(*) from public.suppression_list where valore_normalizzato like '%@example.com')
   + (select count(*) from public.audit_logs where dopo::text like '%Esempio%' or prima::text like '%Esempio%')
+  + (select count(*) from public.import_batches where file like '%finto%')
     as residui,
   exists (select 1 from pg_constraint where conname = 'users_email_domain') as vincolo_dominio_presente;
 `;
