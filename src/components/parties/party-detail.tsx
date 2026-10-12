@@ -7,6 +7,7 @@ import { Table, Td, Th, Tr } from "@/components/ui/table";
 import { formatDate, formatNumber } from "@/lib/format";
 import { OSM_ATTRIBUTION, OSM_COPYRIGHT_URL } from "@/lib/geo/osm-attribution";
 import { googleMapsLink } from "@/lib/google/maps-link";
+import { formatKm } from "@/lib/settings/distance";
 import {
   CONTACT_CHANNEL_LABELS,
   DATA_STATUS_LABELS,
@@ -66,6 +67,7 @@ export function PartyDetail({
   contacts,
   provenance,
   distances,
+  maxDistanceM,
   history,
   isAdmin,
   dialogOpenFor,
@@ -75,6 +77,7 @@ export function PartyDetail({
   contacts: Contact[];
   provenance: Provenance[];
   distances: Distance[];
+  maxDistanceM: number;
   history: HistoryEntry[];
   isAdmin: boolean;
   // For previews only: open the "Non contattare" dialog of this record.
@@ -203,7 +206,8 @@ export function PartyDetail({
           ) : (
             <ul className="flex flex-col divide-y divide-grey-60">
               {locations.map((location) => {
-                const near = distances.filter((row) => row.location_id === location.id).slice(0, 5);
+                const near = distances.filter((row) => row.location_id === location.id);
+                const located = location.lat !== null && location.lng !== null;
                 return (
                   <li key={location.id} className="flex flex-col gap-3 py-4 first:pt-0 last:pb-0 md:flex-row md:justify-between">
                     <div className="min-w-0">
@@ -237,9 +241,14 @@ export function PartyDetail({
                       )}
                     </div>
                     <div className="flex shrink-0 flex-col gap-2 md:items-end">
+                      {located && near.length === 0 && (
+                        <p className="text-caption text-black-60">Nessun parcheggio entro {formatKm(maxDistanceM)}</p>
+                      )}
                       {near.length > 0 && (
                         <div className="text-caption">
-                          <p className="font-semibold text-black-80">Distanza in linea d&apos;aria dai parcheggi attivi</p>
+                          <p className="font-semibold text-black-80">
+                            Parcheggi attivi entro {formatKm(maxDistanceM)}, in linea d&apos;aria
+                          </p>
                           <ul>
                             {near.map((row) => (
                               <li key={row.parking_id} className="tabular-nums">

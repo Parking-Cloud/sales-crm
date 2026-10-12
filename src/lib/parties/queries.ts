@@ -182,9 +182,10 @@ export async function listProvenance(partyId: string, contactIds: string[]): Pro
   }));
 }
 
-export async function listDistances(partyId: string): Promise<Distance[]> {
+// Car parks within maxMeters of each location, nearest first.
+export async function listDistances(partyId: string, maxMeters: number): Promise<Distance[]> {
   const supabase = await createClient();
-  const { data, error } = await supabase.rpc("party_location_distances", { p_party_id: partyId });
+  const { data, error } = await supabase.rpc("party_location_distances", { p_party_id: partyId, p_max_m: maxMeters });
   if (error) fail("party_location_distances", error);
   return data ?? [];
 }

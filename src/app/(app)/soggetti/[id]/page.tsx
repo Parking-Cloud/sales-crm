@@ -5,6 +5,7 @@ import { getCurrentUser } from "@/lib/auth/current-user";
 import { SIGN_IN_PATH } from "@/lib/auth/routes";
 import { partyName } from "@/lib/parties/labels";
 import { getParty, listContacts, listDistances, listHistory, listLocations, listProvenance } from "@/lib/parties/queries";
+import { getMaxParkingDistance } from "@/lib/settings/queries";
 
 const UUID = /^[0-9a-f-]{36}$/i;
 
@@ -25,7 +26,12 @@ export default async function PartyPage({ params }: { params: Promise<{ id: stri
   // A merged party's address leads to the party it was merged into.
   if (party.merged_into_id) redirect(`/soggetti/${party.merged_into_id}`);
 
-  const [locations, contacts, distances] = await Promise.all([listLocations(id), listContacts(id), listDistances(id)]);
+  const maxDistance = await getMaxParkingDistance();
+  const [locations, contacts, distances] = await Promise.all([
+    listLocations(id),
+    listContacts(id),
+    listDistances(id, maxDistance.meters),
+  ]);
   const contactIds = contacts.map((contact) => contact.id);
   const [provenance, history] = await Promise.all([listProvenance(id, contactIds), listHistory(id, contactIds, locations.map((location) => location.id))]);
 
@@ -36,6 +42,7 @@ export default async function PartyPage({ params }: { params: Promise<{ id: stri
       contacts={contacts}
       provenance={provenance}
       distances={distances}
+      maxDistanceM={maxDistance.meters}
       history={history}
       isAdmin={user.isAdmin}
     />
