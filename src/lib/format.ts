@@ -7,7 +7,7 @@ const EURO = new Intl.NumberFormat("it-IT", {
   useGrouping: "always",
 });
 
-const NUMBER = new Intl.NumberFormat("it-IT", { useGrouping: "always", maximumFractionDigits: 2 });
+export const NUMBER_FORMAT_IT = new Intl.NumberFormat("it-IT", { useGrouping: "always", maximumFractionDigits: 2 });
 
 const DATE = new Intl.DateTimeFormat("it-IT", {
   day: "2-digit",
@@ -21,7 +21,7 @@ export function formatEuro(value: number | null | undefined): string {
 }
 
 export function formatNumber(value: number | null | undefined): string {
-  return value === null || value === undefined ? "–" : NUMBER.format(value);
+  return value === null || value === undefined ? "–" : NUMBER_FORMAT_IT.format(value);
 }
 
 export function formatDate(value: string | Date | null | undefined): string {
