@@ -1,4 +1,4 @@
-import { AlertTriangleIcon, ArchiveIcon } from "./icons";
+import { AlertTriangleIcon, ArchiveIcon, BanIcon } from "./icons";
 
 // UI Kit badge (backoffice-app ui-kit/Badge): uppercase pill that always
 // carries its meaning in the text; the tone only reinforces it.
@@ -20,7 +20,7 @@ export function Badge({
   children,
 }: {
   tone?: BadgeTone;
-  icon?: "archive";
+  icon?: "archive" | "ban";
   children: React.ReactNode;
 }) {
   return (
@@ -29,6 +29,7 @@ export function Badge({
     >
       {tone === "attention" && <AlertTriangleIcon size={14} className="-ml-0.5 shrink-0" />}
       {icon === "archive" && <ArchiveIcon size={13} className="-ml-0.5 shrink-0" />}
+      {icon === "ban" && <BanIcon size={13} className="-ml-0.5 shrink-0" />}
       {children}
     </span>
   );
