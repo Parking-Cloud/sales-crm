@@ -968,7 +968,9 @@ export type Database = {
       parking_facilities: {
         Row: {
           archived_at: string | null
+          cap: string | null
           capacita: number | null
+          citta: string | null
           created_at: string
           created_by: string | null
           id: string
@@ -976,6 +978,7 @@ export type Database = {
           lat: number | null
           lng: number | null
           nome: string
+          note: string | null
           posti_commerciali: number | null
           raggio_m: number | null
           responsabile_id: string | null
@@ -985,7 +988,9 @@ export type Database = {
         }
         Insert: {
           archived_at?: string | null
+          cap?: string | null
           capacita?: number | null
+          citta?: string | null
           created_at?: string
           created_by?: string | null
           id?: string
@@ -993,6 +998,7 @@ export type Database = {
           lat?: number | null
           lng?: number | null
           nome: string
+          note?: string | null
           posti_commerciali?: number | null
           raggio_m?: number | null
           responsabile_id?: string | null
@@ -1002,7 +1008,9 @@ export type Database = {
         }
         Update: {
           archived_at?: string | null
+          cap?: string | null
           capacita?: number | null
+          citta?: string | null
           created_at?: string
           created_by?: string | null
           id?: string
@@ -1010,6 +1018,7 @@ export type Database = {
           lat?: number | null
           lng?: number | null
           nome?: string
+          note?: string | null
           posti_commerciali?: number | null
           raggio_m?: number | null
           responsabile_id?: string | null
