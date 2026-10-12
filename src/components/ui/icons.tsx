@@ -63,3 +63,12 @@ export function ArchiveIcon({ className, size = 14 }: IconProps) {
     </svg>
   );
 }
+
+export function BanIcon({ className, size = 14 }: IconProps) {
+  return (
+    <svg aria-hidden="true" width={size} height={size} viewBox="0 0 20 20" className={className}>
+      <circle cx="10" cy="10" r="8" fill="none" stroke="currentColor" strokeWidth="2" />
+      <path d="m4.5 15.5 11-11" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+    </svg>
+  );
+}

@@ -1132,6 +1132,7 @@ export type Database = {
           dipendenti_stimati: number | null
           dominio: string | null
           email: string | null
+          form_web_url: string | null
           id: string
           merged_into_id: string | null
           nome: string | null
@@ -1153,6 +1154,7 @@ export type Database = {
           dipendenti_stimati?: number | null
           dominio?: string | null
           email?: string | null
+          form_web_url?: string | null
           id?: string
           merged_into_id?: string | null
           nome?: string | null
@@ -1174,6 +1176,7 @@ export type Database = {
           dipendenti_stimati?: number | null
           dominio?: string | null
           email?: string | null
+          form_web_url?: string | null
           id?: string
           merged_into_id?: string | null
           nome?: string | null
@@ -1399,12 +1402,96 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      check_party_duplicates: {
+        Args: {
+          p_cap?: string
+          p_citta?: string
+          p_cognome?: string
+          p_denominazione?: string
+          p_email?: string
+          p_nome?: string
+          p_party_id?: string
+          p_piva?: string
+          p_place_id?: string
+          p_sito?: string
+          p_telefono?: string
+        }
+        Returns: {
+          livello: string
+          motivo: string
+          nome: string
+          party_id: string
+          valore: string
+        }[]
+      }
+      clear_do_not_contact: {
+        Args: { p_entita: string; p_id: string }
+        Returns: number
+      }
+      do_not_contact_values: {
+        Args: { p_entita: string; p_id: string }
+        Returns: {
+          tipo: Database["public"]["Enums"]["suppression_type"]
+          valore: string
+        }[]
+      }
+      generic_email_domains: { Args: never; Returns: string[] }
       geo_point: { Args: { lat: number; lng: number }; Returns: unknown }
       is_active_user: { Args: never; Returns: boolean }
       is_admin: { Args: never; Returns: boolean }
+      is_generic_domain: { Args: { domain: string }; Returns: boolean }
+      is_valid_email: { Args: { value: string }; Returns: boolean }
+      mark_do_not_contact: {
+        Args: { p_entita: string; p_id: string; p_motivo: string }
+        Returns: number
+      }
+      merge_parties: {
+        Args: { p_drop: string; p_keep: string; p_values?: Json }
+        Returns: undefined
+      }
+      normalize_domain: { Args: { raw: string }; Returns: string }
+      normalize_phone: { Args: { raw: string }; Returns: string }
+      normalize_phone_list: { Args: { raw: string }; Returns: string }
+      normalize_piva: { Args: { raw: string }; Returns: string }
+      party_location_distances: {
+        Args: { p_party_id: string }
+        Returns: {
+          distanza_m: number
+          location_id: string
+          parcheggio: string
+          parking_id: string
+        }[]
+      }
       party_search_name: {
         Args: { cognome: string; denominazione: string; nome: string }
         Returns: string
+      }
+      party_tracked_fields: { Args: never; Returns: string[] }
+      search_parties: {
+        Args: {
+          p_categoria?: string
+          p_citta?: string
+          p_limit?: number
+          p_offset?: number
+          p_query?: string
+          p_solo_da_verificare?: boolean
+          p_tipo?: Database["public"]["Enums"]["party_type"]
+        }
+        Returns: {
+          campi_valorizzati: number
+          campi_verificati: number
+          categoria: string
+          citta: string
+          cognome: string
+          denominazione: string
+          id: string
+          nome: string
+          non_contattare: boolean
+          somiglianza: number
+          telefono: string
+          tipo: Database["public"]["Enums"]["party_type"]
+          totale: number
+        }[]
       }
     }
     Enums: {
