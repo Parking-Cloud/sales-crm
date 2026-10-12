@@ -8,7 +8,8 @@
 -- left behind. Only fake example.com addresses are used; the users email
 -- domain constraint is dropped inside the transaction so they can be inserted,
 -- and comes back with the rollback.
--- Output: one line per test, PASS or FAIL. Exits with an error if any test fails.
+-- Output: one line per test, PASS or FAIL, then the summary.
+-- Through the Management API: npm run db:test (scripts/run-db-tests.ts).
 
 \set ON_ERROR_STOP 1
 \set QUIET on
@@ -206,19 +207,21 @@ exception when others then
 end;
 $$;
 
-select pg_temp.expect_error(
-  'operatore: non modifica i prezzi',
-  format('update public.parking_products set prezzo_netto = 1 where id = %L', pg_temp.id('product')),
-  '42501'
-);
-select pg_temp.expect_error(
-  'operatore: non crea prodotti con prezzo',
-  format(
-    $$insert into public.parking_products (parking_id, nome, tipo, prezzo_netto) values (%L, 'Prodotto Esempio', 'carnet', 5)$$,
-    pg_temp.id('parking')
-  ),
-  '42501'
-);
+-- Car parks and products are written by administrators only (RLS): an
+-- operator update matches no rows, an insert is rejected.
+do $$
+declare
+  changed int;
+begin
+  update public.parking_products set prezzo_netto = 1 where id = pg_temp.id('product');
+  get diagnostics changed = row_count;
+  perform pg_temp.record(
+    'operatore: non modifica i prezzi',
+    changed = 0 and (select prezzo_netto from public.parking_products where id = pg_temp.id('product')) = 100.00,
+    changed || ' righe modificate'
+  );
+end;
+$$;
 
 do $$
 declare
@@ -226,7 +229,42 @@ declare
 begin
   update public.parking_products set note = 'Nota di prova' where id = pg_temp.id('product');
   get diagnostics changed = row_count;
-  perform pg_temp.record('operatore: modifica un prodotto senza toccare i prezzi', changed = 1);
+  perform pg_temp.record('operatore: non modifica i prodotti', changed = 0, changed || ' righe modificate');
+
+  update public.parking_facilities set nome = 'Parcheggio Rinominato' where id = pg_temp.id('parking');
+  get diagnostics changed = row_count;
+  perform pg_temp.record('operatore: non modifica i parcheggi', changed = 0, changed || ' righe modificate');
+end;
+$$;
+
+select pg_temp.expect_error(
+  'operatore: non crea prodotti',
+  format(
+    $$insert into public.parking_products (parking_id, nome, tipo) values (%L, 'Prodotto Esempio', 'carnet')$$,
+    pg_temp.id('parking')
+  ),
+  '42501'
+);
+select pg_temp.expect_error(
+  'operatore: non crea parcheggi',
+  $$insert into public.parking_facilities (nome, tipo) values ('Parcheggio Nuovo Esempio', 'aziendale')$$,
+  '42501'
+);
+
+-- Suppression list: operators add entries, only administrators change them.
+do $$
+declare
+  changed int;
+begin
+  insert into public.suppression_list (tipo, valore_normalizzato, motivo)
+  values ('email', 'opposizione@example.com', 'Test');
+  perform pg_temp.record('operatore: aggiunge alla lista di esclusione', true);
+
+  update public.suppression_list set motivo = 'Modificato' where valore_normalizzato = 'opposizione@example.com';
+  get diagnostics changed = row_count;
+  perform pg_temp.record('operatore: non modifica la lista di esclusione', changed = 0, changed || ' righe modificate');
+exception when others then
+  perform pg_temp.record('operatore: aggiunge alla lista di esclusione', false, sqlstate || ': ' || sqlerrm);
 end;
 $$;
 
@@ -357,6 +395,16 @@ exception when others then
 end;
 $$;
 
+do $$
+declare
+  changed int;
+begin
+  update public.suppression_list set motivo = 'Modificato da admin' where valore_normalizzato = 'opposizione@example.com';
+  get diagnostics changed = row_count;
+  perform pg_temp.record('admin: modifica la lista di esclusione', changed = 1);
+end;
+$$;
+
 select pg_temp.expect_error(
   'update su audit_logs da admin: rifiutato',
   'update public.audit_logs set azione = ''delete''',
@@ -391,23 +439,18 @@ select pg_temp.expect_error(
 );
 
 -- ---------------------------------------------------------------------------
--- Report
+-- Report: one result set (the last one), so it also comes back through the
+-- Supabase Management API, which returns only the last result.
 -- ---------------------------------------------------------------------------
 
-select case when ok then 'PASS' else 'FAIL' end || '  ' || name
-       || coalesce('  (' || detail || ')', '')
-from test_results
+select esito from (
+  select n, case when ok then 'PASS' else 'FAIL' end || '  ' || name
+            || coalesce('  (' || detail || ')', '') as esito
+  from test_results
+  union all
+  select 1000000, (count(*) filter (where ok)) || '/' || count(*) || ' test superati'
+  from test_results
+) report
 order by n;
-
-select (count(*) filter (where ok)) || '/' || count(*) || ' test superati'
-from test_results;
-
-do $$
-begin
-  if exists (select 1 from test_results where not ok) then
-    raise exception 'some tests failed';
-  end if;
-end;
-$$;
 
 rollback;
