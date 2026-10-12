@@ -109,6 +109,41 @@ export type Database = {
           },
         ]
       }
+      app_settings: {
+        Row: {
+          chiave: string
+          created_at: string
+          id: string
+          updated_at: string
+          updated_by: string | null
+          valore: Json
+        }
+        Insert: {
+          chiave: string
+          created_at?: string
+          id?: string
+          updated_at?: string
+          updated_by?: string | null
+          valore: Json
+        }
+        Update: {
+          chiave?: string
+          created_at?: string
+          id?: string
+          updated_at?: string
+          updated_by?: string | null
+          valore?: Json
+        }
+        Relationships: [
+          {
+            foreignKeyName: "app_settings_updated_by_fkey"
+            columns: ["updated_by"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       audit_logs: {
         Row: {
           azione: Database["public"]["Enums"]["audit_action"]
@@ -1566,7 +1601,7 @@ export type Database = {
       normalize_phone_list: { Args: { raw: string }; Returns: string }
       normalize_piva: { Args: { raw: string }; Returns: string }
       party_location_distances: {
-        Args: { p_party_id: string }
+        Args: { p_max_m?: number; p_party_id: string }
         Returns: {
           distanza_m: number
           location_id: string
