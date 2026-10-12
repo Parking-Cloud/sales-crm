@@ -3,7 +3,13 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
+import { signOut } from "@/app/auth/actions";
 import { NAV_ITEMS } from "./nav-items";
+
+export type ShellUser = {
+  name: string;
+  roleLabel: string;
+};
 
 function Brand() {
   return (
@@ -44,7 +50,31 @@ function NavList({ onNavigate }: { onNavigate?: () => void }) {
   );
 }
 
-export function AppShell({ children }: { children: React.ReactNode }) {
+// Signed-in user and sign-out, at the bottom of the sidebar.
+function UserPanel({ user }: { user: ShellUser }) {
+  return (
+    <div className="border-t border-grey-60 px-3 py-4">
+      <p className="truncate px-3 text-body font-semibold text-brand-black">{user.name}</p>
+      <p className="px-3 text-caption text-black-60">{user.roleLabel}</p>
+      <form action={signOut} className="mt-2">
+        <button
+          type="submit"
+          className="flex min-h-(--control-h) w-full items-center rounded-sm px-3 text-body font-medium text-black-80 hover:bg-grey-40"
+        >
+          Esci
+        </button>
+      </form>
+    </div>
+  );
+}
+
+export function AppShell({
+  children,
+  user,
+}: {
+  children: React.ReactNode;
+  user: ShellUser;
+}) {
   const [menuOpen, setMenuOpen] = useState(false);
   const openButtonRef = useRef<HTMLButtonElement>(null);
   const closeButtonRef = useRef<HTMLButtonElement>(null);
@@ -109,6 +139,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         <nav aria-label="Navigazione principale" className="flex-1 overflow-y-auto px-3 py-4">
           <NavList />
         </nav>
+        <UserPanel user={user} />
       </aside>
 
       {/* Mobile top bar */}
@@ -159,6 +190,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             <nav aria-label="Navigazione principale" className="flex-1 overflow-y-auto px-3 py-4">
               <NavList onNavigate={() => setMenuOpen(false)} />
             </nav>
+            <UserPanel user={user} />
           </div>
         </div>
       )}
