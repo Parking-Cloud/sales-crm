@@ -100,9 +100,14 @@
     font-size: var(--fs-body);
   }
 
+  /*
+   * Focus ring: 2px brand blue outline, 2px away from the element, so it is
+   * drawn on the page background (white or grey-20, contrast above 6:1)
+   * and stays visible on blue buttons. A real outline (not a shadow) also
+   * works in forced-colors mode.
+   */
   :focus-visible {
-    /* Transparent outline keeps focus visible in forced-colors mode. */
-    outline: 2px solid transparent;
-    box-shadow: var(--focus-ring);
+    outline: 2px solid var(--brand-blue);
+    outline-offset: 2px;
   }
 }
