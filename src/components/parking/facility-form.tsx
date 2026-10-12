@@ -6,6 +6,7 @@ import { Alert } from "@/components/ui/alert";
 import { Button, ButtonLink } from "@/components/ui/button";
 import { Field, Input, Select, Textarea } from "@/components/ui/field";
 import { decimalInputValue } from "@/lib/format";
+import { OSM_ATTRIBUTION, OSM_COPYRIGHT_URL } from "@/lib/geo/osm-attribution";
 import { INITIAL_FORM_STATE, type FormState } from "@/lib/parking/form-state";
 import {
   CAMPAIGN_STATUS_LABELS,
@@ -41,13 +42,11 @@ function initialValues(facility: Facility | null): RawValues {
 export function FacilityForm({
   facility,
   users,
-  geocodingEnabled,
   initialState = INITIAL_FORM_STATE,
   action = saveFacility,
 }: {
   facility: Facility | null;
   users: UserOption[];
-  geocodingEnabled: boolean;
   // For previews only.
   initialState?: FormState;
   action?: typeof saveFacility;
@@ -136,9 +135,9 @@ export function FacilityForm({
           Coordinate
         </h2>
         <p className="mt-1 text-body text-black-60">
-          {geocodingEnabled
-            ? "Quando l'indirizzo cambia, al salvataggio cerchiamo le coordinate su Google e ti chiediamo di confermarle."
-            : "Ricerca automatica non attiva: inserisci latitudine e longitudine a mano. Le trovi su Google Maps con il tasto destro sul punto."}
+          Quando l&apos;indirizzo cambia, al salvataggio cerchiamo le coordinate su OpenStreetMap e
+          ti chiediamo di confermarle. Puoi anche inserirle a mano: le trovi su Google Maps con il
+          tasto destro sul punto.
         </p>
         {state.status === "geocode-failed" && state.message && (
           <Alert tone="warning" className="mt-4">
@@ -155,10 +154,16 @@ export function FacilityForm({
         <div className="rounded-md border border-blue-40 bg-info-surface p-5" role="status">
           <h2 className="text-h4 font-semibold text-blue-ink">Conferma la posizione trovata</h2>
           <p className="mt-2 text-body">
-            Indirizzo trovato da Google: <strong>{state.geocode!.formattedAddress}</strong>
+            Indirizzo trovato su OpenStreetMap: <strong>{state.geocode!.formattedAddress}</strong>
           </p>
           <p className="mt-1 text-body">
             Coordinate: {COORDINATE.format(state.geocode!.lat)}, {COORDINATE.format(state.geocode!.lng)}
+          </p>
+          <p className="mt-1 text-caption">
+            <a href={OSM_COPYRIGHT_URL} target="_blank" rel="noopener noreferrer" className="rounded-xs underline underline-offset-2">
+              {OSM_ATTRIBUTION}
+              <span className="sr-only"> (si apre in una nuova scheda)</span>
+            </a>
           </p>
           <input type="hidden" name="geo_lat" value={String(state.geocode!.lat)} />
           <input type="hidden" name="geo_lng" value={String(state.geocode!.lng)} />

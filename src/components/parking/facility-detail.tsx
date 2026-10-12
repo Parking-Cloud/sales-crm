@@ -5,6 +5,7 @@ import { Button, ButtonLink } from "@/components/ui/button";
 import { EmptyState } from "@/components/ui/empty-state";
 import { Field, Select } from "@/components/ui/field";
 import { formatDate, formatNumber } from "@/lib/format";
+import { OSM_ATTRIBUTION, OSM_COPYRIGHT_URL } from "@/lib/geo/osm-attribution";
 import { googleMapsLink } from "@/lib/google/maps-link";
 import { seatsExceeded, subscriptionSeats } from "@/lib/parking/capacity";
 import { CAMPAIGN_STATUS_LABELS, CAMPAIGN_STATUS_TONES, PARKING_TYPE_LABELS } from "@/lib/parking/labels";
@@ -14,6 +15,16 @@ import { ArchiveControl } from "./archive-control";
 import { ProductTable } from "./product-table";
 
 const COORDINATE = new Intl.NumberFormat("it-IT", { minimumFractionDigits: 6, maximumFractionDigits: 6 });
+
+const COORDINATE_SOURCE_LABELS: Record<string, string> = {
+  nominatim: "OpenStreetMap",
+  manuale: "Inserite a mano",
+  google: "Google",
+};
+
+function coordinateSourceLabel(source: string | null): string {
+  return source ? (COORDINATE_SOURCE_LABELS[source] ?? source) : "Non indicata";
+}
 
 function Card({ title, id, children }: { title: string; id?: string; children: React.ReactNode }) {
   return (
@@ -120,12 +131,27 @@ export function FacilityDetail({
               <dl className="grid grid-cols-2 gap-4">
                 <Detail label="Latitudine">{COORDINATE.format(facility.lat!)}</Detail>
                 <Detail label="Longitudine">{COORDINATE.format(facility.lng!)}</Detail>
+                <Detail label="Fonte">{coordinateSourceLabel(facility.coordinate_fonte)}</Detail>
+                <Detail label="Aggiornate il">{formatDate(facility.coordinate_aggiornate_il)}</Detail>
               </dl>
+              {facility.coordinate_fonte === "nominatim" && (
+                <p className="mt-4 text-caption text-black-60">
+                  <a
+                    href={OSM_COPYRIGHT_URL}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="rounded-xs underline underline-offset-2"
+                  >
+                    {OSM_ATTRIBUTION}
+                    <span className="sr-only"> (si apre in una nuova scheda)</span>
+                  </a>
+                </p>
+              )}
               <a
                 href={googleMapsLink(facility.lat!, facility.lng!)}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="mt-4 inline-block rounded-xs font-semibold text-blue-ink underline underline-offset-2"
+                className="mt-3 inline-block rounded-xs font-semibold text-blue-ink underline underline-offset-2"
               >
                 Apri in Google Maps<span className="sr-only"> (si apre in una nuova scheda)</span>
               </a>

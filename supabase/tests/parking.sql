@@ -153,6 +153,17 @@ select pg_temp.expect_rows(
 );
 
 select pg_temp.expect_rows(
+  'admin: salva coordinate con fonte e data',
+  format($$update public.parking_facilities set coordinate_fonte = 'nominatim', coordinate_aggiornate_il = now() where id = %L$$, pg_temp.id('parking')),
+  1
+);
+select pg_temp.expect_error(
+  'fonte delle coordinate non ammessa: rifiutata',
+  format($$update public.parking_facilities set coordinate_fonte = 'altro' where id = %L$$, pg_temp.id('parking')),
+  '23514'
+);
+
+select pg_temp.expect_rows(
   'admin: archivia il parcheggio',
   format('update public.parking_facilities set archived_at = now() where id = %L', pg_temp.id('parking')),
   1
@@ -170,7 +181,7 @@ select pg_temp.record(
   'audit: creazione, modifiche e archiviazione registrate con l''autore',
   (select count(*) from public.audit_logs
    where entita = 'parking_facilities' and entita_id = pg_temp.id('parking')
-     and utente_id = pg_temp.id('admin')) = 4
+     and utente_id = pg_temp.id('admin')) = 5
   and (select count(*) from public.audit_logs
    where entita = 'parking_products' and entita_id = pg_temp.id('product')
      and utente_id = pg_temp.id('admin')) = 2

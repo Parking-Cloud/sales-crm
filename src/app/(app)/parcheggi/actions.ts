@@ -3,7 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { getCurrentUser } from "@/lib/auth/current-user";
-import { geocodeAddress, isGeocodingEnabled } from "@/lib/google/geocoding";
+import { geocodeAddress } from "@/lib/geo/nominatim";
 import { parseDecimal } from "@/lib/format";
 import type { FormState } from "@/lib/parking/form-state";
 import { getFacility, listUserOptions } from "@/lib/parking/queries";
@@ -62,9 +62,10 @@ export async function saveFacility(previous: FormState, form: FormData): Promise
     };
   }
 
-  // Geocoding: when the address changed, propose the coordinates found and
-  // save only after the administrator confirms them.
+  // Geocoding (OpenStreetMap Nominatim): when the address changed, propose
+  // the coordinates found and save them only after the administrator confirms.
   const decision = field(form, "geo");
+  let source: "nominatim" | "manuale" | null = null;
   if (decision === "accept") {
     const lat = parseDecimal(field(form, "geo_lat"));
     const lng = parseDecimal(field(form, "geo_lng"));
@@ -73,11 +74,12 @@ export async function saveFacility(previous: FormState, form: FormData): Promise
     }
     values.lat = lat;
     values.lng = lng;
-  } else if (decision !== "skip" && isGeocodingEnabled()) {
+    source = "nominatim";
+  } else {
     const address = facilityAddress(values);
     const addressChanged = !existing || address !== facilityAddress(existing);
-    if (addressChanged) {
-      const result = await geocodeAddress(`${address}, Italia`);
+    if (decision !== "skip" && addressChanged) {
+      const result = await geocodeAddress(address);
       if (result.kind === "found") {
         return {
           version,
@@ -91,21 +93,33 @@ export async function saveFacility(previous: FormState, form: FormData): Promise
         status: "geocode-failed",
         message:
           result.kind === "not-found"
-            ? "Google non ha trovato questo indirizzo. Controllalo, oppure inserisci latitudine e longitudine a mano e salva."
+            ? "OpenStreetMap non ha trovato questo indirizzo. Controllalo, oppure inserisci latitudine e longitudine a mano e salva."
             : "La ricerca delle coordinate non è riuscita. Inserisci latitudine e longitudine a mano e salva.",
         values: raw,
       };
     }
+    const coordinatesChanged = !existing || values.lat !== existing.lat || values.lng !== existing.lng;
+    if (coordinatesChanged && values.lat !== null) source = "manuale";
   }
+
+  // Record where the coordinates come from whenever they change.
+  const coordinatesTouched = source !== null || (existing !== null && existing.lat !== null && values.lat === null);
+  const record = coordinatesTouched
+    ? {
+        ...values,
+        coordinate_fonte: source,
+        coordinate_aggiornate_il: source ? new Date().toISOString() : null,
+      }
+    : values;
 
   const supabase = await createClient();
   let savedId = id;
   if (existing) {
-    const { data, error } = await supabase.from("parking_facilities").update(values).eq("id", id).select("id");
+    const { data, error } = await supabase.from("parking_facilities").update(record).eq("id", id).select("id");
     if (error) return { version, status: "error", message: writeError(error.code), values: raw };
     if (data.length === 0) return { version, status: "error", message: NOT_ADMIN, values: raw };
   } else {
-    const { data, error } = await supabase.from("parking_facilities").insert(values).select("id").single();
+    const { data, error } = await supabase.from("parking_facilities").insert(record).select("id").single();
     if (error) return { version, status: "error", message: writeError(error.code), values: raw };
     savedId = data.id;
   }
