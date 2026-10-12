@@ -971,6 +971,8 @@ export type Database = {
           cap: string | null
           capacita: number | null
           citta: string | null
+          coordinate_aggiornate_il: string | null
+          coordinate_fonte: string | null
           created_at: string
           created_by: string | null
           id: string
@@ -991,6 +993,8 @@ export type Database = {
           cap?: string | null
           capacita?: number | null
           citta?: string | null
+          coordinate_aggiornate_il?: string | null
+          coordinate_fonte?: string | null
           created_at?: string
           created_by?: string | null
           id?: string
@@ -1011,6 +1015,8 @@ export type Database = {
           cap?: string | null
           capacita?: number | null
           citta?: string | null
+          coordinate_aggiornate_il?: string | null
+          coordinate_fonte?: string | null
           created_at?: string
           created_by?: string | null
           id?: string
@@ -1200,6 +1206,8 @@ export type Database = {
         Row: {
           cap: string | null
           citta: string | null
+          coordinate_aggiornate_il: string | null
+          coordinate_fonte: string | null
           created_at: string
           created_by: string | null
           id: string
@@ -1213,6 +1221,8 @@ export type Database = {
         Insert: {
           cap?: string | null
           citta?: string | null
+          coordinate_aggiornate_il?: string | null
+          coordinate_fonte?: string | null
           created_at?: string
           created_by?: string | null
           id?: string
@@ -1226,6 +1236,8 @@ export type Database = {
         Update: {
           cap?: string | null
           citta?: string | null
+          coordinate_aggiornate_il?: string | null
+          coordinate_fonte?: string | null
           created_at?: string
           created_by?: string | null
           id?: string
