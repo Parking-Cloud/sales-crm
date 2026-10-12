@@ -6,7 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "users:sync": "tsc -p scripts/tsconfig.json && node scripts/dist/sync-allowed-users.js"
   },
   "dependencies": {
     "@supabase/ssr": "0.12.7",
