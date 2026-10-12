@@ -4,8 +4,11 @@ import type { Database } from "@/lib/supabase/types";
 export type UserRole = Database["public"]["Enums"]["user_role"];
 
 export type CurrentUser = {
+  id: string;
   name: string;
   role: UserRole;
+  // For showing or hiding write actions only: permissions are enforced by RLS.
+  isAdmin: boolean;
 };
 
 export const ROLE_LABELS: Record<UserRole, string> = {
@@ -28,5 +31,10 @@ export async function getCurrentUser(): Promise<CurrentUser | null> {
     .maybeSingle();
   if (!data || !data.attivo) return null;
 
-  return { name: data.nome?.trim() || data.email, role: data.ruolo };
+  return {
+    id: userId,
+    name: data.nome?.trim() || data.email,
+    role: data.ruolo,
+    isAdmin: data.ruolo === "admin",
+  };
 }

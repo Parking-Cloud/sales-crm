@@ -223,13 +223,26 @@ Migrazioni in SQL versionato, senza funzioni proprietarie del provider. Il multi
 
 Google Places va usato come motore di scoperta, non come database: i termini permettono di conservare il place\_id, ma latitudine e longitudine solo per 30 giorni, e i contenuti Places vanno mostrati su una mappa Google ([termini dei servizi](https://cloud.google.com/maps-platform/terms/maps-service-terms)).
 
+**Modello ibrido per i dati geografici** (deciso il 12 ottobre 2026):
+
+- **Indirizzi nostri** (parcheggi; in futuro le sedi verificate dei soggetti): geocodifica con OpenStreetMap Nominatim. Le coordinate si conservano, con l'attribuzione "© OpenStreetMap contributors".
+- **Ricerca delle aziende** (blocco 1a-5): Google Places. Si conserva il place\_id; le coordinate Google restano al massimo 30 giorni.
+- Ogni coordinata salvata registra la fonte (`nominatim`, `manuale`, `google`) e la data dell'ultimo aggiornamento.
+
+### OpenStreetMap Nominatim
+
+| Uso | Servizio | Regole d'uso |
+| --- | --- | --- |
+| Coordinate del parcheggio (e in futuro delle sedi verificate) | Nominatim search, formato jsonv2, solo Italia, un risultato | Solo lato server; User-Agent identificativo con indirizzo di contatto; al massimo 1 richiesta al secondo; una richiesta solo quando l'admin salva un indirizzo cambiato, mai in blocco |
+
+Il risultato si salva solo dopo la conferma dell'admin; in alternativa lat e lng si inseriscono a mano (fonte `manuale`). Nominatim è gratuito; i dati sono sotto licenza ODbL e vanno attribuiti dove si mostrano ([copyright OpenStreetMap](https://www.openstreetmap.org/copyright), [policy d'uso Nominatim](https://operations.osmfoundation.org/policies/nominatim/)).
+
 ### Google Maps Platform
 
 | Uso | API e SKU | Quota gratuita al mese | Oltre la quota (per 1.000) |
 | --- | --- | --- | --- |
 | Ricerca attività vicine (nome, indirizzo, tipo, posizione) | Nearby Search Pro | 5.000 | 32 $ |
 | Telefono e sito dei soli risultati scelti | Place Details Enterprise | 1.000 | 20 $ |
-| Coordinate del parcheggio | Geocoding | 10.000 | 5 $ |
 | Distanza a piedi dei risultati scelti | Compute Route Matrix Essentials | 10.000 | 5 $ |
 | Mappa nel CRM | Dynamic Maps | 10.000 | 7 $ |
 
@@ -238,7 +251,7 @@ Fonte: [listino Google Maps Platform](https://developers.google.com/maps/billing
 Regole di conservazione (PROP, da validare):
 
 - **place\_id**: conservato, serve per deduplicare e rileggere i dati.
-- **Coordinate da Places**: cancellate o rilette entro 30 giorni da un job notturno. La posizione permanente del soggetto viene dalla geocodifica del suo indirizzo con un servizio che ne consente la conservazione (IPOTESI: da verificare i termini, ad esempio OpenStreetMap/Nominatim).
+- **Coordinate da Places**: cancellate o rilette entro 30 giorni da un job notturno. La posizione permanente del soggetto viene dalla geocodifica del suo indirizzo verificato con Nominatim (vedi sopra).
 - **Nome, telefono, sito**: entrano in anagrafica come dato verificato solo dopo che l'operatore li ha confermati sul sito dell'azienda o in chiamata; la fonte registrata è quella.
 
 Arricchimento (dipendenti, P.IVA, parcheggio privato) resta manuale in Fase 1. In Fase 2 si valutano fonti a pagamento con licenza chiara (Registro Imprese, banche dati aziendali) e gli strumenti già in uso in azienda (Clay, Outscraper), verificando che i termini permettano la conservazione.
