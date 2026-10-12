@@ -1,0 +1,108 @@
+/* Same font loading as backoffice-app (src/styles/globals.css). */
+@import url('https://fonts.googleapis.com/css2?family=Jost:ital,wght@0,100..900;1,100..900&display=swap');
+@import "tailwindcss";
+@import "../styles/ui-kit-tokens.css";
+
+/*
+ * Tailwind v4 theme mapped onto the UI Kit tokens. Values live only in
+ * ui-kit-tokens.css; here we just point Tailwind namespaces at those variables.
+ * Default Tailwind palettes and scales are reset so only UI Kit values exist.
+ * Where the Tailwind name equals the token name (--radius-*, --shadow-*,
+ * --font-*), the unlayered token declaration wins over the theme layer.
+ */
+@theme inline {
+  --color-*: initial;
+  --radius-*: initial;
+  --shadow-*: initial;
+  --font-*: initial;
+  --text-*: initial;
+
+  --color-brand-blue: var(--brand-blue);
+  --color-brand-offwhite: var(--brand-offwhite);
+  --color-brand-black: var(--brand-black);
+  --color-brand-grey: var(--brand-grey);
+  --color-brand-navy: var(--brand-navy);
+  --color-white: var(--white);
+  --color-blue-80: var(--blue-80);
+  --color-blue-60: var(--blue-60);
+  --color-blue-40: var(--blue-40);
+  --color-blue-20: var(--blue-20);
+  --color-blue-hover: var(--blue-hover);
+  --color-blue-pressed: var(--blue-pressed);
+  --color-blue-ink: var(--blue-ink);
+  --color-black-80: var(--black-80);
+  --color-black-60: var(--black-60);
+  --color-black-40: var(--black-40);
+  --color-black-20: var(--black-20);
+  --color-grey-80: var(--grey-80);
+  --color-grey-60: var(--grey-60);
+  --color-grey-40: var(--grey-40);
+  --color-grey-20: var(--grey-20);
+  --color-accent-cyan: var(--accent-cyan);
+  --color-cyan-60: var(--cyan-60);
+  --color-cyan-40: var(--cyan-40);
+  --color-cyan-20: var(--cyan-20);
+  --color-error: var(--error);
+  --color-error-hover: var(--error-hover);
+  --color-error-surface: var(--error-surface);
+  --color-error-ink: var(--error-ink);
+  --color-error-line: var(--error-line);
+  --color-success: var(--success);
+  --color-success-surface: var(--success-surface);
+  --color-success-ink: var(--success-ink);
+  --color-success-line: var(--success-line);
+  --color-warn-surface: var(--warn-surface);
+  --color-warn-line: var(--warn-line);
+  --color-warn-ink: var(--warn-ink);
+  --color-info-surface: var(--info-surface);
+  --color-info-line: var(--info-line);
+  --color-info-ink: var(--info-ink);
+
+  /* UI Kit spacing is a 4px scale: p-4 = --space-4 = 16px. */
+  --spacing: var(--space-1);
+
+  --radius-xs: var(--radius-xs);
+  --radius-sm: var(--radius-sm);
+  --radius-md: var(--radius-md);
+  --radius-lg: var(--radius-lg);
+  --radius-pill: var(--radius-pill);
+
+  --shadow-sm: var(--shadow-sm);
+  --shadow-md: var(--shadow-md);
+  --shadow-lg: var(--shadow-lg);
+  --shadow-focus: var(--focus-ring);
+  --shadow-focus-dark: var(--focus-ring-dark);
+
+  --font-sans: var(--font-sans);
+  --font-mono: var(--font-mono);
+
+  --text-display: var(--fs-display);
+  --text-h1: var(--fs-h1);
+  --text-h2: var(--fs-h2);
+  --text-h3: var(--fs-h3);
+  --text-h4: var(--fs-h4);
+  --text-body-lg: var(--fs-body-lg);
+  --text-body: var(--fs-body);
+  --text-caption: var(--fs-caption);
+  --text-label: var(--fs-label);
+
+  --container-page: var(--page-max);
+}
+
+@layer base {
+  html {
+    font-family: var(--font-sans);
+  }
+
+  body {
+    background: var(--grey-20);
+    color: var(--brand-black);
+    font-size: var(--fs-body);
+  }
+
+  :focus-visible {
+    /* Transparent outline keeps focus visible in forced-colors mode. */
+    outline: 2px solid transparent;
+    box-shadow: var(--focus-ring);
+  }
+}
