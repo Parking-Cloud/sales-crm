@@ -636,6 +636,3692 @@ insert into plan_input values ($plan$[
   ]
  },
  {
+  "ref": "Anagrafica Attvità Commerciali:14",
+  "sheet": "Anagrafica Attvità Commerciali",
+  "kind": "anagrafica",
+  "row": 14,
+  "status": "valida",
+  "discard": null,
+  "warnings": [],
+  "party": {
+   "tipo": "azienda",
+   "denominazione": "Alfa Servizi Esempio Srl",
+   "nome": null,
+   "cognome": null,
+   "categoria": "Studi professionali",
+   "sito": "www.alfa-servizi.example",
+   "telefono": "02 7000 1000",
+   "email": "info@alfa-servizi.example",
+   "form_web_url": null
+  },
+  "externalId": "Anagrafica Attvità Commerciali#2000",
+  "contact": {
+   "nome": "Referente",
+   "cognome": "Alfa",
+   "ruolo": "Responsabile",
+   "email": null,
+   "telefono": null
+  },
+  "opportunity": {
+   "fase": "contattata",
+   "esito": "aperta",
+   "motivo_perdita": null,
+   "posti_richiesti": 2
+  },
+  "activities": [
+   {
+    "tipo": "chiamata",
+    "testo": "Chiamata (da import Excel)",
+    "data": "2026-10-01"
+   },
+   {
+    "tipo": "email",
+    "testo": "Email inviata (da import Excel)",
+    "data": "2026-10-01"
+   }
+  ],
+  "offer": null,
+  "linkTo": null,
+  "needsTypeChoice": false,
+  "duplicates": [],
+  "decision": "crea",
+  "mergeInto": null,
+  "parkingId": "00000000-0000-4000-8000-0000000000f1",
+  "dates": [
+   "2026-10-01"
+  ]
+ },
+ {
+  "ref": "Anagrafica Attvità Commerciali:15",
+  "sheet": "Anagrafica Attvità Commerciali",
+  "kind": "anagrafica",
+  "row": 15,
+  "status": "valida",
+  "discard": null,
+  "warnings": [],
+  "party": {
+   "tipo": "azienda",
+   "denominazione": "Beta Servizi Esempio Srl",
+   "nome": null,
+   "cognome": null,
+   "categoria": "Studi professionali",
+   "sito": "www.beta-servizi.example",
+   "telefono": "02 7000 1001",
+   "email": "info@beta-servizi.example",
+   "form_web_url": null
+  },
+  "externalId": "Anagrafica Attvità Commerciali#2001",
+  "contact": null,
+  "opportunity": {
+   "fase": "interessata",
+   "esito": "aperta",
+   "motivo_perdita": null,
+   "posti_richiesti": null
+  },
+  "activities": [
+   {
+    "tipo": "chiamata",
+    "testo": "Chiamata (da import Excel)",
+    "data": "2026-10-02"
+   }
+  ],
+  "offer": null,
+  "linkTo": null,
+  "needsTypeChoice": false,
+  "duplicates": [],
+  "decision": "crea",
+  "mergeInto": null,
+  "parkingId": "00000000-0000-4000-8000-0000000000f1",
+  "dates": [
+   "2026-10-02"
+  ]
+ },
+ {
+  "ref": "Anagrafica Attvità Commerciali:16",
+  "sheet": "Anagrafica Attvità Commerciali",
+  "kind": "anagrafica",
+  "row": 16,
+  "status": "valida",
+  "discard": null,
+  "warnings": [],
+  "party": {
+   "tipo": "azienda",
+   "denominazione": "Gamma Servizi Esempio Srl",
+   "nome": null,
+   "cognome": null,
+   "categoria": "Hotel",
+   "sito": "www.gamma-servizi.example",
+   "telefono": "02 7000 1002",
+   "email": "info@gamma-servizi.example",
+   "form_web_url": null
+  },
+  "externalId": "Anagrafica Attvità Commerciali#2002",
+  "contact": null,
+  "opportunity": {
+   "fase": "contattata",
+   "esito": "persa",
+   "motivo_perdita": "nessun_bisogno",
+   "posti_richiesti": null
+  },
+  "activities": [
+   {
+    "tipo": "chiamata",
+    "testo": "Chiamata (da import Excel)",
+    "data": "2026-10-03"
+   },
+   {
+    "tipo": "email",
+    "testo": "Email inviata (da import Excel)",
+    "data": "2026-10-03"
+   },
+   {
+    "tipo": "nota",
+    "testo": "non hanno bisogno di posti auto",
+    "data": "2026-10-03"
+   }
+  ],
+  "offer": null,
+  "linkTo": null,
+  "needsTypeChoice": false,
+  "duplicates": [],
+  "decision": "crea",
+  "mergeInto": null,
+  "parkingId": "00000000-0000-4000-8000-0000000000f1",
+  "dates": [
+   "2026-10-03",
+   "2026-10-03"
+  ]
+ },
+ {
+  "ref": "Anagrafica Attvità Commerciali:17",
+  "sheet": "Anagrafica Attvità Commerciali",
+  "kind": "anagrafica",
+  "row": 17,
+  "status": "valida",
+  "discard": null,
+  "warnings": [],
+  "party": {
+   "tipo": "azienda",
+   "denominazione": "Delta Servizi Esempio Srl",
+   "nome": null,
+   "cognome": null,
+   "categoria": "Ristoranti",
+   "sito": "www.delta-servizi.example",
+   "telefono": "02 7000 1003",
+   "email": "info@delta-servizi.example",
+   "form_web_url": null
+  },
+  "externalId": "Anagrafica Attvità Commerciali#2003",
+  "contact": {
+   "nome": "Referente",
+   "cognome": "Delta",
+   "ruolo": "Responsabile",
+   "email": null,
+   "telefono": null
+  },
+  "opportunity": {
+   "fase": "interessata",
+   "esito": "aperta",
+   "motivo_perdita": null,
+   "posti_richiesti": null
+  },
+  "activities": [
+   {
+    "tipo": "chiamata",
+    "testo": "Chiamata (da import Excel)",
+    "data": "2026-10-04"
+   }
+  ],
+  "offer": null,
+  "linkTo": null,
+  "needsTypeChoice": false,
+  "duplicates": [],
+  "decision": "crea",
+  "mergeInto": null,
+  "parkingId": "00000000-0000-4000-8000-0000000000f1",
+  "dates": [
+   "2026-10-04"
+  ]
+ },
+ {
+  "ref": "Anagrafica Attvità Commerciali:18",
+  "sheet": "Anagrafica Attvità Commerciali",
+  "kind": "anagrafica",
+  "row": 18,
+  "status": "valida",
+  "discard": null,
+  "warnings": [],
+  "party": {
+   "tipo": "azienda",
+   "denominazione": "Epsilon Servizi Esempio Srl",
+   "nome": null,
+   "cognome": null,
+   "categoria": "Centri medici",
+   "sito": "www.epsilon-servizi.example",
+   "telefono": "02 7000 1004",
+   "email": "info@epsilon-servizi.example",
+   "form_web_url": null
+  },
+  "externalId": "Anagrafica Attvità Commerciali#2004",
+  "contact": null,
+  "opportunity": {
+   "fase": "contattata",
+   "esito": "aperta",
+   "motivo_perdita": null,
+   "posti_richiesti": null
+  },
+  "activities": [
+   {
+    "tipo": "chiamata",
+    "testo": "Chiamata (da import Excel)",
+    "data": "2026-10-05"
+   },
+   {
+    "tipo": "email",
+    "testo": "Email inviata (da import Excel)",
+    "data": "2026-10-05"
+   }
+  ],
+  "offer": null,
+  "linkTo": null,
+  "needsTypeChoice": false,
+  "duplicates": [],
+  "decision": "crea",
+  "mergeInto": null,
+  "parkingId": "00000000-0000-4000-8000-0000000000f1",
+  "dates": [
+   "2026-10-05"
+  ]
+ },
+ {
+  "ref": "Anagrafica Attvità Commerciali:19",
+  "sheet": "Anagrafica Attvità Commerciali",
+  "kind": "anagrafica",
+  "row": 19,
+  "status": "valida",
+  "discard": null,
+  "warnings": [],
+  "party": {
+   "tipo": "azienda",
+   "denominazione": "Zeta Servizi Esempio Srl",
+   "nome": null,
+   "cognome": null,
+   "categoria": "Uffici",
+   "sito": "www.zeta-servizi.example",
+   "telefono": "02 7000 1005",
+   "email": "info@zeta-servizi.example",
+   "form_web_url": null
+  },
+  "externalId": "Anagrafica Attvità Commerciali#2005",
+  "contact": null,
+  "opportunity": {
+   "fase": "interessata",
+   "esito": "aperta",
+   "motivo_perdita": null,
+   "posti_richiesti": 7
+  },
+  "activities": [
+   {
+    "tipo": "chiamata",
+    "testo": "Chiamata (da import Excel)",
+    "data": "2026-10-06"
+   }
+  ],
+  "offer": null,
+  "linkTo": null,
+  "needsTypeChoice": false,
+  "duplicates": [],
+  "decision": "crea",
+  "mergeInto": null,
+  "parkingId": "00000000-0000-4000-8000-0000000000f1",
+  "dates": [
+   "2026-10-06"
+  ]
+ },
+ {
+  "ref": "Anagrafica Attvità Commerciali:20",
+  "sheet": "Anagrafica Attvità Commerciali",
+  "kind": "anagrafica",
+  "row": 20,
+  "status": "valida",
+  "discard": null,
+  "warnings": [],
+  "party": {
+   "tipo": "azienda",
+   "denominazione": "Eta Servizi Esempio Srl",
+   "nome": null,
+   "cognome": null,
+   "categoria": "Aziende",
+   "sito": "www.eta-servizi.example",
+   "telefono": "02 7000 1006",
+   "email": "info@eta-servizi.example",
+   "form_web_url": null
+  },
+  "externalId": "Anagrafica Attvità Commerciali#2006",
+  "contact": {
+   "nome": "Referente",
+   "cognome": "Eta",
+   "ruolo": "Responsabile",
+   "email": null,
+   "telefono": null
+  },
+  "opportunity": {
+   "fase": "contattata",
+   "esito": "persa",
+   "motivo_perdita": "nessun_bisogno",
+   "posti_richiesti": null
+  },
+  "activities": [
+   {
+    "tipo": "chiamata",
+    "testo": "Chiamata (da import Excel)",
+    "data": "2026-10-07"
+   },
+   {
+    "tipo": "email",
+    "testo": "Email inviata (da import Excel)",
+    "data": "2026-10-07"
+   },
+   {
+    "tipo": "nota",
+    "testo": "non hanno bisogno di posti auto",
+    "data": "2026-10-07"
+   }
+  ],
+  "offer": null,
+  "linkTo": null,
+  "needsTypeChoice": false,
+  "duplicates": [],
+  "decision": "crea",
+  "mergeInto": null,
+  "parkingId": "00000000-0000-4000-8000-0000000000f1",
+  "dates": [
+   "2026-10-07",
+   "2026-10-07"
+  ]
+ },
+ {
+  "ref": "Anagrafica Attvità Commerciali:21",
+  "sheet": "Anagrafica Attvità Commerciali",
+  "kind": "anagrafica",
+  "row": 21,
+  "status": "valida",
+  "discard": null,
+  "warnings": [],
+  "party": {
+   "tipo": "azienda",
+   "denominazione": "Theta Servizi Esempio Srl",
+   "nome": null,
+   "cognome": null,
+   "categoria": "Studi professionali",
+   "sito": "www.theta-servizi.example",
+   "telefono": "02 7000 1007",
+   "email": "info@theta-servizi.example",
+   "form_web_url": null
+  },
+  "externalId": "Anagrafica Attvità Commerciali#2007",
+  "contact": null,
+  "opportunity": {
+   "fase": "interessata",
+   "esito": "aperta",
+   "motivo_perdita": null,
+   "posti_richiesti": null
+  },
+  "activities": [
+   {
+    "tipo": "chiamata",
+    "testo": "Chiamata (da import Excel)",
+    "data": "2026-10-08"
+   }
+  ],
+  "offer": null,
+  "linkTo": null,
+  "needsTypeChoice": false,
+  "duplicates": [],
+  "decision": "crea",
+  "mergeInto": null,
+  "parkingId": "00000000-0000-4000-8000-0000000000f1",
+  "dates": [
+   "2026-10-08"
+  ]
+ },
+ {
+  "ref": "Anagrafica Attvità Commerciali:22",
+  "sheet": "Anagrafica Attvità Commerciali",
+  "kind": "anagrafica",
+  "row": 22,
+  "status": "valida",
+  "discard": null,
+  "warnings": [],
+  "party": {
+   "tipo": "azienda",
+   "denominazione": "Iota Servizi Esempio Srl",
+   "nome": null,
+   "cognome": null,
+   "categoria": "Altro",
+   "sito": "www.iota-servizi.example",
+   "telefono": "02 7000 1008",
+   "email": "info@iota-servizi.example",
+   "form_web_url": null
+  },
+  "externalId": "Anagrafica Attvità Commerciali#2008",
+  "contact": null,
+  "opportunity": {
+   "fase": "contattata",
+   "esito": "aperta",
+   "motivo_perdita": null,
+   "posti_richiesti": null
+  },
+  "activities": [
+   {
+    "tipo": "chiamata",
+    "testo": "Chiamata (da import Excel)",
+    "data": "2026-10-09"
+   },
+   {
+    "tipo": "email",
+    "testo": "Email inviata (da import Excel)",
+    "data": "2026-10-09"
+   }
+  ],
+  "offer": null,
+  "linkTo": null,
+  "needsTypeChoice": false,
+  "duplicates": [],
+  "decision": "crea",
+  "mergeInto": null,
+  "parkingId": "00000000-0000-4000-8000-0000000000f1",
+  "dates": [
+   "2026-10-09"
+  ]
+ },
+ {
+  "ref": "Anagrafica Attvità Commerciali:23",
+  "sheet": "Anagrafica Attvità Commerciali",
+  "kind": "anagrafica",
+  "row": 23,
+  "status": "avvisi",
+  "discard": null,
+  "warnings": [
+   "Settore “Palestra” non riconosciuto: categoria Altro"
+  ],
+  "party": {
+   "tipo": "azienda",
+   "denominazione": "Kappa Servizi Esempio Srl",
+   "nome": null,
+   "cognome": null,
+   "categoria": "Altro",
+   "sito": "www.kappa-servizi.example",
+   "telefono": "02 7000 1009",
+   "email": "info@kappa-servizi.example",
+   "form_web_url": null
+  },
+  "externalId": "Anagrafica Attvità Commerciali#2009",
+  "contact": {
+   "nome": "Referente",
+   "cognome": "Kappa",
+   "ruolo": "Responsabile",
+   "email": null,
+   "telefono": null
+  },
+  "opportunity": {
+   "fase": "interessata",
+   "esito": "aperta",
+   "motivo_perdita": null,
+   "posti_richiesti": null
+  },
+  "activities": [
+   {
+    "tipo": "chiamata",
+    "testo": "Chiamata (da import Excel)",
+    "data": "2026-10-01"
+   }
+  ],
+  "offer": null,
+  "linkTo": null,
+  "needsTypeChoice": false,
+  "duplicates": [],
+  "decision": "crea",
+  "mergeInto": null,
+  "parkingId": "00000000-0000-4000-8000-0000000000f1",
+  "dates": [
+   "2026-10-01"
+  ]
+ },
+ {
+  "ref": "Anagrafica Attvità Commerciali:24",
+  "sheet": "Anagrafica Attvità Commerciali",
+  "kind": "anagrafica",
+  "row": 24,
+  "status": "valida",
+  "discard": null,
+  "warnings": [],
+  "party": {
+   "tipo": "azienda",
+   "denominazione": "Lambda Servizi Esempio Srl",
+   "nome": null,
+   "cognome": null,
+   "categoria": "Studi professionali",
+   "sito": "www.lambda-servizi.example",
+   "telefono": "02 7000 1010",
+   "email": "info@lambda-servizi.example",
+   "form_web_url": null
+  },
+  "externalId": "Anagrafica Attvità Commerciali#2010",
+  "contact": null,
+  "opportunity": {
+   "fase": "contattata",
+   "esito": "persa",
+   "motivo_perdita": "nessun_bisogno",
+   "posti_richiesti": 5
+  },
+  "activities": [
+   {
+    "tipo": "chiamata",
+    "testo": "Chiamata (da import Excel)",
+    "data": "2026-10-02"
+   },
+   {
+    "tipo": "email",
+    "testo": "Email inviata (da import Excel)",
+    "data": "2026-10-02"
+   },
+   {
+    "tipo": "nota",
+    "testo": "non hanno bisogno di posti auto",
+    "data": "2026-10-02"
+   }
+  ],
+  "offer": null,
+  "linkTo": null,
+  "needsTypeChoice": false,
+  "duplicates": [],
+  "decision": "crea",
+  "mergeInto": null,
+  "parkingId": "00000000-0000-4000-8000-0000000000f1",
+  "dates": [
+   "2026-10-02",
+   "2026-10-02"
+  ]
+ },
+ {
+  "ref": "Anagrafica Attvità Commerciali:25",
+  "sheet": "Anagrafica Attvità Commerciali",
+  "kind": "anagrafica",
+  "row": 25,
+  "status": "valida",
+  "discard": null,
+  "warnings": [],
+  "party": {
+   "tipo": "azienda",
+   "denominazione": "Sigma Servizi Esempio Srl",
+   "nome": null,
+   "cognome": null,
+   "categoria": "Studi professionali",
+   "sito": "www.sigma-servizi.example",
+   "telefono": "02 7000 1011",
+   "email": "info@sigma-servizi.example",
+   "form_web_url": null
+  },
+  "externalId": "Anagrafica Attvità Commerciali#2011",
+  "contact": null,
+  "opportunity": {
+   "fase": "interessata",
+   "esito": "aperta",
+   "motivo_perdita": null,
+   "posti_richiesti": null
+  },
+  "activities": [
+   {
+    "tipo": "chiamata",
+    "testo": "Chiamata (da import Excel)",
+    "data": "2026-10-03"
+   }
+  ],
+  "offer": null,
+  "linkTo": null,
+  "needsTypeChoice": false,
+  "duplicates": [],
+  "decision": "crea",
+  "mergeInto": null,
+  "parkingId": "00000000-0000-4000-8000-0000000000f1",
+  "dates": [
+   "2026-10-03"
+  ]
+ },
+ {
+  "ref": "Anagrafica Attvità Commerciali:26",
+  "sheet": "Anagrafica Attvità Commerciali",
+  "kind": "anagrafica",
+  "row": 26,
+  "status": "valida",
+  "discard": null,
+  "warnings": [],
+  "party": {
+   "tipo": "azienda",
+   "denominazione": "Alfa Consulenze Esempio Srl",
+   "nome": null,
+   "cognome": null,
+   "categoria": "Hotel",
+   "sito": "www.alfa-consulenze.example",
+   "telefono": "02 7000 1012",
+   "email": "info@alfa-consulenze.example",
+   "form_web_url": null
+  },
+  "externalId": "Anagrafica Attvità Commerciali#2012",
+  "contact": {
+   "nome": "Referente",
+   "cognome": "Alfa",
+   "ruolo": "Responsabile",
+   "email": null,
+   "telefono": null
+  },
+  "opportunity": {
+   "fase": "contattata",
+   "esito": "aperta",
+   "motivo_perdita": null,
+   "posti_richiesti": null
+  },
+  "activities": [
+   {
+    "tipo": "chiamata",
+    "testo": "Chiamata (da import Excel)",
+    "data": "2026-10-04"
+   },
+   {
+    "tipo": "email",
+    "testo": "Email inviata (da import Excel)",
+    "data": "2026-10-04"
+   }
+  ],
+  "offer": null,
+  "linkTo": null,
+  "needsTypeChoice": false,
+  "duplicates": [],
+  "decision": "crea",
+  "mergeInto": null,
+  "parkingId": "00000000-0000-4000-8000-0000000000f1",
+  "dates": [
+   "2026-10-04"
+  ]
+ },
+ {
+  "ref": "Anagrafica Attvità Commerciali:27",
+  "sheet": "Anagrafica Attvità Commerciali",
+  "kind": "anagrafica",
+  "row": 27,
+  "status": "valida",
+  "discard": null,
+  "warnings": [],
+  "party": {
+   "tipo": "azienda",
+   "denominazione": "Beta Consulenze Esempio Srl",
+   "nome": null,
+   "cognome": null,
+   "categoria": "Ristoranti",
+   "sito": "www.beta-consulenze.example",
+   "telefono": "02 7000 1013",
+   "email": "info@beta-consulenze.example",
+   "form_web_url": null
+  },
+  "externalId": "Anagrafica Attvità Commerciali#2013",
+  "contact": null,
+  "opportunity": {
+   "fase": "interessata",
+   "esito": "aperta",
+   "motivo_perdita": null,
+   "posti_richiesti": null
+  },
+  "activities": [
+   {
+    "tipo": "chiamata",
+    "testo": "Chiamata (da import Excel)",
+    "data": "2026-10-05"
+   }
+  ],
+  "offer": null,
+  "linkTo": null,
+  "needsTypeChoice": false,
+  "duplicates": [],
+  "decision": "crea",
+  "mergeInto": null,
+  "parkingId": "00000000-0000-4000-8000-0000000000f1",
+  "dates": [
+   "2026-10-05"
+  ]
+ },
+ {
+  "ref": "Anagrafica Attvità Commerciali:28",
+  "sheet": "Anagrafica Attvità Commerciali",
+  "kind": "anagrafica",
+  "row": 28,
+  "status": "valida",
+  "discard": null,
+  "warnings": [],
+  "party": {
+   "tipo": "azienda",
+   "denominazione": "Gamma Consulenze Esempio Srl",
+   "nome": null,
+   "cognome": null,
+   "categoria": "Centri medici",
+   "sito": "www.gamma-consulenze.example",
+   "telefono": "02 7000 1014",
+   "email": "info@gamma-consulenze.example",
+   "form_web_url": null
+  },
+  "externalId": "Anagrafica Attvità Commerciali#2014",
+  "contact": null,
+  "opportunity": {
+   "fase": "contattata",
+   "esito": "persa",
+   "motivo_perdita": "nessun_bisogno",
+   "posti_richiesti": null
+  },
+  "activities": [
+   {
+    "tipo": "chiamata",
+    "testo": "Chiamata (da import Excel)",
+    "data": "2026-10-06"
+   },
+   {
+    "tipo": "email",
+    "testo": "Email inviata (da import Excel)",
+    "data": "2026-10-06"
+   },
+   {
+    "tipo": "nota",
+    "testo": "non hanno bisogno di posti auto",
+    "data": "2026-10-06"
+   }
+  ],
+  "offer": null,
+  "linkTo": null,
+  "needsTypeChoice": false,
+  "duplicates": [],
+  "decision": "crea",
+  "mergeInto": null,
+  "parkingId": "00000000-0000-4000-8000-0000000000f1",
+  "dates": [
+   "2026-10-06",
+   "2026-10-06"
+  ]
+ },
+ {
+  "ref": "Anagrafica Attvità Commerciali:29",
+  "sheet": "Anagrafica Attvità Commerciali",
+  "kind": "anagrafica",
+  "row": 29,
+  "status": "valida",
+  "discard": null,
+  "warnings": [],
+  "party": {
+   "tipo": "azienda",
+   "denominazione": "Delta Consulenze Esempio Srl",
+   "nome": null,
+   "cognome": null,
+   "categoria": "Uffici",
+   "sito": "www.delta-consulenze.example",
+   "telefono": "02 7000 1015",
+   "email": "info@delta-consulenze.example",
+   "form_web_url": null
+  },
+  "externalId": "Anagrafica Attvità Commerciali#2015",
+  "contact": {
+   "nome": "Referente",
+   "cognome": "Delta",
+   "ruolo": "Responsabile",
+   "email": null,
+   "telefono": null
+  },
+  "opportunity": {
+   "fase": "interessata",
+   "esito": "aperta",
+   "motivo_perdita": null,
+   "posti_richiesti": 3
+  },
+  "activities": [
+   {
+    "tipo": "chiamata",
+    "testo": "Chiamata (da import Excel)",
+    "data": "2026-10-07"
+   }
+  ],
+  "offer": null,
+  "linkTo": null,
+  "needsTypeChoice": false,
+  "duplicates": [],
+  "decision": "crea",
+  "mergeInto": null,
+  "parkingId": "00000000-0000-4000-8000-0000000000f1",
+  "dates": [
+   "2026-10-07"
+  ]
+ },
+ {
+  "ref": "Anagrafica Attvità Commerciali:30",
+  "sheet": "Anagrafica Attvità Commerciali",
+  "kind": "anagrafica",
+  "row": 30,
+  "status": "valida",
+  "discard": null,
+  "warnings": [],
+  "party": {
+   "tipo": "azienda",
+   "denominazione": "Epsilon Consulenze Esempio Srl",
+   "nome": null,
+   "cognome": null,
+   "categoria": "Aziende",
+   "sito": "www.epsilon-consulenze.example",
+   "telefono": "02 7000 1016",
+   "email": "info@epsilon-consulenze.example",
+   "form_web_url": null
+  },
+  "externalId": "Anagrafica Attvità Commerciali#2016",
+  "contact": null,
+  "opportunity": {
+   "fase": "contattata",
+   "esito": "aperta",
+   "motivo_perdita": null,
+   "posti_richiesti": null
+  },
+  "activities": [
+   {
+    "tipo": "chiamata",
+    "testo": "Chiamata (da import Excel)",
+    "data": "2026-10-08"
+   },
+   {
+    "tipo": "email",
+    "testo": "Email inviata (da import Excel)",
+    "data": "2026-10-08"
+   }
+  ],
+  "offer": null,
+  "linkTo": null,
+  "needsTypeChoice": false,
+  "duplicates": [],
+  "decision": "crea",
+  "mergeInto": null,
+  "parkingId": "00000000-0000-4000-8000-0000000000f1",
+  "dates": [
+   "2026-10-08"
+  ]
+ },
+ {
+  "ref": "Anagrafica Attvità Commerciali:31",
+  "sheet": "Anagrafica Attvità Commerciali",
+  "kind": "anagrafica",
+  "row": 31,
+  "status": "valida",
+  "discard": null,
+  "warnings": [],
+  "party": {
+   "tipo": "azienda",
+   "denominazione": "Zeta Consulenze Esempio Srl",
+   "nome": null,
+   "cognome": null,
+   "categoria": "Studi professionali",
+   "sito": "www.zeta-consulenze.example",
+   "telefono": "02 7000 1017",
+   "email": "info@zeta-consulenze.example",
+   "form_web_url": null
+  },
+  "externalId": "Anagrafica Attvità Commerciali#2017",
+  "contact": null,
+  "opportunity": {
+   "fase": "interessata",
+   "esito": "aperta",
+   "motivo_perdita": null,
+   "posti_richiesti": null
+  },
+  "activities": [
+   {
+    "tipo": "chiamata",
+    "testo": "Chiamata (da import Excel)",
+    "data": "2026-10-09"
+   }
+  ],
+  "offer": null,
+  "linkTo": null,
+  "needsTypeChoice": false,
+  "duplicates": [],
+  "decision": "crea",
+  "mergeInto": null,
+  "parkingId": "00000000-0000-4000-8000-0000000000f1",
+  "dates": [
+   "2026-10-09"
+  ]
+ },
+ {
+  "ref": "Anagrafica Attvità Commerciali:32",
+  "sheet": "Anagrafica Attvità Commerciali",
+  "kind": "anagrafica",
+  "row": 32,
+  "status": "valida",
+  "discard": null,
+  "warnings": [],
+  "party": {
+   "tipo": "azienda",
+   "denominazione": "Eta Consulenze Esempio Srl",
+   "nome": null,
+   "cognome": null,
+   "categoria": "Altro",
+   "sito": "www.eta-consulenze.example",
+   "telefono": "02 7000 1018",
+   "email": "info@eta-consulenze.example",
+   "form_web_url": null
+  },
+  "externalId": "Anagrafica Attvità Commerciali#2018",
+  "contact": {
+   "nome": "Referente",
+   "cognome": "Eta",
+   "ruolo": "Responsabile",
+   "email": null,
+   "telefono": null
+  },
+  "opportunity": {
+   "fase": "contattata",
+   "esito": "persa",
+   "motivo_perdita": "nessun_bisogno",
+   "posti_richiesti": null
+  },
+  "activities": [
+   {
+    "tipo": "chiamata",
+    "testo": "Chiamata (da import Excel)",
+    "data": "2026-10-01"
+   },
+   {
+    "tipo": "email",
+    "testo": "Email inviata (da import Excel)",
+    "data": "2026-10-01"
+   },
+   {
+    "tipo": "nota",
+    "testo": "non hanno bisogno di posti auto",
+    "data": "2026-10-01"
+   }
+  ],
+  "offer": null,
+  "linkTo": null,
+  "needsTypeChoice": false,
+  "duplicates": [],
+  "decision": "crea",
+  "mergeInto": null,
+  "parkingId": "00000000-0000-4000-8000-0000000000f1",
+  "dates": [
+   "2026-10-01",
+   "2026-10-01"
+  ]
+ },
+ {
+  "ref": "Anagrafica Attvità Commerciali:33",
+  "sheet": "Anagrafica Attvità Commerciali",
+  "kind": "anagrafica",
+  "row": 33,
+  "status": "avvisi",
+  "discard": null,
+  "warnings": [
+   "Settore “Palestra” non riconosciuto: categoria Altro"
+  ],
+  "party": {
+   "tipo": "azienda",
+   "denominazione": "Theta Consulenze Esempio Srl",
+   "nome": null,
+   "cognome": null,
+   "categoria": "Altro",
+   "sito": "www.theta-consulenze.example",
+   "telefono": "02 7000 1019",
+   "email": "info@theta-consulenze.example",
+   "form_web_url": null
+  },
+  "externalId": "Anagrafica Attvità Commerciali#2019",
+  "contact": null,
+  "opportunity": {
+   "fase": "interessata",
+   "esito": "aperta",
+   "motivo_perdita": null,
+   "posti_richiesti": null
+  },
+  "activities": [
+   {
+    "tipo": "chiamata",
+    "testo": "Chiamata (da import Excel)",
+    "data": "2026-10-02"
+   }
+  ],
+  "offer": null,
+  "linkTo": null,
+  "needsTypeChoice": false,
+  "duplicates": [],
+  "decision": "crea",
+  "mergeInto": null,
+  "parkingId": "00000000-0000-4000-8000-0000000000f1",
+  "dates": [
+   "2026-10-02"
+  ]
+ },
+ {
+  "ref": "Anagrafica Attvità Commerciali:34",
+  "sheet": "Anagrafica Attvità Commerciali",
+  "kind": "anagrafica",
+  "row": 34,
+  "status": "valida",
+  "discard": null,
+  "warnings": [],
+  "party": {
+   "tipo": "azienda",
+   "denominazione": "Iota Consulenze Esempio Srl",
+   "nome": null,
+   "cognome": null,
+   "categoria": "Studi professionali",
+   "sito": "www.iota-consulenze.example",
+   "telefono": "02 7000 1020",
+   "email": "info@iota-consulenze.example",
+   "form_web_url": null
+  },
+  "externalId": "Anagrafica Attvità Commerciali#2020",
+  "contact": null,
+  "opportunity": {
+   "fase": "contattata",
+   "esito": "aperta",
+   "motivo_perdita": null,
+   "posti_richiesti": 8
+  },
+  "activities": [
+   {
+    "tipo": "chiamata",
+    "testo": "Chiamata (da import Excel)",
+    "data": "2026-10-03"
+   },
+   {
+    "tipo": "email",
+    "testo": "Email inviata (da import Excel)",
+    "data": "2026-10-03"
+   }
+  ],
+  "offer": null,
+  "linkTo": null,
+  "needsTypeChoice": false,
+  "duplicates": [],
+  "decision": "crea",
+  "mergeInto": null,
+  "parkingId": "00000000-0000-4000-8000-0000000000f1",
+  "dates": [
+   "2026-10-03"
+  ]
+ },
+ {
+  "ref": "Anagrafica Attvità Commerciali:35",
+  "sheet": "Anagrafica Attvità Commerciali",
+  "kind": "anagrafica",
+  "row": 35,
+  "status": "valida",
+  "discard": null,
+  "warnings": [],
+  "party": {
+   "tipo": "azienda",
+   "denominazione": "Kappa Consulenze Esempio Srl",
+   "nome": null,
+   "cognome": null,
+   "categoria": "Studi professionali",
+   "sito": "www.kappa-consulenze.example",
+   "telefono": "02 7000 1021",
+   "email": "info@kappa-consulenze.example",
+   "form_web_url": null
+  },
+  "externalId": "Anagrafica Attvità Commerciali#2021",
+  "contact": {
+   "nome": "Referente",
+   "cognome": "Kappa",
+   "ruolo": "Responsabile",
+   "email": null,
+   "telefono": null
+  },
+  "opportunity": {
+   "fase": "interessata",
+   "esito": "aperta",
+   "motivo_perdita": null,
+   "posti_richiesti": null
+  },
+  "activities": [
+   {
+    "tipo": "chiamata",
+    "testo": "Chiamata (da import Excel)",
+    "data": "2026-10-04"
+   }
+  ],
+  "offer": null,
+  "linkTo": null,
+  "needsTypeChoice": false,
+  "duplicates": [],
+  "decision": "crea",
+  "mergeInto": null,
+  "parkingId": "00000000-0000-4000-8000-0000000000f1",
+  "dates": [
+   "2026-10-04"
+  ]
+ },
+ {
+  "ref": "Anagrafica Attvità Commerciali:36",
+  "sheet": "Anagrafica Attvità Commerciali",
+  "kind": "anagrafica",
+  "row": 36,
+  "status": "valida",
+  "discard": null,
+  "warnings": [],
+  "party": {
+   "tipo": "azienda",
+   "denominazione": "Lambda Consulenze Esempio Srl",
+   "nome": null,
+   "cognome": null,
+   "categoria": "Hotel",
+   "sito": "www.lambda-consulenze.example",
+   "telefono": "02 7000 1022",
+   "email": "info@lambda-consulenze.example",
+   "form_web_url": null
+  },
+  "externalId": "Anagrafica Attvità Commerciali#2022",
+  "contact": null,
+  "opportunity": {
+   "fase": "contattata",
+   "esito": "persa",
+   "motivo_perdita": "nessun_bisogno",
+   "posti_richiesti": null
+  },
+  "activities": [
+   {
+    "tipo": "chiamata",
+    "testo": "Chiamata (da import Excel)",
+    "data": "2026-10-05"
+   },
+   {
+    "tipo": "email",
+    "testo": "Email inviata (da import Excel)",
+    "data": "2026-10-05"
+   },
+   {
+    "tipo": "nota",
+    "testo": "non hanno bisogno di posti auto",
+    "data": "2026-10-05"
+   }
+  ],
+  "offer": null,
+  "linkTo": null,
+  "needsTypeChoice": false,
+  "duplicates": [],
+  "decision": "crea",
+  "mergeInto": null,
+  "parkingId": "00000000-0000-4000-8000-0000000000f1",
+  "dates": [
+   "2026-10-05",
+   "2026-10-05"
+  ]
+ },
+ {
+  "ref": "Anagrafica Attvità Commerciali:37",
+  "sheet": "Anagrafica Attvità Commerciali",
+  "kind": "anagrafica",
+  "row": 37,
+  "status": "valida",
+  "discard": null,
+  "warnings": [],
+  "party": {
+   "tipo": "azienda",
+   "denominazione": "Sigma Consulenze Esempio Srl",
+   "nome": null,
+   "cognome": null,
+   "categoria": "Ristoranti",
+   "sito": "www.sigma-consulenze.example",
+   "telefono": "02 7000 1023",
+   "email": "info@sigma-consulenze.example",
+   "form_web_url": null
+  },
+  "externalId": "Anagrafica Attvità Commerciali#2023",
+  "contact": null,
+  "opportunity": {
+   "fase": "interessata",
+   "esito": "aperta",
+   "motivo_perdita": null,
+   "posti_richiesti": null
+  },
+  "activities": [
+   {
+    "tipo": "chiamata",
+    "testo": "Chiamata (da import Excel)",
+    "data": "2026-10-06"
+   }
+  ],
+  "offer": null,
+  "linkTo": null,
+  "needsTypeChoice": false,
+  "duplicates": [],
+  "decision": "crea",
+  "mergeInto": null,
+  "parkingId": "00000000-0000-4000-8000-0000000000f1",
+  "dates": [
+   "2026-10-06"
+  ]
+ },
+ {
+  "ref": "Anagrafica Attvità Commerciali:38",
+  "sheet": "Anagrafica Attvità Commerciali",
+  "kind": "anagrafica",
+  "row": 38,
+  "status": "valida",
+  "discard": null,
+  "warnings": [],
+  "party": {
+   "tipo": "azienda",
+   "denominazione": "Alfa Logistica Esempio Srl",
+   "nome": null,
+   "cognome": null,
+   "categoria": "Centri medici",
+   "sito": "www.alfa-logistica.example",
+   "telefono": "02 7000 1024",
+   "email": "info@alfa-logistica.example",
+   "form_web_url": null
+  },
+  "externalId": "Anagrafica Attvità Commerciali#2024",
+  "contact": {
+   "nome": "Referente",
+   "cognome": "Alfa",
+   "ruolo": "Responsabile",
+   "email": null,
+   "telefono": null
+  },
+  "opportunity": {
+   "fase": "contattata",
+   "esito": "aperta",
+   "motivo_perdita": null,
+   "posti_richiesti": null
+  },
+  "activities": [
+   {
+    "tipo": "chiamata",
+    "testo": "Chiamata (da import Excel)",
+    "data": "2026-10-07"
+   },
+   {
+    "tipo": "email",
+    "testo": "Email inviata (da import Excel)",
+    "data": "2026-10-07"
+   }
+  ],
+  "offer": null,
+  "linkTo": null,
+  "needsTypeChoice": false,
+  "duplicates": [],
+  "decision": "crea",
+  "mergeInto": null,
+  "parkingId": "00000000-0000-4000-8000-0000000000f1",
+  "dates": [
+   "2026-10-07"
+  ]
+ },
+ {
+  "ref": "Anagrafica Attvità Commerciali:39",
+  "sheet": "Anagrafica Attvità Commerciali",
+  "kind": "anagrafica",
+  "row": 39,
+  "status": "valida",
+  "discard": null,
+  "warnings": [],
+  "party": {
+   "tipo": "azienda",
+   "denominazione": "Beta Logistica Esempio Srl",
+   "nome": null,
+   "cognome": null,
+   "categoria": "Uffici",
+   "sito": "www.beta-logistica.example",
+   "telefono": "02 7000 1025",
+   "email": "info@beta-logistica.example",
+   "form_web_url": null
+  },
+  "externalId": "Anagrafica Attvità Commerciali#2025",
+  "contact": null,
+  "opportunity": {
+   "fase": "interessata",
+   "esito": "aperta",
+   "motivo_perdita": null,
+   "posti_richiesti": 6
+  },
+  "activities": [
+   {
+    "tipo": "chiamata",
+    "testo": "Chiamata (da import Excel)",
+    "data": "2026-10-08"
+   }
+  ],
+  "offer": null,
+  "linkTo": null,
+  "needsTypeChoice": false,
+  "duplicates": [],
+  "decision": "crea",
+  "mergeInto": null,
+  "parkingId": "00000000-0000-4000-8000-0000000000f1",
+  "dates": [
+   "2026-10-08"
+  ]
+ },
+ {
+  "ref": "Anagrafica Attvità Commerciali:40",
+  "sheet": "Anagrafica Attvità Commerciali",
+  "kind": "anagrafica",
+  "row": 40,
+  "status": "valida",
+  "discard": null,
+  "warnings": [],
+  "party": {
+   "tipo": "azienda",
+   "denominazione": "Gamma Logistica Esempio Srl",
+   "nome": null,
+   "cognome": null,
+   "categoria": "Aziende",
+   "sito": "www.gamma-logistica.example",
+   "telefono": "02 7000 1026",
+   "email": "info@gamma-logistica.example",
+   "form_web_url": null
+  },
+  "externalId": "Anagrafica Attvità Commerciali#2026",
+  "contact": null,
+  "opportunity": {
+   "fase": "contattata",
+   "esito": "persa",
+   "motivo_perdita": "nessun_bisogno",
+   "posti_richiesti": null
+  },
+  "activities": [
+   {
+    "tipo": "chiamata",
+    "testo": "Chiamata (da import Excel)",
+    "data": "2026-10-09"
+   },
+   {
+    "tipo": "email",
+    "testo": "Email inviata (da import Excel)",
+    "data": "2026-10-09"
+   },
+   {
+    "tipo": "nota",
+    "testo": "non hanno bisogno di posti auto",
+    "data": "2026-10-09"
+   }
+  ],
+  "offer": null,
+  "linkTo": null,
+  "needsTypeChoice": false,
+  "duplicates": [],
+  "decision": "crea",
+  "mergeInto": null,
+  "parkingId": "00000000-0000-4000-8000-0000000000f1",
+  "dates": [
+   "2026-10-09",
+   "2026-10-09"
+  ]
+ },
+ {
+  "ref": "Anagrafica Attvità Commerciali:41",
+  "sheet": "Anagrafica Attvità Commerciali",
+  "kind": "anagrafica",
+  "row": 41,
+  "status": "valida",
+  "discard": null,
+  "warnings": [],
+  "party": {
+   "tipo": "azienda",
+   "denominazione": "Delta Logistica Esempio Srl",
+   "nome": null,
+   "cognome": null,
+   "categoria": "Studi professionali",
+   "sito": "www.delta-logistica.example",
+   "telefono": "02 7000 1027",
+   "email": "info@delta-logistica.example",
+   "form_web_url": null
+  },
+  "externalId": "Anagrafica Attvità Commerciali#2027",
+  "contact": {
+   "nome": "Referente",
+   "cognome": "Delta",
+   "ruolo": "Responsabile",
+   "email": null,
+   "telefono": null
+  },
+  "opportunity": {
+   "fase": "interessata",
+   "esito": "aperta",
+   "motivo_perdita": null,
+   "posti_richiesti": null
+  },
+  "activities": [
+   {
+    "tipo": "chiamata",
+    "testo": "Chiamata (da import Excel)",
+    "data": "2026-10-01"
+   }
+  ],
+  "offer": null,
+  "linkTo": null,
+  "needsTypeChoice": false,
+  "duplicates": [],
+  "decision": "crea",
+  "mergeInto": null,
+  "parkingId": "00000000-0000-4000-8000-0000000000f1",
+  "dates": [
+   "2026-10-01"
+  ]
+ },
+ {
+  "ref": "Anagrafica Attvità Commerciali:42",
+  "sheet": "Anagrafica Attvità Commerciali",
+  "kind": "anagrafica",
+  "row": 42,
+  "status": "valida",
+  "discard": null,
+  "warnings": [],
+  "party": {
+   "tipo": "azienda",
+   "denominazione": "Epsilon Logistica Esempio Srl",
+   "nome": null,
+   "cognome": null,
+   "categoria": "Altro",
+   "sito": "www.epsilon-logistica.example",
+   "telefono": "02 7000 1028",
+   "email": "info@epsilon-logistica.example",
+   "form_web_url": null
+  },
+  "externalId": "Anagrafica Attvità Commerciali#2028",
+  "contact": null,
+  "opportunity": {
+   "fase": "contattata",
+   "esito": "aperta",
+   "motivo_perdita": null,
+   "posti_richiesti": null
+  },
+  "activities": [
+   {
+    "tipo": "chiamata",
+    "testo": "Chiamata (da import Excel)",
+    "data": "2026-10-02"
+   },
+   {
+    "tipo": "email",
+    "testo": "Email inviata (da import Excel)",
+    "data": "2026-10-02"
+   }
+  ],
+  "offer": null,
+  "linkTo": null,
+  "needsTypeChoice": false,
+  "duplicates": [],
+  "decision": "crea",
+  "mergeInto": null,
+  "parkingId": "00000000-0000-4000-8000-0000000000f1",
+  "dates": [
+   "2026-10-02"
+  ]
+ },
+ {
+  "ref": "Anagrafica Attvità Commerciali:43",
+  "sheet": "Anagrafica Attvità Commerciali",
+  "kind": "anagrafica",
+  "row": 43,
+  "status": "avvisi",
+  "discard": null,
+  "warnings": [
+   "Settore “Palestra” non riconosciuto: categoria Altro"
+  ],
+  "party": {
+   "tipo": "azienda",
+   "denominazione": "Zeta Logistica Esempio Srl",
+   "nome": null,
+   "cognome": null,
+   "categoria": "Altro",
+   "sito": "www.zeta-logistica.example",
+   "telefono": "02 7000 1029",
+   "email": "info@zeta-logistica.example",
+   "form_web_url": null
+  },
+  "externalId": "Anagrafica Attvità Commerciali#2029",
+  "contact": null,
+  "opportunity": {
+   "fase": "interessata",
+   "esito": "aperta",
+   "motivo_perdita": null,
+   "posti_richiesti": null
+  },
+  "activities": [
+   {
+    "tipo": "chiamata",
+    "testo": "Chiamata (da import Excel)",
+    "data": "2026-10-03"
+   }
+  ],
+  "offer": null,
+  "linkTo": null,
+  "needsTypeChoice": false,
+  "duplicates": [],
+  "decision": "crea",
+  "mergeInto": null,
+  "parkingId": "00000000-0000-4000-8000-0000000000f1",
+  "dates": [
+   "2026-10-03"
+  ]
+ },
+ {
+  "ref": "Anagrafica Attvità Commerciali:44",
+  "sheet": "Anagrafica Attvità Commerciali",
+  "kind": "anagrafica",
+  "row": 44,
+  "status": "valida",
+  "discard": null,
+  "warnings": [],
+  "party": {
+   "tipo": "azienda",
+   "denominazione": "Eta Logistica Esempio Srl",
+   "nome": null,
+   "cognome": null,
+   "categoria": "Studi professionali",
+   "sito": "www.eta-logistica.example",
+   "telefono": "02 7000 1030",
+   "email": "info@eta-logistica.example",
+   "form_web_url": null
+  },
+  "externalId": "Anagrafica Attvità Commerciali#2030",
+  "contact": {
+   "nome": "Referente",
+   "cognome": "Eta",
+   "ruolo": "Responsabile",
+   "email": null,
+   "telefono": null
+  },
+  "opportunity": {
+   "fase": "contattata",
+   "esito": "persa",
+   "motivo_perdita": "nessun_bisogno",
+   "posti_richiesti": 4
+  },
+  "activities": [
+   {
+    "tipo": "chiamata",
+    "testo": "Chiamata (da import Excel)",
+    "data": "2026-10-04"
+   },
+   {
+    "tipo": "email",
+    "testo": "Email inviata (da import Excel)",
+    "data": "2026-10-04"
+   },
+   {
+    "tipo": "nota",
+    "testo": "non hanno bisogno di posti auto",
+    "data": "2026-10-04"
+   }
+  ],
+  "offer": null,
+  "linkTo": null,
+  "needsTypeChoice": false,
+  "duplicates": [],
+  "decision": "crea",
+  "mergeInto": null,
+  "parkingId": "00000000-0000-4000-8000-0000000000f1",
+  "dates": [
+   "2026-10-04",
+   "2026-10-04"
+  ]
+ },
+ {
+  "ref": "Anagrafica Attvità Commerciali:45",
+  "sheet": "Anagrafica Attvità Commerciali",
+  "kind": "anagrafica",
+  "row": 45,
+  "status": "valida",
+  "discard": null,
+  "warnings": [],
+  "party": {
+   "tipo": "azienda",
+   "denominazione": "Theta Logistica Esempio Srl",
+   "nome": null,
+   "cognome": null,
+   "categoria": "Studi professionali",
+   "sito": "www.theta-logistica.example",
+   "telefono": "02 7000 1031",
+   "email": "info@theta-logistica.example",
+   "form_web_url": null
+  },
+  "externalId": "Anagrafica Attvità Commerciali#2031",
+  "contact": null,
+  "opportunity": {
+   "fase": "interessata",
+   "esito": "aperta",
+   "motivo_perdita": null,
+   "posti_richiesti": null
+  },
+  "activities": [
+   {
+    "tipo": "chiamata",
+    "testo": "Chiamata (da import Excel)",
+    "data": "2026-10-05"
+   }
+  ],
+  "offer": null,
+  "linkTo": null,
+  "needsTypeChoice": false,
+  "duplicates": [],
+  "decision": "crea",
+  "mergeInto": null,
+  "parkingId": "00000000-0000-4000-8000-0000000000f1",
+  "dates": [
+   "2026-10-05"
+  ]
+ },
+ {
+  "ref": "Anagrafica Attvità Commerciali:46",
+  "sheet": "Anagrafica Attvità Commerciali",
+  "kind": "anagrafica",
+  "row": 46,
+  "status": "valida",
+  "discard": null,
+  "warnings": [],
+  "party": {
+   "tipo": "azienda",
+   "denominazione": "Iota Logistica Esempio Srl",
+   "nome": null,
+   "cognome": null,
+   "categoria": "Hotel",
+   "sito": "www.iota-logistica.example",
+   "telefono": "02 7000 1032",
+   "email": "info@iota-logistica.example",
+   "form_web_url": null
+  },
+  "externalId": "Anagrafica Attvità Commerciali#2032",
+  "contact": null,
+  "opportunity": {
+   "fase": "contattata",
+   "esito": "aperta",
+   "motivo_perdita": null,
+   "posti_richiesti": null
+  },
+  "activities": [
+   {
+    "tipo": "chiamata",
+    "testo": "Chiamata (da import Excel)",
+    "data": "2026-10-06"
+   },
+   {
+    "tipo": "email",
+    "testo": "Email inviata (da import Excel)",
+    "data": "2026-10-06"
+   }
+  ],
+  "offer": null,
+  "linkTo": null,
+  "needsTypeChoice": false,
+  "duplicates": [],
+  "decision": "crea",
+  "mergeInto": null,
+  "parkingId": "00000000-0000-4000-8000-0000000000f1",
+  "dates": [
+   "2026-10-06"
+  ]
+ },
+ {
+  "ref": "Anagrafica Attvità Commerciali:47",
+  "sheet": "Anagrafica Attvità Commerciali",
+  "kind": "anagrafica",
+  "row": 47,
+  "status": "valida",
+  "discard": null,
+  "warnings": [],
+  "party": {
+   "tipo": "azienda",
+   "denominazione": "Kappa Logistica Esempio Srl",
+   "nome": null,
+   "cognome": null,
+   "categoria": "Ristoranti",
+   "sito": "www.kappa-logistica.example",
+   "telefono": "02 7000 1033",
+   "email": "info@kappa-logistica.example",
+   "form_web_url": null
+  },
+  "externalId": "Anagrafica Attvità Commerciali#2033",
+  "contact": {
+   "nome": "Referente",
+   "cognome": "Kappa",
+   "ruolo": "Responsabile",
+   "email": null,
+   "telefono": null
+  },
+  "opportunity": {
+   "fase": "interessata",
+   "esito": "aperta",
+   "motivo_perdita": null,
+   "posti_richiesti": null
+  },
+  "activities": [
+   {
+    "tipo": "chiamata",
+    "testo": "Chiamata (da import Excel)",
+    "data": "2026-10-07"
+   }
+  ],
+  "offer": null,
+  "linkTo": null,
+  "needsTypeChoice": false,
+  "duplicates": [],
+  "decision": "crea",
+  "mergeInto": null,
+  "parkingId": "00000000-0000-4000-8000-0000000000f1",
+  "dates": [
+   "2026-10-07"
+  ]
+ },
+ {
+  "ref": "Anagrafica Attvità Commerciali:48",
+  "sheet": "Anagrafica Attvità Commerciali",
+  "kind": "anagrafica",
+  "row": 48,
+  "status": "valida",
+  "discard": null,
+  "warnings": [],
+  "party": {
+   "tipo": "azienda",
+   "denominazione": "Lambda Logistica Esempio Srl",
+   "nome": null,
+   "cognome": null,
+   "categoria": "Centri medici",
+   "sito": "www.lambda-logistica.example",
+   "telefono": "02 7000 1034",
+   "email": "info@lambda-logistica.example",
+   "form_web_url": null
+  },
+  "externalId": "Anagrafica Attvità Commerciali#2034",
+  "contact": null,
+  "opportunity": {
+   "fase": "contattata",
+   "esito": "persa",
+   "motivo_perdita": "nessun_bisogno",
+   "posti_richiesti": null
+  },
+  "activities": [
+   {
+    "tipo": "chiamata",
+    "testo": "Chiamata (da import Excel)",
+    "data": "2026-10-08"
+   },
+   {
+    "tipo": "email",
+    "testo": "Email inviata (da import Excel)",
+    "data": "2026-10-08"
+   },
+   {
+    "tipo": "nota",
+    "testo": "non hanno bisogno di posti auto",
+    "data": "2026-10-08"
+   }
+  ],
+  "offer": null,
+  "linkTo": null,
+  "needsTypeChoice": false,
+  "duplicates": [],
+  "decision": "crea",
+  "mergeInto": null,
+  "parkingId": "00000000-0000-4000-8000-0000000000f1",
+  "dates": [
+   "2026-10-08",
+   "2026-10-08"
+  ]
+ },
+ {
+  "ref": "Anagrafica Attvità Commerciali:49",
+  "sheet": "Anagrafica Attvità Commerciali",
+  "kind": "anagrafica",
+  "row": 49,
+  "status": "valida",
+  "discard": null,
+  "warnings": [],
+  "party": {
+   "tipo": "azienda",
+   "denominazione": "Sigma Logistica Esempio Srl",
+   "nome": null,
+   "cognome": null,
+   "categoria": "Uffici",
+   "sito": "www.sigma-logistica.example",
+   "telefono": "02 7000 1035",
+   "email": "info@sigma-logistica.example",
+   "form_web_url": null
+  },
+  "externalId": "Anagrafica Attvità Commerciali#2035",
+  "contact": null,
+  "opportunity": {
+   "fase": "interessata",
+   "esito": "aperta",
+   "motivo_perdita": null,
+   "posti_richiesti": 2
+  },
+  "activities": [
+   {
+    "tipo": "chiamata",
+    "testo": "Chiamata (da import Excel)",
+    "data": "2026-10-09"
+   }
+  ],
+  "offer": null,
+  "linkTo": null,
+  "needsTypeChoice": false,
+  "duplicates": [],
+  "decision": "crea",
+  "mergeInto": null,
+  "parkingId": "00000000-0000-4000-8000-0000000000f1",
+  "dates": [
+   "2026-10-09"
+  ]
+ },
+ {
+  "ref": "Anagrafica Attvità Commerciali:50",
+  "sheet": "Anagrafica Attvità Commerciali",
+  "kind": "anagrafica",
+  "row": 50,
+  "status": "valida",
+  "discard": null,
+  "warnings": [],
+  "party": {
+   "tipo": "azienda",
+   "denominazione": "Alfa Impianti Esempio Srl",
+   "nome": null,
+   "cognome": null,
+   "categoria": "Aziende",
+   "sito": "www.alfa-impianti.example",
+   "telefono": "02 7000 1036",
+   "email": "info@alfa-impianti.example",
+   "form_web_url": null
+  },
+  "externalId": "Anagrafica Attvità Commerciali#2036",
+  "contact": {
+   "nome": "Referente",
+   "cognome": "Alfa",
+   "ruolo": "Responsabile",
+   "email": null,
+   "telefono": null
+  },
+  "opportunity": {
+   "fase": "contattata",
+   "esito": "aperta",
+   "motivo_perdita": null,
+   "posti_richiesti": null
+  },
+  "activities": [
+   {
+    "tipo": "chiamata",
+    "testo": "Chiamata (da import Excel)",
+    "data": "2026-10-01"
+   },
+   {
+    "tipo": "email",
+    "testo": "Email inviata (da import Excel)",
+    "data": "2026-10-01"
+   }
+  ],
+  "offer": null,
+  "linkTo": null,
+  "needsTypeChoice": false,
+  "duplicates": [],
+  "decision": "crea",
+  "mergeInto": null,
+  "parkingId": "00000000-0000-4000-8000-0000000000f1",
+  "dates": [
+   "2026-10-01"
+  ]
+ },
+ {
+  "ref": "Anagrafica Attvità Commerciali:51",
+  "sheet": "Anagrafica Attvità Commerciali",
+  "kind": "anagrafica",
+  "row": 51,
+  "status": "valida",
+  "discard": null,
+  "warnings": [],
+  "party": {
+   "tipo": "azienda",
+   "denominazione": "Beta Impianti Esempio Srl",
+   "nome": null,
+   "cognome": null,
+   "categoria": "Studi professionali",
+   "sito": "www.beta-impianti.example",
+   "telefono": "02 7000 1037",
+   "email": "info@beta-impianti.example",
+   "form_web_url": null
+  },
+  "externalId": "Anagrafica Attvità Commerciali#2037",
+  "contact": null,
+  "opportunity": {
+   "fase": "interessata",
+   "esito": "aperta",
+   "motivo_perdita": null,
+   "posti_richiesti": null
+  },
+  "activities": [
+   {
+    "tipo": "chiamata",
+    "testo": "Chiamata (da import Excel)",
+    "data": "2026-10-02"
+   }
+  ],
+  "offer": null,
+  "linkTo": null,
+  "needsTypeChoice": false,
+  "duplicates": [],
+  "decision": "crea",
+  "mergeInto": null,
+  "parkingId": "00000000-0000-4000-8000-0000000000f1",
+  "dates": [
+   "2026-10-02"
+  ]
+ },
+ {
+  "ref": "Anagrafica Attvità Commerciali:52",
+  "sheet": "Anagrafica Attvità Commerciali",
+  "kind": "anagrafica",
+  "row": 52,
+  "status": "valida",
+  "discard": null,
+  "warnings": [],
+  "party": {
+   "tipo": "azienda",
+   "denominazione": "Gamma Impianti Esempio Srl",
+   "nome": null,
+   "cognome": null,
+   "categoria": "Altro",
+   "sito": "www.gamma-impianti.example",
+   "telefono": "02 7000 1038",
+   "email": "info@gamma-impianti.example",
+   "form_web_url": null
+  },
+  "externalId": "Anagrafica Attvità Commerciali#2038",
+  "contact": null,
+  "opportunity": {
+   "fase": "contattata",
+   "esito": "persa",
+   "motivo_perdita": "nessun_bisogno",
+   "posti_richiesti": null
+  },
+  "activities": [
+   {
+    "tipo": "chiamata",
+    "testo": "Chiamata (da import Excel)",
+    "data": "2026-10-03"
+   },
+   {
+    "tipo": "email",
+    "testo": "Email inviata (da import Excel)",
+    "data": "2026-10-03"
+   },
+   {
+    "tipo": "nota",
+    "testo": "non hanno bisogno di posti auto",
+    "data": "2026-10-03"
+   }
+  ],
+  "offer": null,
+  "linkTo": null,
+  "needsTypeChoice": false,
+  "duplicates": [],
+  "decision": "crea",
+  "mergeInto": null,
+  "parkingId": "00000000-0000-4000-8000-0000000000f1",
+  "dates": [
+   "2026-10-03",
+   "2026-10-03"
+  ]
+ },
+ {
+  "ref": "Anagrafica Attvità Commerciali:53",
+  "sheet": "Anagrafica Attvità Commerciali",
+  "kind": "anagrafica",
+  "row": 53,
+  "status": "avvisi",
+  "discard": null,
+  "warnings": [
+   "Settore “Palestra” non riconosciuto: categoria Altro"
+  ],
+  "party": {
+   "tipo": "azienda",
+   "denominazione": "Delta Impianti Esempio Srl",
+   "nome": null,
+   "cognome": null,
+   "categoria": "Altro",
+   "sito": "www.delta-impianti.example",
+   "telefono": "02 7000 1039",
+   "email": "info@delta-impianti.example",
+   "form_web_url": null
+  },
+  "externalId": "Anagrafica Attvità Commerciali#2039",
+  "contact": {
+   "nome": "Referente",
+   "cognome": "Delta",
+   "ruolo": "Responsabile",
+   "email": null,
+   "telefono": null
+  },
+  "opportunity": {
+   "fase": "interessata",
+   "esito": "aperta",
+   "motivo_perdita": null,
+   "posti_richiesti": null
+  },
+  "activities": [
+   {
+    "tipo": "chiamata",
+    "testo": "Chiamata (da import Excel)",
+    "data": "2026-10-04"
+   }
+  ],
+  "offer": null,
+  "linkTo": null,
+  "needsTypeChoice": false,
+  "duplicates": [],
+  "decision": "crea",
+  "mergeInto": null,
+  "parkingId": "00000000-0000-4000-8000-0000000000f1",
+  "dates": [
+   "2026-10-04"
+  ]
+ },
+ {
+  "ref": "Anagrafica Attvità Commerciali:54",
+  "sheet": "Anagrafica Attvità Commerciali",
+  "kind": "anagrafica",
+  "row": 54,
+  "status": "valida",
+  "discard": null,
+  "warnings": [],
+  "party": {
+   "tipo": "azienda",
+   "denominazione": "Epsilon Impianti Esempio Srl",
+   "nome": null,
+   "cognome": null,
+   "categoria": "Studi professionali",
+   "sito": "www.epsilon-impianti.example",
+   "telefono": "02 7000 1040",
+   "email": "info@epsilon-impianti.example",
+   "form_web_url": null
+  },
+  "externalId": "Anagrafica Attvità Commerciali#2040",
+  "contact": null,
+  "opportunity": {
+   "fase": "contattata",
+   "esito": "aperta",
+   "motivo_perdita": null,
+   "posti_richiesti": 7
+  },
+  "activities": [
+   {
+    "tipo": "chiamata",
+    "testo": "Chiamata (da import Excel)",
+    "data": "2026-10-05"
+   },
+   {
+    "tipo": "email",
+    "testo": "Email inviata (da import Excel)",
+    "data": "2026-10-05"
+   }
+  ],
+  "offer": null,
+  "linkTo": null,
+  "needsTypeChoice": false,
+  "duplicates": [],
+  "decision": "crea",
+  "mergeInto": null,
+  "parkingId": "00000000-0000-4000-8000-0000000000f1",
+  "dates": [
+   "2026-10-05"
+  ]
+ },
+ {
+  "ref": "Anagrafica Attvità Commerciali:55",
+  "sheet": "Anagrafica Attvità Commerciali",
+  "kind": "anagrafica",
+  "row": 55,
+  "status": "valida",
+  "discard": null,
+  "warnings": [],
+  "party": {
+   "tipo": "azienda",
+   "denominazione": "Zeta Impianti Esempio Srl",
+   "nome": null,
+   "cognome": null,
+   "categoria": "Studi professionali",
+   "sito": "www.zeta-impianti.example",
+   "telefono": "02 7000 1041",
+   "email": "info@zeta-impianti.example",
+   "form_web_url": null
+  },
+  "externalId": "Anagrafica Attvità Commerciali#2041",
+  "contact": null,
+  "opportunity": {
+   "fase": "interessata",
+   "esito": "aperta",
+   "motivo_perdita": null,
+   "posti_richiesti": null
+  },
+  "activities": [
+   {
+    "tipo": "chiamata",
+    "testo": "Chiamata (da import Excel)",
+    "data": "2026-10-06"
+   }
+  ],
+  "offer": null,
+  "linkTo": null,
+  "needsTypeChoice": false,
+  "duplicates": [],
+  "decision": "crea",
+  "mergeInto": null,
+  "parkingId": "00000000-0000-4000-8000-0000000000f1",
+  "dates": [
+   "2026-10-06"
+  ]
+ },
+ {
+  "ref": "Anagrafica Attvità Commerciali:56",
+  "sheet": "Anagrafica Attvità Commerciali",
+  "kind": "anagrafica",
+  "row": 56,
+  "status": "valida",
+  "discard": null,
+  "warnings": [],
+  "party": {
+   "tipo": "azienda",
+   "denominazione": "Eta Impianti Esempio Srl",
+   "nome": null,
+   "cognome": null,
+   "categoria": "Hotel",
+   "sito": "www.eta-impianti.example",
+   "telefono": "02 7000 1042",
+   "email": "info@eta-impianti.example",
+   "form_web_url": null
+  },
+  "externalId": "Anagrafica Attvità Commerciali#2042",
+  "contact": {
+   "nome": "Referente",
+   "cognome": "Eta",
+   "ruolo": "Responsabile",
+   "email": null,
+   "telefono": null
+  },
+  "opportunity": {
+   "fase": "contattata",
+   "esito": "persa",
+   "motivo_perdita": "nessun_bisogno",
+   "posti_richiesti": null
+  },
+  "activities": [
+   {
+    "tipo": "chiamata",
+    "testo": "Chiamata (da import Excel)",
+    "data": "2026-10-07"
+   },
+   {
+    "tipo": "email",
+    "testo": "Email inviata (da import Excel)",
+    "data": "2026-10-07"
+   },
+   {
+    "tipo": "nota",
+    "testo": "non hanno bisogno di posti auto",
+    "data": "2026-10-07"
+   }
+  ],
+  "offer": null,
+  "linkTo": null,
+  "needsTypeChoice": false,
+  "duplicates": [],
+  "decision": "crea",
+  "mergeInto": null,
+  "parkingId": "00000000-0000-4000-8000-0000000000f1",
+  "dates": [
+   "2026-10-07",
+   "2026-10-07"
+  ]
+ },
+ {
+  "ref": "Anagrafica Attvità Commerciali:57",
+  "sheet": "Anagrafica Attvità Commerciali",
+  "kind": "anagrafica",
+  "row": 57,
+  "status": "valida",
+  "discard": null,
+  "warnings": [],
+  "party": {
+   "tipo": "azienda",
+   "denominazione": "Theta Impianti Esempio Srl",
+   "nome": null,
+   "cognome": null,
+   "categoria": "Ristoranti",
+   "sito": "www.theta-impianti.example",
+   "telefono": "02 7000 1043",
+   "email": "info@theta-impianti.example",
+   "form_web_url": null
+  },
+  "externalId": "Anagrafica Attvità Commerciali#2043",
+  "contact": null,
+  "opportunity": {
+   "fase": "interessata",
+   "esito": "aperta",
+   "motivo_perdita": null,
+   "posti_richiesti": null
+  },
+  "activities": [
+   {
+    "tipo": "chiamata",
+    "testo": "Chiamata (da import Excel)",
+    "data": "2026-10-08"
+   }
+  ],
+  "offer": null,
+  "linkTo": null,
+  "needsTypeChoice": false,
+  "duplicates": [],
+  "decision": "crea",
+  "mergeInto": null,
+  "parkingId": "00000000-0000-4000-8000-0000000000f1",
+  "dates": [
+   "2026-10-08"
+  ]
+ },
+ {
+  "ref": "Anagrafica Attvità Commerciali:58",
+  "sheet": "Anagrafica Attvità Commerciali",
+  "kind": "anagrafica",
+  "row": 58,
+  "status": "valida",
+  "discard": null,
+  "warnings": [],
+  "party": {
+   "tipo": "azienda",
+   "denominazione": "Iota Impianti Esempio Srl",
+   "nome": null,
+   "cognome": null,
+   "categoria": "Centri medici",
+   "sito": "www.iota-impianti.example",
+   "telefono": "02 7000 1044",
+   "email": "info@iota-impianti.example",
+   "form_web_url": null
+  },
+  "externalId": "Anagrafica Attvità Commerciali#2044",
+  "contact": null,
+  "opportunity": {
+   "fase": "contattata",
+   "esito": "aperta",
+   "motivo_perdita": null,
+   "posti_richiesti": null
+  },
+  "activities": [
+   {
+    "tipo": "chiamata",
+    "testo": "Chiamata (da import Excel)",
+    "data": "2026-10-09"
+   },
+   {
+    "tipo": "email",
+    "testo": "Email inviata (da import Excel)",
+    "data": "2026-10-09"
+   }
+  ],
+  "offer": null,
+  "linkTo": null,
+  "needsTypeChoice": false,
+  "duplicates": [],
+  "decision": "crea",
+  "mergeInto": null,
+  "parkingId": "00000000-0000-4000-8000-0000000000f1",
+  "dates": [
+   "2026-10-09"
+  ]
+ },
+ {
+  "ref": "Anagrafica Attvità Commerciali:59",
+  "sheet": "Anagrafica Attvità Commerciali",
+  "kind": "anagrafica",
+  "row": 59,
+  "status": "valida",
+  "discard": null,
+  "warnings": [],
+  "party": {
+   "tipo": "azienda",
+   "denominazione": "Kappa Impianti Esempio Srl",
+   "nome": null,
+   "cognome": null,
+   "categoria": "Uffici",
+   "sito": "www.kappa-impianti.example",
+   "telefono": "02 7000 1045",
+   "email": "info@kappa-impianti.example",
+   "form_web_url": null
+  },
+  "externalId": "Anagrafica Attvità Commerciali#2045",
+  "contact": {
+   "nome": "Referente",
+   "cognome": "Kappa",
+   "ruolo": "Responsabile",
+   "email": null,
+   "telefono": null
+  },
+  "opportunity": {
+   "fase": "interessata",
+   "esito": "aperta",
+   "motivo_perdita": null,
+   "posti_richiesti": 5
+  },
+  "activities": [
+   {
+    "tipo": "chiamata",
+    "testo": "Chiamata (da import Excel)",
+    "data": "2026-10-01"
+   }
+  ],
+  "offer": null,
+  "linkTo": null,
+  "needsTypeChoice": false,
+  "duplicates": [],
+  "decision": "crea",
+  "mergeInto": null,
+  "parkingId": "00000000-0000-4000-8000-0000000000f1",
+  "dates": [
+   "2026-10-01"
+  ]
+ },
+ {
+  "ref": "Anagrafica Attvità Commerciali:60",
+  "sheet": "Anagrafica Attvità Commerciali",
+  "kind": "anagrafica",
+  "row": 60,
+  "status": "valida",
+  "discard": null,
+  "warnings": [],
+  "party": {
+   "tipo": "azienda",
+   "denominazione": "Lambda Impianti Esempio Srl",
+   "nome": null,
+   "cognome": null,
+   "categoria": "Aziende",
+   "sito": "www.lambda-impianti.example",
+   "telefono": "02 7000 1046",
+   "email": "info@lambda-impianti.example",
+   "form_web_url": null
+  },
+  "externalId": "Anagrafica Attvità Commerciali#2046",
+  "contact": null,
+  "opportunity": {
+   "fase": "contattata",
+   "esito": "persa",
+   "motivo_perdita": "nessun_bisogno",
+   "posti_richiesti": null
+  },
+  "activities": [
+   {
+    "tipo": "chiamata",
+    "testo": "Chiamata (da import Excel)",
+    "data": "2026-10-02"
+   },
+   {
+    "tipo": "email",
+    "testo": "Email inviata (da import Excel)",
+    "data": "2026-10-02"
+   },
+   {
+    "tipo": "nota",
+    "testo": "non hanno bisogno di posti auto",
+    "data": "2026-10-02"
+   }
+  ],
+  "offer": null,
+  "linkTo": null,
+  "needsTypeChoice": false,
+  "duplicates": [],
+  "decision": "crea",
+  "mergeInto": null,
+  "parkingId": "00000000-0000-4000-8000-0000000000f1",
+  "dates": [
+   "2026-10-02",
+   "2026-10-02"
+  ]
+ },
+ {
+  "ref": "Anagrafica Attvità Commerciali:61",
+  "sheet": "Anagrafica Attvità Commerciali",
+  "kind": "anagrafica",
+  "row": 61,
+  "status": "valida",
+  "discard": null,
+  "warnings": [],
+  "party": {
+   "tipo": "azienda",
+   "denominazione": "Sigma Impianti Esempio Srl",
+   "nome": null,
+   "cognome": null,
+   "categoria": "Studi professionali",
+   "sito": "www.sigma-impianti.example",
+   "telefono": "02 7000 1047",
+   "email": "info@sigma-impianti.example",
+   "form_web_url": null
+  },
+  "externalId": "Anagrafica Attvità Commerciali#2047",
+  "contact": null,
+  "opportunity": {
+   "fase": "interessata",
+   "esito": "aperta",
+   "motivo_perdita": null,
+   "posti_richiesti": null
+  },
+  "activities": [
+   {
+    "tipo": "chiamata",
+    "testo": "Chiamata (da import Excel)",
+    "data": "2026-10-03"
+   }
+  ],
+  "offer": null,
+  "linkTo": null,
+  "needsTypeChoice": false,
+  "duplicates": [],
+  "decision": "crea",
+  "mergeInto": null,
+  "parkingId": "00000000-0000-4000-8000-0000000000f1",
+  "dates": [
+   "2026-10-03"
+  ]
+ },
+ {
+  "ref": "Anagrafica Attvità Commerciali:62",
+  "sheet": "Anagrafica Attvità Commerciali",
+  "kind": "anagrafica",
+  "row": 62,
+  "status": "valida",
+  "discard": null,
+  "warnings": [],
+  "party": {
+   "tipo": "azienda",
+   "denominazione": "Alfa Edilizia Esempio Srl",
+   "nome": null,
+   "cognome": null,
+   "categoria": "Altro",
+   "sito": "www.alfa-edilizia.example",
+   "telefono": "02 7000 1048",
+   "email": "info@alfa-edilizia.example",
+   "form_web_url": null
+  },
+  "externalId": "Anagrafica Attvità Commerciali#2048",
+  "contact": {
+   "nome": "Referente",
+   "cognome": "Alfa",
+   "ruolo": "Responsabile",
+   "email": null,
+   "telefono": null
+  },
+  "opportunity": {
+   "fase": "contattata",
+   "esito": "aperta",
+   "motivo_perdita": null,
+   "posti_richiesti": null
+  },
+  "activities": [
+   {
+    "tipo": "chiamata",
+    "testo": "Chiamata (da import Excel)",
+    "data": "2026-10-04"
+   },
+   {
+    "tipo": "email",
+    "testo": "Email inviata (da import Excel)",
+    "data": "2026-10-04"
+   }
+  ],
+  "offer": null,
+  "linkTo": null,
+  "needsTypeChoice": false,
+  "duplicates": [],
+  "decision": "crea",
+  "mergeInto": null,
+  "parkingId": "00000000-0000-4000-8000-0000000000f1",
+  "dates": [
+   "2026-10-04"
+  ]
+ },
+ {
+  "ref": "Anagrafica Attvità Commerciali:63",
+  "sheet": "Anagrafica Attvità Commerciali",
+  "kind": "anagrafica",
+  "row": 63,
+  "status": "avvisi",
+  "discard": null,
+  "warnings": [
+   "Settore “Palestra” non riconosciuto: categoria Altro"
+  ],
+  "party": {
+   "tipo": "azienda",
+   "denominazione": "Beta Edilizia Esempio Srl",
+   "nome": null,
+   "cognome": null,
+   "categoria": "Altro",
+   "sito": "www.beta-edilizia.example",
+   "telefono": "02 7000 1049",
+   "email": "info@beta-edilizia.example",
+   "form_web_url": null
+  },
+  "externalId": "Anagrafica Attvità Commerciali#2049",
+  "contact": null,
+  "opportunity": {
+   "fase": "interessata",
+   "esito": "aperta",
+   "motivo_perdita": null,
+   "posti_richiesti": null
+  },
+  "activities": [
+   {
+    "tipo": "chiamata",
+    "testo": "Chiamata (da import Excel)",
+    "data": "2026-10-05"
+   }
+  ],
+  "offer": null,
+  "linkTo": null,
+  "needsTypeChoice": false,
+  "duplicates": [],
+  "decision": "crea",
+  "mergeInto": null,
+  "parkingId": "00000000-0000-4000-8000-0000000000f1",
+  "dates": [
+   "2026-10-05"
+  ]
+ },
+ {
+  "ref": "Anagrafica Attvità Commerciali:64",
+  "sheet": "Anagrafica Attvità Commerciali",
+  "kind": "anagrafica",
+  "row": 64,
+  "status": "valida",
+  "discard": null,
+  "warnings": [],
+  "party": {
+   "tipo": "azienda",
+   "denominazione": "Gamma Edilizia Esempio Srl",
+   "nome": null,
+   "cognome": null,
+   "categoria": "Studi professionali",
+   "sito": "www.gamma-edilizia.example",
+   "telefono": "02 7000 1050",
+   "email": "info@gamma-edilizia.example",
+   "form_web_url": null
+  },
+  "externalId": "Anagrafica Attvità Commerciali#2050",
+  "contact": null,
+  "opportunity": {
+   "fase": "contattata",
+   "esito": "persa",
+   "motivo_perdita": "nessun_bisogno",
+   "posti_richiesti": 3
+  },
+  "activities": [
+   {
+    "tipo": "chiamata",
+    "testo": "Chiamata (da import Excel)",
+    "data": "2026-10-06"
+   },
+   {
+    "tipo": "email",
+    "testo": "Email inviata (da import Excel)",
+    "data": "2026-10-06"
+   },
+   {
+    "tipo": "nota",
+    "testo": "non hanno bisogno di posti auto",
+    "data": "2026-10-06"
+   }
+  ],
+  "offer": null,
+  "linkTo": null,
+  "needsTypeChoice": false,
+  "duplicates": [],
+  "decision": "crea",
+  "mergeInto": null,
+  "parkingId": "00000000-0000-4000-8000-0000000000f1",
+  "dates": [
+   "2026-10-06",
+   "2026-10-06"
+  ]
+ },
+ {
+  "ref": "Anagrafica Attvità Commerciali:65",
+  "sheet": "Anagrafica Attvità Commerciali",
+  "kind": "anagrafica",
+  "row": 65,
+  "status": "valida",
+  "discard": null,
+  "warnings": [],
+  "party": {
+   "tipo": "azienda",
+   "denominazione": "Delta Edilizia Esempio Srl",
+   "nome": null,
+   "cognome": null,
+   "categoria": "Studi professionali",
+   "sito": "www.delta-edilizia.example",
+   "telefono": "02 7000 1051",
+   "email": "info@delta-edilizia.example",
+   "form_web_url": null
+  },
+  "externalId": "Anagrafica Attvità Commerciali#2051",
+  "contact": {
+   "nome": "Referente",
+   "cognome": "Delta",
+   "ruolo": "Responsabile",
+   "email": null,
+   "telefono": null
+  },
+  "opportunity": {
+   "fase": "interessata",
+   "esito": "aperta",
+   "motivo_perdita": null,
+   "posti_richiesti": null
+  },
+  "activities": [
+   {
+    "tipo": "chiamata",
+    "testo": "Chiamata (da import Excel)",
+    "data": "2026-10-07"
+   }
+  ],
+  "offer": null,
+  "linkTo": null,
+  "needsTypeChoice": false,
+  "duplicates": [],
+  "decision": "crea",
+  "mergeInto": null,
+  "parkingId": "00000000-0000-4000-8000-0000000000f1",
+  "dates": [
+   "2026-10-07"
+  ]
+ },
+ {
+  "ref": "Anagrafica Attvità Commerciali:66",
+  "sheet": "Anagrafica Attvità Commerciali",
+  "kind": "anagrafica",
+  "row": 66,
+  "status": "valida",
+  "discard": null,
+  "warnings": [],
+  "party": {
+   "tipo": "azienda",
+   "denominazione": "Epsilon Edilizia Esempio Srl",
+   "nome": null,
+   "cognome": null,
+   "categoria": "Hotel",
+   "sito": "www.epsilon-edilizia.example",
+   "telefono": "02 7000 1052",
+   "email": "info@epsilon-edilizia.example",
+   "form_web_url": null
+  },
+  "externalId": "Anagrafica Attvità Commerciali#2052",
+  "contact": null,
+  "opportunity": {
+   "fase": "contattata",
+   "esito": "aperta",
+   "motivo_perdita": null,
+   "posti_richiesti": null
+  },
+  "activities": [
+   {
+    "tipo": "chiamata",
+    "testo": "Chiamata (da import Excel)",
+    "data": "2026-10-08"
+   },
+   {
+    "tipo": "email",
+    "testo": "Email inviata (da import Excel)",
+    "data": "2026-10-08"
+   }
+  ],
+  "offer": null,
+  "linkTo": null,
+  "needsTypeChoice": false,
+  "duplicates": [],
+  "decision": "crea",
+  "mergeInto": null,
+  "parkingId": "00000000-0000-4000-8000-0000000000f1",
+  "dates": [
+   "2026-10-08"
+  ]
+ },
+ {
+  "ref": "Anagrafica Attvità Commerciali:67",
+  "sheet": "Anagrafica Attvità Commerciali",
+  "kind": "anagrafica",
+  "row": 67,
+  "status": "valida",
+  "discard": null,
+  "warnings": [],
+  "party": {
+   "tipo": "azienda",
+   "denominazione": "Zeta Edilizia Esempio Srl",
+   "nome": null,
+   "cognome": null,
+   "categoria": "Ristoranti",
+   "sito": null,
+   "telefono": "02 7000 1053",
+   "email": "info@zeta-edilizia.example",
+   "form_web_url": null
+  },
+  "externalId": "Anagrafica Attvità Commerciali#2053",
+  "contact": null,
+  "opportunity": {
+   "fase": "interessata",
+   "esito": "aperta",
+   "motivo_perdita": null,
+   "posti_richiesti": null
+  },
+  "activities": [
+   {
+    "tipo": "chiamata",
+    "testo": "Chiamata (da import Excel)",
+    "data": "2026-10-09"
+   }
+  ],
+  "offer": null,
+  "linkTo": null,
+  "needsTypeChoice": false,
+  "duplicates": [],
+  "decision": "crea",
+  "mergeInto": null,
+  "parkingId": "00000000-0000-4000-8000-0000000000f1",
+  "dates": [
+   "2026-10-09"
+  ]
+ },
+ {
+  "ref": "Anagrafica Attvità Commerciali:68",
+  "sheet": "Anagrafica Attvità Commerciali",
+  "kind": "anagrafica",
+  "row": 68,
+  "status": "valida",
+  "discard": null,
+  "warnings": [],
+  "party": {
+   "tipo": "azienda",
+   "denominazione": "Eta Edilizia Esempio Srl",
+   "nome": null,
+   "cognome": null,
+   "categoria": "Centri medici",
+   "sito": null,
+   "telefono": "02 7000 1054",
+   "email": "info@eta-edilizia.example",
+   "form_web_url": null
+  },
+  "externalId": "Anagrafica Attvità Commerciali#2054",
+  "contact": {
+   "nome": "Referente",
+   "cognome": "Eta",
+   "ruolo": "Responsabile",
+   "email": null,
+   "telefono": null
+  },
+  "opportunity": {
+   "fase": "contattata",
+   "esito": "persa",
+   "motivo_perdita": "nessun_bisogno",
+   "posti_richiesti": null
+  },
+  "activities": [
+   {
+    "tipo": "chiamata",
+    "testo": "Chiamata (da import Excel)",
+    "data": "2026-10-01"
+   },
+   {
+    "tipo": "email",
+    "testo": "Email inviata (da import Excel)",
+    "data": "2026-10-01"
+   },
+   {
+    "tipo": "nota",
+    "testo": "non hanno bisogno di posti auto",
+    "data": "2026-10-01"
+   }
+  ],
+  "offer": null,
+  "linkTo": null,
+  "needsTypeChoice": false,
+  "duplicates": [],
+  "decision": "crea",
+  "mergeInto": null,
+  "parkingId": "00000000-0000-4000-8000-0000000000f1",
+  "dates": [
+   "2026-10-01",
+   "2026-10-01"
+  ]
+ },
+ {
+  "ref": "Anagrafica Attvità Commerciali:69",
+  "sheet": "Anagrafica Attvità Commerciali",
+  "kind": "anagrafica",
+  "row": 69,
+  "status": "valida",
+  "discard": null,
+  "warnings": [],
+  "party": {
+   "tipo": "azienda",
+   "denominazione": "Theta Edilizia Esempio Srl",
+   "nome": null,
+   "cognome": null,
+   "categoria": "Uffici",
+   "sito": null,
+   "telefono": "02 7000 1055",
+   "email": "info@theta-edilizia.example",
+   "form_web_url": null
+  },
+  "externalId": "Anagrafica Attvità Commerciali#2055",
+  "contact": null,
+  "opportunity": {
+   "fase": "interessata",
+   "esito": "aperta",
+   "motivo_perdita": null,
+   "posti_richiesti": 8
+  },
+  "activities": [
+   {
+    "tipo": "chiamata",
+    "testo": "Chiamata (da import Excel)",
+    "data": "2026-10-02"
+   }
+  ],
+  "offer": null,
+  "linkTo": null,
+  "needsTypeChoice": false,
+  "duplicates": [],
+  "decision": "crea",
+  "mergeInto": null,
+  "parkingId": "00000000-0000-4000-8000-0000000000f1",
+  "dates": [
+   "2026-10-02"
+  ]
+ },
+ {
+  "ref": "Anagrafica Attvità Commerciali:70",
+  "sheet": "Anagrafica Attvità Commerciali",
+  "kind": "anagrafica",
+  "row": 70,
+  "status": "valida",
+  "discard": null,
+  "warnings": [],
+  "party": {
+   "tipo": "azienda",
+   "denominazione": "Iota Edilizia Esempio Srl",
+   "nome": null,
+   "cognome": null,
+   "categoria": "Aziende",
+   "sito": null,
+   "telefono": "02 7000 1056",
+   "email": "info@iota-edilizia.example",
+   "form_web_url": null
+  },
+  "externalId": "Anagrafica Attvità Commerciali#2056",
+  "contact": null,
+  "opportunity": {
+   "fase": "contattata",
+   "esito": "aperta",
+   "motivo_perdita": null,
+   "posti_richiesti": null
+  },
+  "activities": [
+   {
+    "tipo": "chiamata",
+    "testo": "Chiamata (da import Excel)",
+    "data": "2026-10-03"
+   },
+   {
+    "tipo": "email",
+    "testo": "Email inviata (da import Excel)",
+    "data": "2026-10-03"
+   }
+  ],
+  "offer": null,
+  "linkTo": null,
+  "needsTypeChoice": false,
+  "duplicates": [],
+  "decision": "crea",
+  "mergeInto": null,
+  "parkingId": "00000000-0000-4000-8000-0000000000f1",
+  "dates": [
+   "2026-10-03"
+  ]
+ },
+ {
+  "ref": "Anagrafica Attvità Commerciali:71",
+  "sheet": "Anagrafica Attvità Commerciali",
+  "kind": "anagrafica",
+  "row": 71,
+  "status": "valida",
+  "discard": null,
+  "warnings": [],
+  "party": {
+   "tipo": "azienda",
+   "denominazione": "Kappa Edilizia Esempio Srl",
+   "nome": null,
+   "cognome": null,
+   "categoria": "Studi professionali",
+   "sito": null,
+   "telefono": "02 7000 1057",
+   "email": "info@kappa-edilizia.example",
+   "form_web_url": null
+  },
+  "externalId": "Anagrafica Attvità Commerciali#2057",
+  "contact": {
+   "nome": "Referente",
+   "cognome": "Kappa",
+   "ruolo": "Responsabile",
+   "email": null,
+   "telefono": null
+  },
+  "opportunity": {
+   "fase": "interessata",
+   "esito": "aperta",
+   "motivo_perdita": null,
+   "posti_richiesti": null
+  },
+  "activities": [
+   {
+    "tipo": "chiamata",
+    "testo": "Chiamata (da import Excel)",
+    "data": "2026-10-04"
+   }
+  ],
+  "offer": null,
+  "linkTo": null,
+  "needsTypeChoice": false,
+  "duplicates": [],
+  "decision": "crea",
+  "mergeInto": null,
+  "parkingId": "00000000-0000-4000-8000-0000000000f1",
+  "dates": [
+   "2026-10-04"
+  ]
+ },
+ {
+  "ref": "Anagrafica Attvità Commerciali:72",
+  "sheet": "Anagrafica Attvità Commerciali",
+  "kind": "anagrafica",
+  "row": 72,
+  "status": "valida",
+  "discard": null,
+  "warnings": [],
+  "party": {
+   "tipo": "azienda",
+   "denominazione": "Lambda Edilizia Esempio Srl",
+   "nome": null,
+   "cognome": null,
+   "categoria": "Altro",
+   "sito": null,
+   "telefono": "02 7000 1058",
+   "email": "info@lambda-edilizia.example",
+   "form_web_url": null
+  },
+  "externalId": "Anagrafica Attvità Commerciali#2058",
+  "contact": null,
+  "opportunity": {
+   "fase": "contattata",
+   "esito": "persa",
+   "motivo_perdita": "nessun_bisogno",
+   "posti_richiesti": null
+  },
+  "activities": [
+   {
+    "tipo": "chiamata",
+    "testo": "Chiamata (da import Excel)",
+    "data": "2026-10-05"
+   },
+   {
+    "tipo": "email",
+    "testo": "Email inviata (da import Excel)",
+    "data": "2026-10-05"
+   },
+   {
+    "tipo": "nota",
+    "testo": "non hanno bisogno di posti auto",
+    "data": "2026-10-05"
+   }
+  ],
+  "offer": null,
+  "linkTo": null,
+  "needsTypeChoice": false,
+  "duplicates": [],
+  "decision": "crea",
+  "mergeInto": null,
+  "parkingId": "00000000-0000-4000-8000-0000000000f1",
+  "dates": [
+   "2026-10-05",
+   "2026-10-05"
+  ]
+ },
+ {
+  "ref": "Anagrafica Attvità Commerciali:73",
+  "sheet": "Anagrafica Attvità Commerciali",
+  "kind": "anagrafica",
+  "row": 73,
+  "status": "avvisi",
+  "discard": null,
+  "warnings": [
+   "Settore “Palestra” non riconosciuto: categoria Altro"
+  ],
+  "party": {
+   "tipo": "azienda",
+   "denominazione": "Sigma Edilizia Esempio Srl",
+   "nome": null,
+   "cognome": null,
+   "categoria": "Altro",
+   "sito": null,
+   "telefono": "02 7000 1059",
+   "email": "info@sigma-edilizia.example",
+   "form_web_url": null
+  },
+  "externalId": "Anagrafica Attvità Commerciali#2059",
+  "contact": null,
+  "opportunity": {
+   "fase": "interessata",
+   "esito": "aperta",
+   "motivo_perdita": null,
+   "posti_richiesti": null
+  },
+  "activities": [
+   {
+    "tipo": "chiamata",
+    "testo": "Chiamata (da import Excel)",
+    "data": "2026-10-06"
+   }
+  ],
+  "offer": null,
+  "linkTo": null,
+  "needsTypeChoice": false,
+  "duplicates": [],
+  "decision": "crea",
+  "mergeInto": null,
+  "parkingId": "00000000-0000-4000-8000-0000000000f1",
+  "dates": [
+   "2026-10-06"
+  ]
+ },
+ {
+  "ref": "Anagrafica Attvità Commerciali:74",
+  "sheet": "Anagrafica Attvità Commerciali",
+  "kind": "anagrafica",
+  "row": 74,
+  "status": "valida",
+  "discard": null,
+  "warnings": [],
+  "party": {
+   "tipo": "azienda",
+   "denominazione": "Alfa Tessile Esempio Srl",
+   "nome": null,
+   "cognome": null,
+   "categoria": "Studi professionali",
+   "sito": null,
+   "telefono": "02 7000 1060",
+   "email": "info@alfa-tessile.example",
+   "form_web_url": null
+  },
+  "externalId": "Anagrafica Attvità Commerciali#2060",
+  "contact": {
+   "nome": "Referente",
+   "cognome": "Alfa",
+   "ruolo": "Responsabile",
+   "email": null,
+   "telefono": null
+  },
+  "opportunity": {
+   "fase": "contattata",
+   "esito": "aperta",
+   "motivo_perdita": null,
+   "posti_richiesti": 6
+  },
+  "activities": [
+   {
+    "tipo": "chiamata",
+    "testo": "Chiamata (da import Excel)",
+    "data": "2026-10-07"
+   },
+   {
+    "tipo": "email",
+    "testo": "Email inviata (da import Excel)",
+    "data": "2026-10-07"
+   }
+  ],
+  "offer": null,
+  "linkTo": null,
+  "needsTypeChoice": false,
+  "duplicates": [],
+  "decision": "crea",
+  "mergeInto": null,
+  "parkingId": "00000000-0000-4000-8000-0000000000f1",
+  "dates": [
+   "2026-10-07"
+  ]
+ },
+ {
+  "ref": "Anagrafica Attvità Commerciali:75",
+  "sheet": "Anagrafica Attvità Commerciali",
+  "kind": "anagrafica",
+  "row": 75,
+  "status": "valida",
+  "discard": null,
+  "warnings": [],
+  "party": {
+   "tipo": "azienda",
+   "denominazione": "Beta Tessile Esempio Srl",
+   "nome": null,
+   "cognome": null,
+   "categoria": "Studi professionali",
+   "sito": null,
+   "telefono": "02 7000 1061",
+   "email": "info@beta-tessile.example",
+   "form_web_url": null
+  },
+  "externalId": "Anagrafica Attvità Commerciali#2061",
+  "contact": null,
+  "opportunity": {
+   "fase": "interessata",
+   "esito": "aperta",
+   "motivo_perdita": null,
+   "posti_richiesti": null
+  },
+  "activities": [
+   {
+    "tipo": "chiamata",
+    "testo": "Chiamata (da import Excel)",
+    "data": "2026-10-08"
+   }
+  ],
+  "offer": null,
+  "linkTo": null,
+  "needsTypeChoice": false,
+  "duplicates": [],
+  "decision": "crea",
+  "mergeInto": null,
+  "parkingId": "00000000-0000-4000-8000-0000000000f1",
+  "dates": [
+   "2026-10-08"
+  ]
+ },
+ {
+  "ref": "Anagrafica Attvità Commerciali:76",
+  "sheet": "Anagrafica Attvità Commerciali",
+  "kind": "anagrafica",
+  "row": 76,
+  "status": "valida",
+  "discard": null,
+  "warnings": [],
+  "party": {
+   "tipo": "azienda",
+   "denominazione": "Gamma Tessile Esempio Srl",
+   "nome": null,
+   "cognome": null,
+   "categoria": "Hotel",
+   "sito": null,
+   "telefono": "02 7000 1062",
+   "email": "info@gamma-tessile.example",
+   "form_web_url": null
+  },
+  "externalId": "Anagrafica Attvità Commerciali#2062",
+  "contact": null,
+  "opportunity": {
+   "fase": "contattata",
+   "esito": "persa",
+   "motivo_perdita": "nessun_bisogno",
+   "posti_richiesti": null
+  },
+  "activities": [
+   {
+    "tipo": "chiamata",
+    "testo": "Chiamata (da import Excel)",
+    "data": "2026-10-09"
+   },
+   {
+    "tipo": "email",
+    "testo": "Email inviata (da import Excel)",
+    "data": "2026-10-09"
+   },
+   {
+    "tipo": "nota",
+    "testo": "non hanno bisogno di posti auto",
+    "data": "2026-10-09"
+   }
+  ],
+  "offer": null,
+  "linkTo": null,
+  "needsTypeChoice": false,
+  "duplicates": [],
+  "decision": "crea",
+  "mergeInto": null,
+  "parkingId": "00000000-0000-4000-8000-0000000000f1",
+  "dates": [
+   "2026-10-09",
+   "2026-10-09"
+  ]
+ },
+ {
+  "ref": "Anagrafica Attvità Commerciali:77",
+  "sheet": "Anagrafica Attvità Commerciali",
+  "kind": "anagrafica",
+  "row": 77,
+  "status": "valida",
+  "discard": null,
+  "warnings": [],
+  "party": {
+   "tipo": "azienda",
+   "denominazione": "Delta Tessile Esempio Srl",
+   "nome": null,
+   "cognome": null,
+   "categoria": "Ristoranti",
+   "sito": null,
+   "telefono": "02 7000 1063",
+   "email": "info@delta-tessile.example",
+   "form_web_url": null
+  },
+  "externalId": "Anagrafica Attvità Commerciali#2063",
+  "contact": {
+   "nome": "Referente",
+   "cognome": "Delta",
+   "ruolo": "Responsabile",
+   "email": null,
+   "telefono": null
+  },
+  "opportunity": {
+   "fase": "interessata",
+   "esito": "aperta",
+   "motivo_perdita": null,
+   "posti_richiesti": null
+  },
+  "activities": [
+   {
+    "tipo": "chiamata",
+    "testo": "Chiamata (da import Excel)",
+    "data": "2026-10-01"
+   }
+  ],
+  "offer": null,
+  "linkTo": null,
+  "needsTypeChoice": false,
+  "duplicates": [],
+  "decision": "crea",
+  "mergeInto": null,
+  "parkingId": "00000000-0000-4000-8000-0000000000f1",
+  "dates": [
+   "2026-10-01"
+  ]
+ },
+ {
+  "ref": "Anagrafica Attvità Commerciali:78",
+  "sheet": "Anagrafica Attvità Commerciali",
+  "kind": "anagrafica",
+  "row": 78,
+  "status": "valida",
+  "discard": null,
+  "warnings": [],
+  "party": {
+   "tipo": "azienda",
+   "denominazione": "Epsilon Tessile Esempio Srl",
+   "nome": null,
+   "cognome": null,
+   "categoria": "Centri medici",
+   "sito": null,
+   "telefono": "02 7000 1064",
+   "email": "info@epsilon-tessile.example",
+   "form_web_url": null
+  },
+  "externalId": "Anagrafica Attvità Commerciali#2064",
+  "contact": null,
+  "opportunity": {
+   "fase": "contattata",
+   "esito": "aperta",
+   "motivo_perdita": null,
+   "posti_richiesti": null
+  },
+  "activities": [
+   {
+    "tipo": "chiamata",
+    "testo": "Chiamata (da import Excel)",
+    "data": "2026-10-02"
+   },
+   {
+    "tipo": "email",
+    "testo": "Email inviata (da import Excel)",
+    "data": "2026-10-02"
+   }
+  ],
+  "offer": null,
+  "linkTo": null,
+  "needsTypeChoice": false,
+  "duplicates": [],
+  "decision": "crea",
+  "mergeInto": null,
+  "parkingId": "00000000-0000-4000-8000-0000000000f1",
+  "dates": [
+   "2026-10-02"
+  ]
+ },
+ {
+  "ref": "Anagrafica Attvità Commerciali:79",
+  "sheet": "Anagrafica Attvità Commerciali",
+  "kind": "anagrafica",
+  "row": 79,
+  "status": "valida",
+  "discard": null,
+  "warnings": [],
+  "party": {
+   "tipo": "azienda",
+   "denominazione": "Zeta Tessile Esempio Srl",
+   "nome": null,
+   "cognome": null,
+   "categoria": "Uffici",
+   "sito": null,
+   "telefono": "02 7000 1065",
+   "email": "info@zeta-tessile.example",
+   "form_web_url": null
+  },
+  "externalId": "Anagrafica Attvità Commerciali#2065",
+  "contact": null,
+  "opportunity": {
+   "fase": "interessata",
+   "esito": "aperta",
+   "motivo_perdita": null,
+   "posti_richiesti": 4
+  },
+  "activities": [
+   {
+    "tipo": "chiamata",
+    "testo": "Chiamata (da import Excel)",
+    "data": "2026-10-03"
+   }
+  ],
+  "offer": null,
+  "linkTo": null,
+  "needsTypeChoice": false,
+  "duplicates": [],
+  "decision": "crea",
+  "mergeInto": null,
+  "parkingId": "00000000-0000-4000-8000-0000000000f1",
+  "dates": [
+   "2026-10-03"
+  ]
+ },
+ {
+  "ref": "Anagrafica Attvità Commerciali:80",
+  "sheet": "Anagrafica Attvità Commerciali",
+  "kind": "anagrafica",
+  "row": 80,
+  "status": "valida",
+  "discard": null,
+  "warnings": [],
+  "party": {
+   "tipo": "azienda",
+   "denominazione": "Eta Tessile Esempio Srl",
+   "nome": null,
+   "cognome": null,
+   "categoria": "Aziende",
+   "sito": null,
+   "telefono": "02 7000 1066",
+   "email": "info@eta-tessile.example",
+   "form_web_url": null
+  },
+  "externalId": "Anagrafica Attvità Commerciali#2066",
+  "contact": {
+   "nome": "Referente",
+   "cognome": "Eta",
+   "ruolo": "Responsabile",
+   "email": null,
+   "telefono": null
+  },
+  "opportunity": {
+   "fase": "contattata",
+   "esito": "persa",
+   "motivo_perdita": "nessun_bisogno",
+   "posti_richiesti": null
+  },
+  "activities": [
+   {
+    "tipo": "chiamata",
+    "testo": "Chiamata (da import Excel)",
+    "data": "2026-10-04"
+   },
+   {
+    "tipo": "email",
+    "testo": "Email inviata (da import Excel)",
+    "data": "2026-10-04"
+   },
+   {
+    "tipo": "nota",
+    "testo": "non hanno bisogno di posti auto",
+    "data": "2026-10-04"
+   }
+  ],
+  "offer": null,
+  "linkTo": null,
+  "needsTypeChoice": false,
+  "duplicates": [],
+  "decision": "crea",
+  "mergeInto": null,
+  "parkingId": "00000000-0000-4000-8000-0000000000f1",
+  "dates": [
+   "2026-10-04",
+   "2026-10-04"
+  ]
+ },
+ {
+  "ref": "Anagrafica Attvità Commerciali:81",
+  "sheet": "Anagrafica Attvità Commerciali",
+  "kind": "anagrafica",
+  "row": 81,
+  "status": "valida",
+  "discard": null,
+  "warnings": [],
+  "party": {
+   "tipo": "azienda",
+   "denominazione": "Theta Tessile Esempio Srl",
+   "nome": null,
+   "cognome": null,
+   "categoria": "Studi professionali",
+   "sito": null,
+   "telefono": "02 7000 1067",
+   "email": "info@theta-tessile.example",
+   "form_web_url": null
+  },
+  "externalId": "Anagrafica Attvità Commerciali#2067",
+  "contact": null,
+  "opportunity": {
+   "fase": "interessata",
+   "esito": "aperta",
+   "motivo_perdita": null,
+   "posti_richiesti": null
+  },
+  "activities": [
+   {
+    "tipo": "chiamata",
+    "testo": "Chiamata (da import Excel)",
+    "data": "2026-10-05"
+   }
+  ],
+  "offer": null,
+  "linkTo": null,
+  "needsTypeChoice": false,
+  "duplicates": [],
+  "decision": "crea",
+  "mergeInto": null,
+  "parkingId": "00000000-0000-4000-8000-0000000000f1",
+  "dates": [
+   "2026-10-05"
+  ]
+ },
+ {
+  "ref": "Anagrafica Attvità Commerciali:82",
+  "sheet": "Anagrafica Attvità Commerciali",
+  "kind": "anagrafica",
+  "row": 82,
+  "status": "valida",
+  "discard": null,
+  "warnings": [],
+  "party": {
+   "tipo": "azienda",
+   "denominazione": "Iota Tessile Esempio Srl",
+   "nome": null,
+   "cognome": null,
+   "categoria": "Altro",
+   "sito": null,
+   "telefono": "02 7000 1068",
+   "email": "info@iota-tessile.example",
+   "form_web_url": null
+  },
+  "externalId": "Anagrafica Attvità Commerciali#2068",
+  "contact": null,
+  "opportunity": {
+   "fase": "contattata",
+   "esito": "aperta",
+   "motivo_perdita": null,
+   "posti_richiesti": null
+  },
+  "activities": [
+   {
+    "tipo": "chiamata",
+    "testo": "Chiamata (da import Excel)",
+    "data": "2026-10-06"
+   },
+   {
+    "tipo": "email",
+    "testo": "Email inviata (da import Excel)",
+    "data": "2026-10-06"
+   }
+  ],
+  "offer": null,
+  "linkTo": null,
+  "needsTypeChoice": false,
+  "duplicates": [],
+  "decision": "crea",
+  "mergeInto": null,
+  "parkingId": "00000000-0000-4000-8000-0000000000f1",
+  "dates": [
+   "2026-10-06"
+  ]
+ },
+ {
+  "ref": "Anagrafica Attvità Commerciali:83",
+  "sheet": "Anagrafica Attvità Commerciali",
+  "kind": "anagrafica",
+  "row": 83,
+  "status": "avvisi",
+  "discard": null,
+  "warnings": [
+   "Settore “Palestra” non riconosciuto: categoria Altro"
+  ],
+  "party": {
+   "tipo": "azienda",
+   "denominazione": "Kappa Tessile Esempio Srl",
+   "nome": null,
+   "cognome": null,
+   "categoria": "Altro",
+   "sito": null,
+   "telefono": "02 7000 1069",
+   "email": "info@kappa-tessile.example",
+   "form_web_url": null
+  },
+  "externalId": "Anagrafica Attvità Commerciali#2069",
+  "contact": {
+   "nome": "Referente",
+   "cognome": "Kappa",
+   "ruolo": "Responsabile",
+   "email": null,
+   "telefono": null
+  },
+  "opportunity": {
+   "fase": "interessata",
+   "esito": "aperta",
+   "motivo_perdita": null,
+   "posti_richiesti": null
+  },
+  "activities": [
+   {
+    "tipo": "chiamata",
+    "testo": "Chiamata (da import Excel)",
+    "data": "2026-10-07"
+   }
+  ],
+  "offer": null,
+  "linkTo": null,
+  "needsTypeChoice": false,
+  "duplicates": [],
+  "decision": "crea",
+  "mergeInto": null,
+  "parkingId": "00000000-0000-4000-8000-0000000000f1",
+  "dates": [
+   "2026-10-07"
+  ]
+ },
+ {
+  "ref": "Anagrafica Attvità Commerciali:84",
+  "sheet": "Anagrafica Attvità Commerciali",
+  "kind": "anagrafica",
+  "row": 84,
+  "status": "valida",
+  "discard": null,
+  "warnings": [],
+  "party": {
+   "tipo": "azienda",
+   "denominazione": "Lambda Tessile Esempio Srl",
+   "nome": null,
+   "cognome": null,
+   "categoria": "Studi professionali",
+   "sito": null,
+   "telefono": "02 7000 1070",
+   "email": "info@lambda-tessile.example",
+   "form_web_url": null
+  },
+  "externalId": "Anagrafica Attvità Commerciali#2070",
+  "contact": null,
+  "opportunity": {
+   "fase": "contattata",
+   "esito": "persa",
+   "motivo_perdita": "nessun_bisogno",
+   "posti_richiesti": 2
+  },
+  "activities": [
+   {
+    "tipo": "chiamata",
+    "testo": "Chiamata (da import Excel)",
+    "data": "2026-10-08"
+   },
+   {
+    "tipo": "email",
+    "testo": "Email inviata (da import Excel)",
+    "data": "2026-10-08"
+   },
+   {
+    "tipo": "nota",
+    "testo": "non hanno bisogno di posti auto",
+    "data": "2026-10-08"
+   }
+  ],
+  "offer": null,
+  "linkTo": null,
+  "needsTypeChoice": false,
+  "duplicates": [],
+  "decision": "crea",
+  "mergeInto": null,
+  "parkingId": "00000000-0000-4000-8000-0000000000f1",
+  "dates": [
+   "2026-10-08",
+   "2026-10-08"
+  ]
+ },
+ {
+  "ref": "Anagrafica Attvità Commerciali:85",
+  "sheet": "Anagrafica Attvità Commerciali",
+  "kind": "anagrafica",
+  "row": 85,
+  "status": "valida",
+  "discard": null,
+  "warnings": [],
+  "party": {
+   "tipo": "azienda",
+   "denominazione": "Sigma Tessile Esempio Srl",
+   "nome": null,
+   "cognome": null,
+   "categoria": "Studi professionali",
+   "sito": null,
+   "telefono": "02 7000 1071",
+   "email": "info@sigma-tessile.example",
+   "form_web_url": null
+  },
+  "externalId": "Anagrafica Attvità Commerciali#2071",
+  "contact": null,
+  "opportunity": {
+   "fase": "interessata",
+   "esito": "aperta",
+   "motivo_perdita": null,
+   "posti_richiesti": null
+  },
+  "activities": [
+   {
+    "tipo": "chiamata",
+    "testo": "Chiamata (da import Excel)",
+    "data": "2026-10-09"
+   }
+  ],
+  "offer": null,
+  "linkTo": null,
+  "needsTypeChoice": false,
+  "duplicates": [],
+  "decision": "crea",
+  "mergeInto": null,
+  "parkingId": "00000000-0000-4000-8000-0000000000f1",
+  "dates": [
+   "2026-10-09"
+  ]
+ },
+ {
   "ref": "Gestione Prospectrichieste:6",
   "sheet": "Gestione Prospectrichieste",
   "kind": "prospect",
@@ -950,6 +4636,826 @@ insert into plan_input values ($plan$[
   "dates": [
    "2026-10-09"
   ]
+ },
+ {
+  "ref": "Gestione Prospectrichieste:12",
+  "sheet": "Gestione Prospectrichieste",
+  "kind": "prospect",
+  "row": 12,
+  "status": "valida",
+  "discard": null,
+  "warnings": [],
+  "party": {
+   "tipo": "azienda",
+   "denominazione": "Alfa Servizi Esempio Srl",
+   "nome": null,
+   "cognome": null,
+   "categoria": "Studi professionali",
+   "sito": "www.alfa-servizi.example",
+   "telefono": "02 7000 1000",
+   "email": "info@alfa-servizi.example",
+   "form_web_url": null
+  },
+  "externalId": null,
+  "contact": null,
+  "opportunity": {
+   "fase": "vinta",
+   "esito": "vinta",
+   "motivo_perdita": null,
+   "posti_richiesti": 1
+  },
+  "activities": [
+   {
+    "tipo": "email",
+    "testo": "Offerta inviata (da import Excel)",
+    "data": "2026-10-01"
+   }
+  ],
+  "offer": {
+   "stato": "accettata",
+   "inviata_il": "2026-10-01",
+   "accettata_il": "2026-10-01",
+   "motivo_rifiuto": null,
+   "condizioni": {
+    "testo_originale": "150",
+    "posti_7_7": "1",
+    "feedback": null,
+    "origine": "Import Excel"
+   },
+   "importo": 150,
+   "posti": 1
+  },
+  "linkTo": "Anagrafica Attvità Commerciali:14",
+  "needsTypeChoice": false,
+  "duplicates": [],
+  "decision": "unisci",
+  "mergeInto": null,
+  "parkingId": "00000000-0000-4000-8000-0000000000f1",
+  "dates": [
+   "2026-10-01"
+  ]
+ },
+ {
+  "ref": "Gestione Prospectrichieste:13",
+  "sheet": "Gestione Prospectrichieste",
+  "kind": "prospect",
+  "row": 13,
+  "status": "valida",
+  "discard": null,
+  "warnings": [],
+  "party": {
+   "tipo": "azienda",
+   "denominazione": "Theta Servizi Esempio Srl",
+   "nome": null,
+   "cognome": null,
+   "categoria": "Studi professionali",
+   "sito": "www.theta-servizi.example",
+   "telefono": "02 7000 1007",
+   "email": "info@theta-servizi.example",
+   "form_web_url": null
+  },
+  "externalId": null,
+  "contact": null,
+  "opportunity": {
+   "fase": "offerta_inviata",
+   "esito": "persa",
+   "motivo_perdita": "prezzo",
+   "posti_richiesti": 2
+  },
+  "activities": [
+   {
+    "tipo": "email",
+    "testo": "Offerta inviata (da import Excel)",
+    "data": "2026-10-02"
+   }
+  ],
+  "offer": {
+   "stato": "rifiutata",
+   "inviata_il": "2026-10-02",
+   "accettata_il": null,
+   "motivo_rifiuto": "Prezzo troppo alto",
+   "condizioni": {
+    "testo_originale": "160",
+    "posti_7_7": "2",
+    "feedback": "Prezzo troppo alto",
+    "origine": "Import Excel"
+   },
+   "importo": 160,
+   "posti": 2
+  },
+  "linkTo": "Anagrafica Attvità Commerciali:21",
+  "needsTypeChoice": false,
+  "duplicates": [],
+  "decision": "unisci",
+  "mergeInto": null,
+  "parkingId": "00000000-0000-4000-8000-0000000000f1",
+  "dates": [
+   "2026-10-02"
+  ]
+ },
+ {
+  "ref": "Gestione Prospectrichieste:14",
+  "sheet": "Gestione Prospectrichieste",
+  "kind": "prospect",
+  "row": 14,
+  "status": "valida",
+  "discard": null,
+  "warnings": [],
+  "party": {
+   "tipo": "azienda",
+   "denominazione": "Gamma Consulenze Esempio Srl",
+   "nome": null,
+   "cognome": null,
+   "categoria": "Centri medici",
+   "sito": "www.gamma-consulenze.example",
+   "telefono": "02 7000 1014",
+   "email": "info@gamma-consulenze.example",
+   "form_web_url": null
+  },
+  "externalId": null,
+  "contact": null,
+  "opportunity": {
+   "fase": "offerta_inviata",
+   "esito": "aperta",
+   "motivo_perdita": null,
+   "posti_richiesti": 3
+  },
+  "activities": [
+   {
+    "tipo": "email",
+    "testo": "Offerta inviata (da import Excel)",
+    "data": "2026-10-03"
+   }
+  ],
+  "offer": {
+   "stato": "inviata",
+   "inviata_il": "2026-10-03",
+   "accettata_il": null,
+   "motivo_rifiuto": null,
+   "condizioni": {
+    "testo_originale": "170",
+    "posti_7_7": "3",
+    "feedback": null,
+    "origine": "Import Excel"
+   },
+   "importo": 170,
+   "posti": 3
+  },
+  "linkTo": "Anagrafica Attvità Commerciali:28",
+  "needsTypeChoice": false,
+  "duplicates": [],
+  "decision": "unisci",
+  "mergeInto": null,
+  "parkingId": "00000000-0000-4000-8000-0000000000f1",
+  "dates": [
+   "2026-10-03"
+  ]
+ },
+ {
+  "ref": "Gestione Prospectrichieste:15",
+  "sheet": "Gestione Prospectrichieste",
+  "kind": "prospect",
+  "row": 15,
+  "status": "valida",
+  "discard": null,
+  "warnings": [],
+  "party": {
+   "tipo": "azienda",
+   "denominazione": "Kappa Consulenze Esempio Srl",
+   "nome": null,
+   "cognome": null,
+   "categoria": "Studi professionali",
+   "sito": "www.kappa-consulenze.example",
+   "telefono": "02 7000 1021",
+   "email": "info@kappa-consulenze.example",
+   "form_web_url": null
+  },
+  "externalId": null,
+  "contact": null,
+  "opportunity": {
+   "fase": "vinta",
+   "esito": "vinta",
+   "motivo_perdita": null,
+   "posti_richiesti": 4
+  },
+  "activities": [
+   {
+    "tipo": "email",
+    "testo": "Offerta inviata (da import Excel)",
+    "data": "2026-10-04"
+   }
+  ],
+  "offer": {
+   "stato": "accettata",
+   "inviata_il": "2026-10-04",
+   "accettata_il": "2026-10-04",
+   "motivo_rifiuto": null,
+   "condizioni": {
+    "testo_originale": "180",
+    "posti_7_7": "4",
+    "feedback": null,
+    "origine": "Import Excel"
+   },
+   "importo": 180,
+   "posti": 4
+  },
+  "linkTo": "Anagrafica Attvità Commerciali:35",
+  "needsTypeChoice": false,
+  "duplicates": [],
+  "decision": "unisci",
+  "mergeInto": null,
+  "parkingId": "00000000-0000-4000-8000-0000000000f1",
+  "dates": [
+   "2026-10-04"
+  ]
+ },
+ {
+  "ref": "Gestione Prospectrichieste:16",
+  "sheet": "Gestione Prospectrichieste",
+  "kind": "prospect",
+  "row": 16,
+  "status": "valida",
+  "discard": null,
+  "warnings": [],
+  "party": {
+   "tipo": "azienda",
+   "denominazione": "Epsilon Logistica Esempio Srl",
+   "nome": null,
+   "cognome": null,
+   "categoria": "Altro",
+   "sito": "www.epsilon-logistica.example",
+   "telefono": "02 7000 1028",
+   "email": "info@epsilon-logistica.example",
+   "form_web_url": null
+  },
+  "externalId": null,
+  "contact": null,
+  "opportunity": {
+   "fase": "offerta_inviata",
+   "esito": "persa",
+   "motivo_perdita": "prezzo",
+   "posti_richiesti": 1
+  },
+  "activities": [
+   {
+    "tipo": "email",
+    "testo": "Offerta inviata (da import Excel)",
+    "data": "2026-10-05"
+   }
+  ],
+  "offer": {
+   "stato": "rifiutata",
+   "inviata_il": "2026-10-05",
+   "accettata_il": null,
+   "motivo_rifiuto": "Prezzo troppo alto",
+   "condizioni": {
+    "testo_originale": "190",
+    "posti_7_7": "1",
+    "feedback": "Prezzo troppo alto",
+    "origine": "Import Excel"
+   },
+   "importo": 190,
+   "posti": 1
+  },
+  "linkTo": "Anagrafica Attvità Commerciali:42",
+  "needsTypeChoice": false,
+  "duplicates": [],
+  "decision": "unisci",
+  "mergeInto": null,
+  "parkingId": "00000000-0000-4000-8000-0000000000f1",
+  "dates": [
+   "2026-10-05"
+  ]
+ },
+ {
+  "ref": "Gestione Prospectrichieste:17",
+  "sheet": "Gestione Prospectrichieste",
+  "kind": "prospect",
+  "row": 17,
+  "status": "valida",
+  "discard": null,
+  "warnings": [],
+  "party": {
+   "tipo": "azienda",
+   "denominazione": "Sigma Logistica Esempio Srl",
+   "nome": null,
+   "cognome": null,
+   "categoria": "Uffici",
+   "sito": "www.sigma-logistica.example",
+   "telefono": "02 7000 1035",
+   "email": "info@sigma-logistica.example",
+   "form_web_url": null
+  },
+  "externalId": null,
+  "contact": null,
+  "opportunity": {
+   "fase": "offerta_inviata",
+   "esito": "aperta",
+   "motivo_perdita": null,
+   "posti_richiesti": 2
+  },
+  "activities": [
+   {
+    "tipo": "email",
+    "testo": "Offerta inviata (da import Excel)",
+    "data": "2026-10-06"
+   }
+  ],
+  "offer": {
+   "stato": "inviata",
+   "inviata_il": "2026-10-06",
+   "accettata_il": null,
+   "motivo_rifiuto": null,
+   "condizioni": {
+    "testo_originale": "200",
+    "posti_7_7": "2",
+    "feedback": null,
+    "origine": "Import Excel"
+   },
+   "importo": 200,
+   "posti": 2
+  },
+  "linkTo": "Anagrafica Attvità Commerciali:49",
+  "needsTypeChoice": false,
+  "duplicates": [],
+  "decision": "unisci",
+  "mergeInto": null,
+  "parkingId": "00000000-0000-4000-8000-0000000000f1",
+  "dates": [
+   "2026-10-06"
+  ]
+ },
+ {
+  "ref": "Gestione Prospectrichieste:18",
+  "sheet": "Gestione Prospectrichieste",
+  "kind": "prospect",
+  "row": 18,
+  "status": "valida",
+  "discard": null,
+  "warnings": [],
+  "party": {
+   "tipo": "azienda",
+   "denominazione": "Eta Impianti Esempio Srl",
+   "nome": null,
+   "cognome": null,
+   "categoria": "Hotel",
+   "sito": "www.eta-impianti.example",
+   "telefono": "02 7000 1042",
+   "email": "info@eta-impianti.example",
+   "form_web_url": null
+  },
+  "externalId": null,
+  "contact": null,
+  "opportunity": {
+   "fase": "vinta",
+   "esito": "vinta",
+   "motivo_perdita": null,
+   "posti_richiesti": 3
+  },
+  "activities": [
+   {
+    "tipo": "email",
+    "testo": "Offerta inviata (da import Excel)",
+    "data": "2026-10-07"
+   }
+  ],
+  "offer": {
+   "stato": "accettata",
+   "inviata_il": "2026-10-07",
+   "accettata_il": "2026-10-07",
+   "motivo_rifiuto": null,
+   "condizioni": {
+    "testo_originale": "210",
+    "posti_7_7": "3",
+    "feedback": null,
+    "origine": "Import Excel"
+   },
+   "importo": 210,
+   "posti": 3
+  },
+  "linkTo": "Anagrafica Attvità Commerciali:56",
+  "needsTypeChoice": false,
+  "duplicates": [],
+  "decision": "unisci",
+  "mergeInto": null,
+  "parkingId": "00000000-0000-4000-8000-0000000000f1",
+  "dates": [
+   "2026-10-07"
+  ]
+ },
+ {
+  "ref": "Gestione Prospectrichieste:19",
+  "sheet": "Gestione Prospectrichieste",
+  "kind": "prospect",
+  "row": 19,
+  "status": "valida",
+  "discard": null,
+  "warnings": [],
+  "party": {
+   "tipo": "azienda",
+   "denominazione": "Beta Edilizia Esempio Srl",
+   "nome": null,
+   "cognome": null,
+   "categoria": "Altro",
+   "sito": "www.beta-edilizia.example",
+   "telefono": "02 7000 1049",
+   "email": "info@beta-edilizia.example",
+   "form_web_url": null
+  },
+  "externalId": null,
+  "contact": null,
+  "opportunity": {
+   "fase": "offerta_inviata",
+   "esito": "persa",
+   "motivo_perdita": "prezzo",
+   "posti_richiesti": 4
+  },
+  "activities": [
+   {
+    "tipo": "email",
+    "testo": "Offerta inviata (da import Excel)",
+    "data": "2026-10-08"
+   }
+  ],
+  "offer": {
+   "stato": "rifiutata",
+   "inviata_il": "2026-10-08",
+   "accettata_il": null,
+   "motivo_rifiuto": "Prezzo troppo alto",
+   "condizioni": {
+    "testo_originale": "220",
+    "posti_7_7": "4",
+    "feedback": "Prezzo troppo alto",
+    "origine": "Import Excel"
+   },
+   "importo": 220,
+   "posti": 4
+  },
+  "linkTo": "Anagrafica Attvità Commerciali:63",
+  "needsTypeChoice": false,
+  "duplicates": [],
+  "decision": "unisci",
+  "mergeInto": null,
+  "parkingId": "00000000-0000-4000-8000-0000000000f1",
+  "dates": [
+   "2026-10-08"
+  ]
+ },
+ {
+  "ref": "Gestione Prospectrichieste:20",
+  "sheet": "Gestione Prospectrichieste",
+  "kind": "prospect",
+  "row": 20,
+  "status": "valida",
+  "discard": null,
+  "warnings": [],
+  "party": {
+   "tipo": "azienda",
+   "denominazione": "Iota Edilizia Esempio Srl",
+   "nome": null,
+   "cognome": null,
+   "categoria": "Aziende",
+   "sito": null,
+   "telefono": "02 7000 1056",
+   "email": "info@iota-edilizia.example",
+   "form_web_url": null
+  },
+  "externalId": null,
+  "contact": null,
+  "opportunity": {
+   "fase": "offerta_inviata",
+   "esito": "aperta",
+   "motivo_perdita": null,
+   "posti_richiesti": 1
+  },
+  "activities": [
+   {
+    "tipo": "email",
+    "testo": "Offerta inviata (da import Excel)",
+    "data": "2026-10-09"
+   }
+  ],
+  "offer": {
+   "stato": "inviata",
+   "inviata_il": "2026-10-09",
+   "accettata_il": null,
+   "motivo_rifiuto": null,
+   "condizioni": {
+    "testo_originale": "230",
+    "posti_7_7": "1",
+    "feedback": null,
+    "origine": "Import Excel"
+   },
+   "importo": 230,
+   "posti": 1
+  },
+  "linkTo": "Anagrafica Attvità Commerciali:70",
+  "needsTypeChoice": false,
+  "duplicates": [],
+  "decision": "unisci",
+  "mergeInto": null,
+  "parkingId": "00000000-0000-4000-8000-0000000000f1",
+  "dates": [
+   "2026-10-09"
+  ]
+ },
+ {
+  "ref": "Gestione Prospectrichieste:21",
+  "sheet": "Gestione Prospectrichieste",
+  "kind": "prospect",
+  "row": 21,
+  "status": "valida",
+  "discard": null,
+  "warnings": [],
+  "party": {
+   "tipo": "azienda",
+   "denominazione": "Delta Tessile Esempio Srl",
+   "nome": null,
+   "cognome": null,
+   "categoria": "Ristoranti",
+   "sito": null,
+   "telefono": "02 7000 1063",
+   "email": "info@delta-tessile.example",
+   "form_web_url": null
+  },
+  "externalId": null,
+  "contact": null,
+  "opportunity": {
+   "fase": "vinta",
+   "esito": "vinta",
+   "motivo_perdita": null,
+   "posti_richiesti": 2
+  },
+  "activities": [
+   {
+    "tipo": "email",
+    "testo": "Offerta inviata (da import Excel)",
+    "data": "2026-10-01"
+   }
+  ],
+  "offer": {
+   "stato": "accettata",
+   "inviata_il": "2026-10-01",
+   "accettata_il": "2026-10-01",
+   "motivo_rifiuto": null,
+   "condizioni": {
+    "testo_originale": "240",
+    "posti_7_7": "2",
+    "feedback": null,
+    "origine": "Import Excel"
+   },
+   "importo": 240,
+   "posti": 2
+  },
+  "linkTo": "Anagrafica Attvità Commerciali:77",
+  "needsTypeChoice": false,
+  "duplicates": [],
+  "decision": "unisci",
+  "mergeInto": null,
+  "parkingId": "00000000-0000-4000-8000-0000000000f1",
+  "dates": [
+   "2026-10-01"
+  ]
+ },
+ {
+  "ref": "Gestione Prospectrichieste:22",
+  "sheet": "Gestione Prospectrichieste",
+  "kind": "prospect",
+  "row": 22,
+  "status": "avvisi",
+  "discard": null,
+  "warnings": [
+   "Non presente in anagrafica: proposto come persona, controlla nome e cognome"
+  ],
+  "party": {
+   "tipo": "persona",
+   "denominazione": null,
+   "nome": "Laura",
+   "cognome": "Finta",
+   "categoria": null,
+   "sito": null,
+   "telefono": null,
+   "email": null,
+   "form_web_url": null
+  },
+  "externalId": null,
+  "contact": null,
+  "opportunity": {
+   "fase": "offerta_inviata",
+   "esito": "aperta",
+   "motivo_perdita": null,
+   "posti_richiesti": 1
+  },
+  "activities": [
+   {
+    "tipo": "email",
+    "testo": "Offerta inviata (da import Excel)",
+    "data": "2026-10-08"
+   }
+  ],
+  "offer": {
+   "stato": "inviata",
+   "inviata_il": "2026-10-08",
+   "accettata_il": null,
+   "motivo_rifiuto": null,
+   "condizioni": {
+    "testo_originale": "200",
+    "posti_7_7": "1",
+    "feedback": null,
+    "origine": "Import Excel"
+   },
+   "importo": 200,
+   "posti": 1
+  },
+  "linkTo": null,
+  "needsTypeChoice": true,
+  "duplicates": [],
+  "decision": "crea",
+  "mergeInto": null,
+  "parkingId": "00000000-0000-4000-8000-0000000000f1",
+  "dates": [
+   "2026-10-08"
+  ]
+ },
+ {
+  "ref": "Gestione Prospectrichieste:23",
+  "sheet": "Gestione Prospectrichieste",
+  "kind": "prospect",
+  "row": 23,
+  "status": "avvisi",
+  "discard": null,
+  "warnings": [
+   "Non presente in anagrafica: proposto come persona, controlla nome e cognome"
+  ],
+  "party": {
+   "tipo": "persona",
+   "denominazione": null,
+   "nome": "Paolo",
+   "cognome": "Inventato",
+   "categoria": null,
+   "sito": null,
+   "telefono": null,
+   "email": null,
+   "form_web_url": null
+  },
+  "externalId": null,
+  "contact": null,
+  "opportunity": {
+   "fase": "offerta_inviata",
+   "esito": "aperta",
+   "motivo_perdita": null,
+   "posti_richiesti": 1
+  },
+  "activities": [
+   {
+    "tipo": "email",
+    "testo": "Offerta inviata (da import Excel)",
+    "data": "2026-10-08"
+   }
+  ],
+  "offer": {
+   "stato": "inviata",
+   "inviata_il": "2026-10-08",
+   "accettata_il": null,
+   "motivo_rifiuto": null,
+   "condizioni": {
+    "testo_originale": "200",
+    "posti_7_7": "1",
+    "feedback": null,
+    "origine": "Import Excel"
+   },
+   "importo": 200,
+   "posti": 1
+  },
+  "linkTo": null,
+  "needsTypeChoice": true,
+  "duplicates": [],
+  "decision": "crea",
+  "mergeInto": null,
+  "parkingId": "00000000-0000-4000-8000-0000000000f1",
+  "dates": [
+   "2026-10-08"
+  ]
+ },
+ {
+  "ref": "Gestione Prospectrichieste:24",
+  "sheet": "Gestione Prospectrichieste",
+  "kind": "prospect",
+  "row": 24,
+  "status": "avvisi",
+  "discard": null,
+  "warnings": [
+   "Non presente in anagrafica: proposto come persona, controlla nome e cognome"
+  ],
+  "party": {
+   "tipo": "persona",
+   "denominazione": null,
+   "nome": "Chiara",
+   "cognome": "Esempio",
+   "categoria": null,
+   "sito": null,
+   "telefono": null,
+   "email": null,
+   "form_web_url": null
+  },
+  "externalId": null,
+  "contact": null,
+  "opportunity": {
+   "fase": "offerta_inviata",
+   "esito": "aperta",
+   "motivo_perdita": null,
+   "posti_richiesti": 1
+  },
+  "activities": [
+   {
+    "tipo": "email",
+    "testo": "Offerta inviata (da import Excel)",
+    "data": "2026-10-08"
+   }
+  ],
+  "offer": {
+   "stato": "inviata",
+   "inviata_il": "2026-10-08",
+   "accettata_il": null,
+   "motivo_rifiuto": null,
+   "condizioni": {
+    "testo_originale": "200",
+    "posti_7_7": "1",
+    "feedback": null,
+    "origine": "Import Excel"
+   },
+   "importo": 200,
+   "posti": 1
+  },
+  "linkTo": null,
+  "needsTypeChoice": true,
+  "duplicates": [],
+  "decision": "crea",
+  "mergeInto": null,
+  "parkingId": "00000000-0000-4000-8000-0000000000f1",
+  "dates": [
+   "2026-10-08"
+  ]
+ },
+ {
+  "ref": "Gestione Prospectrichieste:25",
+  "sheet": "Gestione Prospectrichieste",
+  "kind": "prospect",
+  "row": 25,
+  "status": "avvisi",
+  "discard": null,
+  "warnings": [
+   "Non presente in anagrafica: proposto come persona, controlla nome e cognome"
+  ],
+  "party": {
+   "tipo": "persona",
+   "denominazione": null,
+   "nome": "Bruno",
+   "cognome": "Prova",
+   "categoria": null,
+   "sito": null,
+   "telefono": null,
+   "email": null,
+   "form_web_url": null
+  },
+  "externalId": null,
+  "contact": null,
+  "opportunity": {
+   "fase": "offerta_inviata",
+   "esito": "aperta",
+   "motivo_perdita": null,
+   "posti_richiesti": 1
+  },
+  "activities": [
+   {
+    "tipo": "email",
+    "testo": "Offerta inviata (da import Excel)",
+    "data": "2026-10-08"
+   }
+  ],
+  "offer": {
+   "stato": "inviata",
+   "inviata_il": "2026-10-08",
+   "accettata_il": null,
+   "motivo_rifiuto": null,
+   "condizioni": {
+    "testo_originale": "200",
+    "posti_7_7": "1",
+    "feedback": null,
+    "origine": "Import Excel"
+   },
+   "importo": 200,
+   "posti": 1
+  },
+  "linkTo": null,
+  "needsTypeChoice": true,
+  "duplicates": [],
+  "decision": "crea",
+  "mergeInto": null,
+  "parkingId": "00000000-0000-4000-8000-0000000000f1",
+  "dates": [
+   "2026-10-08"
+  ]
  }
 ]$plan$::jsonb);
 -- END PLAN
@@ -990,9 +5496,9 @@ from plan_input, jsonb_array_elements(plan) with ordinality as e(r, ord);
 reset role;
 
 select pg_temp.record(
-  'piano: 16 righe lette dal file finto (11 anagrafica, 5 prospect)',
-  jsonb_array_length(pg_temp.j('plan')) = 16
-  and (select count(*) from jsonb_array_elements(pg_temp.j('plan')) r where r ->> 'kind' = 'prospect') = 5
+  'piano: 102 righe con valori lette dal file finto (83 anagrafica, 19 prospect; righe solo formattate e "#N/A" escluse)',
+  jsonb_array_length(pg_temp.j('plan')) = 102
+  and (select count(*) from jsonb_array_elements(pg_temp.j('plan')) r where r ->> 'kind' = 'prospect') = 19
 );
 
 -- ---------------------------------------------------------------------------
@@ -1006,6 +5512,11 @@ select pg_temp.expect_error(
   '42501'
 );
 reset role;
+
+-- References already on the database (earlier real imports) stay after the undo.
+insert into test_json
+select 'refs_before', to_jsonb(count(*))
+from public.external_references where sistema = 'excel' and id_esterno like 'Anagrafica Attvità Commerciali#%';
 
 select pg_temp.act_as(pg_temp.id('admin'));
 insert into test_json
@@ -1023,11 +5534,11 @@ from jsonb_array_elements(pg_temp.j('plan')) r
 where r ->> 'decision' <> 'escludi' and r ->> 'status' <> 'scartata';
 
 select pg_temp.record(
-  'import: conteggi (10 soggetti nuovi, 1 esistente arricchito, 11 opportunità, 5 offerte)',
-  (pg_temp.j('result') ->> 'soggetti_creati')::int = 10
+  'import: conteggi (86 soggetti nuovi, 1 esistente arricchito, 87 opportunità, 19 offerte)',
+  (pg_temp.j('result') ->> 'soggetti_creati')::int = 86
   and (pg_temp.j('result') ->> 'soggetti_aggiornati')::int = 1
-  and (pg_temp.j('result') ->> 'opportunita')::int = 11
-  and (pg_temp.j('result') ->> 'offerte')::int = 5
+  and (pg_temp.j('result') ->> 'opportunita')::int = 87
+  and (pg_temp.j('result') ->> 'offerte')::int = 19
   and (pg_temp.j('result') ->> 'attivita')::int =
       (select sum(jsonb_array_length(r -> 'activities')) from jsonb_array_elements(pg_temp.j('included')) r)
   and (pg_temp.j('result') ->> 'contatti')::int =
@@ -1036,15 +5547,15 @@ select pg_temp.record(
 );
 select pg_temp.record(
   'import: import_batch_id su tutte le righe create',
-  (select count(*) from public.parties where import_batch_id = pg_temp.id('batch')) = 10
-  and (select count(*) from public.opportunities where import_batch_id = pg_temp.id('batch')) = 11
-  and (select count(*) from public.offers where import_batch_id = pg_temp.id('batch')) = 5
+  (select count(*) from public.parties where import_batch_id = pg_temp.id('batch')) = 86
+  and (select count(*) from public.opportunities where import_batch_id = pg_temp.id('batch')) = 87
+  and (select count(*) from public.offers where import_batch_id = pg_temp.id('batch')) = 19
   and (select count(*) from public.activities where import_batch_id = pg_temp.id('batch')) = (pg_temp.j('result') ->> 'attivita')::int
   and (select count(*) from public.contacts where import_batch_id = pg_temp.id('batch')) = (pg_temp.j('result') ->> 'contatti')::int
 );
 select pg_temp.record(
   'import: conteggi e report salvati con il batch',
-  (select (conteggi ->> 'righe')::int = 16 and (conteggi ->> 'scartate')::int = 1 and (conteggi ->> 'escluse')::int = 1
+  (select (conteggi ->> 'righe')::int = 102 and (conteggi ->> 'scartate')::int = 1 and (conteggi ->> 'escluse')::int = 1
           and jsonb_array_length(conteggi -> 'report') = 1
    from public.import_batches where id = pg_temp.id('batch'))
 );
@@ -1083,7 +5594,7 @@ select pg_temp.record(
   'import: audit con l''autore',
   (select count(*) from public.audit_logs a join public.parties p on p.id = a.entita_id
    where a.entita = 'parties' and a.azione = 'insert' and a.utente_id = pg_temp.id('admin')
-     and p.import_batch_id = pg_temp.id('batch')) = 10
+     and p.import_batch_id = pg_temp.id('batch')) = 86
 );
 
 -- ---------------------------------------------------------------------------
@@ -1133,7 +5644,7 @@ select pg_temp.record(
   (pg_temp.j('undo1') ->> 'ok')::boolean = false
   and exists (select 1 from jsonb_array_elements(pg_temp.j('undo1') -> 'blockers') b where b ->> 'tabella' = 'party_locations')
   and exists (select 1 from jsonb_array_elements(pg_temp.j('undo1') -> 'blockers') b where b ->> 'tabella' = 'activities')
-  and (select count(*) from public.parties where import_batch_id = pg_temp.id('batch')) = 10,
+  and (select count(*) from public.parties where import_batch_id = pg_temp.id('batch')) = 86,
   pg_temp.j('undo1') -> 'blockers' ->> 0
 );
 
@@ -1147,21 +5658,31 @@ reset role;
 select pg_temp.record(
   'annullamento completo: cancellate solo le righe del batch',
   (pg_temp.j('undo2') ->> 'ok')::boolean
-  and (pg_temp.j('undo2') -> 'eliminati' ->> 'soggetti')::int = 10
+  and (pg_temp.j('undo2') -> 'eliminati' ->> 'soggetti')::int = 86
   and not exists (select 1 from public.parties where import_batch_id = pg_temp.id('batch'))
   and not exists (select 1 from public.opportunities where import_batch_id = pg_temp.id('batch'))
   and not exists (select 1 from public.activities where import_batch_id = pg_temp.id('batch'))
   and not exists (select 1 from public.offers where import_batch_id = pg_temp.id('batch'))
   and not exists (select 1 from public.contacts where import_batch_id = pg_temp.id('batch'))
-  and not exists (select 1 from public.external_references where sistema = 'excel' and id_esterno like 'Anagrafica Attvità Commerciali#%')
+  and (select count(*) from public.external_references where sistema = 'excel' and id_esterno like 'Anagrafica Attvità Commerciali#%')
+      = (pg_temp.j('refs_before'))::text::bigint
   and exists (select 1 from public.parties where id = pg_temp.id('existing'))
   and exists (select 1 from public.parking_facilities where id = '00000000-0000-4000-8000-0000000000f1'),
-  (pg_temp.j('undo2') -> 'eliminati')::text
+  (pg_temp.j('undo2') -> 'eliminati')::text || ' rimasti: ' || jsonb_build_object(
+    'soggetti', (select count(*) from public.parties where import_batch_id = pg_temp.id('batch')),
+    'opportunita', (select count(*) from public.opportunities where import_batch_id = pg_temp.id('batch')),
+    'attivita', (select count(*) from public.activities where import_batch_id = pg_temp.id('batch')),
+    'offerte', (select count(*) from public.offers where import_batch_id = pg_temp.id('batch')),
+    'contatti', (select count(*) from public.contacts where import_batch_id = pg_temp.id('batch')),
+    'riferimenti_in_piu', (select count(*) from public.external_references where sistema = 'excel' and id_esterno like 'Anagrafica Attvità Commerciali#%')
+                          - (pg_temp.j('refs_before'))::text::bigint,
+    'esistente', (select count(*) from public.parties where id = pg_temp.id('existing'))
+  )::text
 );
 select pg_temp.record(
   'annullamento: data registrata sul batch e cancellazioni nel registro',
   (select annullato_il is not null from public.import_batches where id = pg_temp.id('batch'))
-  and (select count(*) from public.audit_logs where entita = 'parties' and azione = 'delete' and utente_id = pg_temp.id('admin')) = 10
+  and (select count(*) from public.audit_logs where entita = 'parties' and azione = 'delete' and utente_id = pg_temp.id('admin')) = 86
 );
 
 select pg_temp.act_as(pg_temp.id('admin'));

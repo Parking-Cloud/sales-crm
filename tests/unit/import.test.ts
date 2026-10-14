@@ -8,8 +8,11 @@ import { categoryFor } from "../../src/lib/import/categories";
 import { lossReasonFor, offerRejectionReason } from "../../src/lib/import/loss-reasons";
 import { CRM_2026, proposeMapping } from "../../src/lib/import/presets";
 import { buildPlan, type PlanRow } from "../../src/lib/import/transform";
+import { safeCall, TIMEOUT_MESSAGE } from "../../src/lib/import/safe-call";
 import {
   cleanText,
+  compactRows,
+  normalizeCell,
   parseAmount,
   parseDates,
   parseEmails,
@@ -17,8 +20,9 @@ import {
   splitDiary,
   splitMulti,
   splitNameAndRole,
+  toText,
 } from "../../src/lib/import/values";
-import { detectDelimiter, parseCsv, readXlsx } from "../../src/lib/import/workbook";
+import { detectDelimiter, parseCsv, readCsv, readXlsx } from "../../src/lib/import/workbook";
 
 const FIXTURE = join(__dirname, "..", "..", "..", "tests", "fixtures", "crm-parcheggio-2026-finto.xlsx");
 
@@ -26,10 +30,9 @@ async function fixturePlan(): Promise<PlanRow[]> {
   const buffer = readFileSync(FIXTURE);
   const { sheets } = await readXlsx(buffer.buffer.slice(buffer.byteOffset, buffer.byteOffset + buffer.byteLength));
   return buildPlan(
-    sheets.map((sheet) => {
+    sheets.flatMap((sheet) => {
       const mapping = proposeMapping(CRM_2026, sheet);
-      assert.ok(mapping, `foglio riconosciuto: ${sheet.name}`);
-      return { name: sheet.name, rows: sheet.rows, mapping, parkingId: "parcheggio-finto" };
+      return mapping ? [{ name: sheet.name, rows: sheet.rows, mapping, parkingId: "parcheggio-finto" }] : [];
     }),
   );
 }
@@ -102,13 +105,85 @@ test("CSV: delimiter detection and quotes", () => {
   ]);
 });
 
+test("Excel errors as text, blank cells and empty rows", () => {
+  for (const error of ["#N/A", "#N/D", "#VALUE!", "#REF!", "#NAME?", " #n/a "]) {
+    assert.equal(normalizeCell(error), null);
+    assert.equal(cleanText(error), null);
+  }
+  assert.equal(normalizeCell("   "), null);
+  assert.equal(normalizeCell(Number.NaN), null);
+  assert.equal(normalizeCell({ text: "oggetto" }), null);
+  assert.equal(normalizeCell("Azienda Esempio Srl"), "Azienda Esempio Srl");
+  // Formatting-only and "#N/A"-only rows become [], trailing ones disappear;
+  // positions (row numbers) do not change.
+  assert.deepEqual(
+    compactRows([["Nome", null, null], [null, "#N/A", "  "], ["Azienda Esempio Srl", "#REF!", null], [null, "#N/A"], []], 5000, 40),
+    [["Nome"], [], ["Azienda Esempio Srl"]],
+  );
+  assert.deepEqual(compactRows([["a", "b", "c"]], 5000, 2), [["a", "b"]]);
+});
+
+test("toText: every shown value is a string", () => {
+  assert.equal(toText(null), "");
+  assert.equal(toText(12), "12");
+  assert.equal(toText(true), "Sì");
+  assert.equal(toText(new Date(Date.UTC(2026, 9, 14))), "14/10/2026");
+  assert.equal(toText({ richText: [{ text: "x" }] }), "");
+  assert.equal(toText(["a"]), "");
+});
+
+test("server action calls: errors and timeouts become a message", async () => {
+  assert.deepEqual(await safeCall(async () => ({ ok: true as const, data: 1 })), { ok: true, data: 1 });
+  assert.deepEqual(await safeCall(() => Promise.reject(new Error("504 Gateway Timeout"))), { ok: false, message: TIMEOUT_MESSAGE });
+  assert.deepEqual(await safeCall(() => new Promise<never>(() => {}), 20), { ok: false, message: TIMEOUT_MESSAGE });
+  assert.deepEqual(await safeCall(async () => undefined as never), { ok: false, message: TIMEOUT_MESSAGE });
+});
+
+test("CSV: whitespace-only rows dropped, row numbers kept", () => {
+  const encoder = new TextEncoder();
+  const { sheets } = readCsv(encoder.encode("Nome;Settore\n ; \nAzienda Esempio Srl;#N/A\n;\n").buffer as ArrayBuffer, "prova.csv");
+  assert.deepEqual(sheets, [{ name: "prova", rows: [["Nome", "Settore"], [], ["Azienda Esempio Srl"]] }]);
+});
+
+test("fixture: reading skips formatted rows, #N/A formulas and other sheets, fast", async () => {
+  const buffer = readFileSync(FIXTURE);
+  const start = performance.now();
+  const { sheets, truncated } = await readXlsx(buffer.buffer.slice(buffer.byteOffset, buffer.byteOffset + buffer.byteLength));
+  const elapsed = performance.now() - start;
+  // Was 8 s on this file (quadratic loop over formatted rows).
+  assert.ok(elapsed < 2000, `lettura in ${Math.round(elapsed)} ms`);
+  assert.equal(truncated, false);
+  const [anagrafica, prospect, mail, tariffe] = sheets;
+  // A1:X993 formatted: data ends at row 85; columns Q-X only formatted.
+  assert.equal(anagrafica.rows.length, 85);
+  assert.ok(anagrafica.rows.every((row) => row.length <= 16));
+  // Header O is empty, P is kept.
+  assert.equal(anagrafica.rows[0][14] ?? null, null);
+  assert.equal(anagrafica.rows[0][15], "Numero Posti Potenziali");
+  // Hyperlinks give their text.
+  assert.equal(anagrafica.rows[1][6], "www.azienda-esempio.example");
+  // VLOOKUP "#N/A" (also as text) down to row 1002: dropped; data ends at row 25.
+  assert.equal(prospect.rows.length, 25);
+  assert.ok(prospect.rows.every((row) => row.every((cell) => typeof cell !== "string" || !cell.startsWith("#"))));
+  assert.ok(prospect.rows.every((row) => (row[0] ?? null) === null));
+  // Sheets with a different structure do not follow the preset.
+  assert.equal(proposeMapping(CRM_2026, anagrafica)?.kind, "anagrafica");
+  assert.equal(proposeMapping(CRM_2026, prospect)?.kind, "prospect");
+  assert.equal(mail.name, "Mail Template");
+  assert.equal(proposeMapping(CRM_2026, mail), null);
+  assert.equal(proposeMapping(CRM_2026, tariffe), null);
+  // A sheet named like the preset but with other headers does not match either.
+  assert.equal(proposeMapping(CRM_2026, { name: "Anagrafica copia", rows: [["Prodotto", "Prezzo"]] }), null);
+});
+
 test("fixture: sheets recognized despite typo and trailing space; row counts", async () => {
   const plan = await fixturePlan();
   const anagrafica = plan.filter((row) => row.kind === "anagrafica");
   const prospect = plan.filter((row) => row.kind === "prospect");
-  // 12 data rows in anagrafica, one completely empty: 11 rows; 6 in prospect, one empty: 5.
-  assert.equal(anagrafica.length, 11);
-  assert.equal(prospect.length, 5);
+  // Anagrafica: 12 hand-written rows (one completely empty) + 72 generated = 83.
+  // Prospect: 6 hand-written rows (one empty) + 14 generated = 19.
+  assert.equal(anagrafica.length, 83);
+  assert.equal(prospect.length, 19);
   assert.equal(plan.filter((row) => row.status === "scartata").length, 1);
   assert.equal(plan.find((row) => row.status === "scartata")?.discard, "Manca il nome dell'azienda");
   // Legend rows of the prospect sheet are ignored.
@@ -191,6 +266,13 @@ test("fixture: prospect rows", async () => {
   assert.equal(company.party.tipo, "azienda");
   assert.equal(company.offer?.stato, "inviata");
   assert.ok(company.warnings.some((warning) => warning.includes("Importo")));
+
+  // VLOOKUP "#N/A" and "#REF!" cached as text: no email, no phone, no warning.
+  const bruno = plan.find((row) => row.kind === "prospect" && row.party.nome === "Bruno")!;
+  assert.equal(bruno.party.email, null);
+  assert.equal(bruno.party.telefono, null);
+  assert.ok(!bruno.warnings.some((warning) => warning.includes("#")));
+  assert.equal(plan.filter((row) => row.kind === "prospect" && row.linkTo).length, 12);
 
   const marco = plan.find((row) => row.kind === "prospect" && row.party.nome === "Marco")!;
   assert.equal(marco.opportunity.motivo_perdita, "nessun_bisogno");

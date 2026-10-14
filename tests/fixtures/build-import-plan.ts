@@ -19,8 +19,12 @@ const END = "-- END PLAN";
 export async function fixturePlan(): Promise<PlanRow[]> {
   const buffer = readFileSync(FIXTURE);
   const { sheets } = await readXlsx(buffer.buffer.slice(buffer.byteOffset, buffer.byteOffset + buffer.byteLength));
+  // Sheets that do not follow the preset ("Mail Template", "Tabella Tariffe") are left out.
   return buildPlan(
-    sheets.map((sheet) => ({ name: sheet.name, rows: sheet.rows, mapping: proposeMapping(CRM_2026, sheet)!, parkingId: TEST_PARKING_ID })),
+    sheets.flatMap((sheet) => {
+      const mapping = proposeMapping(CRM_2026, sheet);
+      return mapping ? [{ name: sheet.name, rows: sheet.rows, mapping, parkingId: TEST_PARKING_ID }] : [];
+    }),
   );
 }
 

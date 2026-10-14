@@ -2,6 +2,14 @@
 // structure of the "CRM parcheggio, formato 2026" preset and all its known
 // defects. Every name, email, phone and site below is invented.
 //
+// Like the real file it also has: about 100 real rows; the anagrafica sheet
+// formatted down to row 993 and column X (empty cells with a style only),
+// list validations down to row 793, headers in A-P only (O without one), 57
+// hyperlinks in column G; the prospect sheet with column A empty and VLOOKUP
+// formulas in C and D down to row 1002 whose cached value is the STRING
+// "#N/A" (t="str"); two more sheets ("Mail Template", "Tabella Tariffe")
+// with a different structure.
+//
 //   node tests/fixtures/build-crm-2026-fixture.mjs
 
 import ExcelJS from "exceljs";
@@ -57,7 +65,54 @@ const rows = [
   ["Very interested", 1200, "Informatica Esempio Spa", "Fornitore informatico", "Elena Prova", "Office manager", "informatica-esempio.example/contatti",
     "elena.prova@informatica-esempio.example", "02-4444-5555", "01/10/2026", "06/10/2026", "Inviata", "Chiamati", null, null, 12],
 ];
+
+// Generated rows 14-85: invented companies, 53 of them with a site link.
+const WORDS = ["Alfa", "Beta", "Gamma", "Delta", "Epsilon", "Zeta", "Eta", "Theta", "Iota", "Kappa", "Lambda", "Sigma"];
+const KINDS = ["Servizi", "Consulenze", "Logistica", "Impianti", "Edilizia", "Tessile"];
+const SECTORS = ["Commercialista", "Consulenza aziendale", "Hotel", "Ristorante", "Studio medico", "Ufficio",
+  "Fornitore informatico", "Agenzia immobiliare", "Scuola di lingue", "Palestra"];
+const STATES = [null, "Interested", "Not interested", "Very interested"];
+const GENERATED = 72;
+const generatedNames = [];
+for (let i = 0; i < GENERATED; i++) {
+  const name = `${WORDS[i % WORDS.length]} ${KINDS[Math.floor(i / WORDS.length)]} Esempio Srl`;
+  const slug = name.toLowerCase().replace(/ esempio srl$/, "").replace(/\s+/g, "-");
+  generatedNames.push({ name, slug });
+  const day = 1 + (i % 9);
+  const state = STATES[i % STATES.length];
+  rows.push([
+    state, 2000 + i, name, SECTORS[i % SECTORS.length], i % 3 === 0 ? `Referente ${WORDS[i % WORDS.length]}` : null,
+    i % 3 === 0 ? "Responsabile" : null, i < 53 ? `www.${slug}.example` : null, `info@${slug}.example`,
+    `02 7000 ${String(1000 + i)}`, `0${day}/10/2026`, null, i % 2 === 0 ? "Inviata" : null, "Chiamati",
+    state === "Not interested" ? `0${day}/10/2026: non hanno bisogno di posti auto` : null, null, i % 5 === 0 ? 2 + (i % 7) : null,
+  ]);
+}
+
 rows.forEach((row) => anagrafica.addRow(row));
+
+// Sites as hyperlinks (57 in column G), like the source file.
+let links = 0;
+for (let r = 2; r <= anagrafica.rowCount; r++) {
+  const cell = anagrafica.getCell(`G${r}`);
+  if (typeof cell.value === "string") {
+    const text = cell.value;
+    cell.value = { text, hyperlink: text.startsWith("http") ? text : `https://${text}` };
+    links++;
+  }
+}
+if (links !== 57) throw new Error(`expected 57 hyperlinks, got ${links}`);
+
+// Formatting only, no values, down to X993: these rows are empty.
+const thin = { style: "thin", color: { argb: "FFBFBFBF" } };
+for (let r = 2; r <= 993; r++) {
+  const row = anagrafica.getRow(r);
+  for (let c = 1; c <= 24; c++) row.getCell(c).border = { top: thin, left: thin, bottom: thin, right: thin };
+}
+// List validations down to row 793.
+const list = (values) => ({ type: "list", allowBlank: true, formulae: [`"${values}"`] });
+anagrafica.dataValidations.add("A2:A793", list("Very interested,Interested,Not interested"));
+anagrafica.dataValidations.add("L2:L793", list("Inviata,Da inviare"));
+anagrafica.dataValidations.add("M2:M793", list("Chiamati,Da Chiamare"));
 
 // Prospect sheet: legend in rows 2-3, headers in row 5, data from column B.
 const prospect = workbook.addWorksheet("Gestione Prospectrichieste");
@@ -89,10 +144,44 @@ const prospects = [
   // 11: person, rejected, no longer needed
   ["Marco Esempio", null, "333 1112223", null, "09/10/2026", null, null, "180", 1, "RIFIUTATA", "Non ha più bisogno del posto"],
 ];
+// Generated prospects: 10 companies of the anagrafica, 4 not in it.
+const OFFER_STATES = ["ACCETTATA", "RIFIUTATA", "IN ATTESA"];
+for (let i = 0; i < 10; i++) {
+  const { name, slug } = generatedNames[i * 7];
+  const r = 6 + prospects.length;
+  prospects.push([name, vlookup(r, 6, `info@${slug}.example`), vlookup(r, 7, `02 7000 ${1000 + i * 7}`), null,
+    `0${1 + (i % 9)}/10/2026`, null, null, 150 + i * 10, 1 + (i % 4), OFFER_STATES[i % 3],
+    i % 3 === 1 ? "Prezzo troppo alto" : null]);
+}
+for (const person of ["Laura Finta", "Paolo Inventato", "Chiara Esempio", "Bruno Prova"]) {
+  const r = 6 + prospects.length;
+  // VLOOKUP of a name not in the anagrafica: "#N/A" as a STRING, plus one "#REF!".
+  prospects.push([person, vlookup(r, 6, "#N/A"), vlookup(r, 7, person === "Bruno Prova" ? "#REF!" : "#N/A"), null,
+    "08/10/2026", null, null, "200", 1, "IN ATTESA", null]);
+}
+
 prospects.forEach((values, r) => {
   const row = prospect.getRow(6 + r);
   values.forEach((value, i) => (row.getCell(i + 2).value = value));
 });
+
+// VLOOKUP formulas copied down to row 1002 on empty rows: cached value "#N/A" as text.
+for (let r = 6 + prospects.length; r <= 1002; r++) {
+  prospect.getCell(`C${r}`).value = vlookup(r, 6, "#N/A");
+  prospect.getCell(`D${r}`).value = vlookup(r, 7, "#N/A");
+}
+
+// Sheets with a different structure.
+const mail = workbook.addWorksheet("Mail Template");
+mail.getCell("A1").value = "Oggetto";
+mail.getCell("B1").value = "Parcheggio per i dipendenti vicino alla vostra sede";
+mail.getCell("A3").value = "Testo";
+mail.getCell("B3").value = "Buongiorno,\nvi scriviamo per proporvi posti auto in abbonamento.\nCordiali saluti";
+const tariffe = workbook.addWorksheet("Tabella Tariffe");
+tariffe.addRow(["Prodotto", "Prezzo mensile", "Note"]);
+tariffe.addRow(["Abbonamento 7/7", 120, "IVA esclusa"]);
+tariffe.addRow(["Abbonamento 5/7", 95, "Lunedì-venerdì"]);
+tariffe.addRow(["Notturno", 60, null]);
 
 await workbook.xlsx.writeFile(out);
 console.log(`Scritto ${out}`);
