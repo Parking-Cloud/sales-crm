@@ -20,7 +20,10 @@ function Brand() {
   );
 }
 
-function NavList({ onNavigate }: { onNavigate?: () => void }) {
+// Counters next to menu entries, by href (e.g. overdue reminders on "Oggi").
+export type NavCounts = Record<string, { count: number; label: string }>;
+
+function NavList({ counts, onNavigate }: { counts: NavCounts; onNavigate?: () => void }) {
   const pathname = usePathname();
 
   return (
@@ -41,7 +44,13 @@ function NavList({ onNavigate }: { onNavigate?: () => void }) {
                   : "border-transparent text-black-80 hover:bg-grey-40",
               ].join(" ")}
             >
-              {item.label}
+              <span className="flex-1">{item.label}</span>
+              {counts[item.href] && counts[item.href].count > 0 && (
+                <span className="ml-2 rounded-pill bg-error-ink px-2 text-caption font-semibold text-white tabular-nums">
+                  {counts[item.href].count}
+                  <span className="sr-only"> {counts[item.href].label}</span>
+                </span>
+              )}
             </Link>
           </li>
         );
@@ -71,9 +80,11 @@ function UserPanel({ user }: { user: ShellUser }) {
 export function AppShell({
   children,
   user,
+  counts = {},
 }: {
   children: React.ReactNode;
   user: ShellUser;
+  counts?: NavCounts;
 }) {
   const [menuOpen, setMenuOpen] = useState(false);
   const openButtonRef = useRef<HTMLButtonElement>(null);
@@ -137,7 +148,7 @@ export function AppShell({
           <Brand />
         </div>
         <nav aria-label="Navigazione principale" className="flex-1 overflow-y-auto px-3 py-4">
-          <NavList />
+          <NavList counts={counts} />
         </nav>
         <UserPanel user={user} />
       </aside>
@@ -188,7 +199,7 @@ export function AppShell({
               </button>
             </div>
             <nav aria-label="Navigazione principale" className="flex-1 overflow-y-auto px-3 py-4">
-              <NavList onNavigate={() => setMenuOpen(false)} />
+              <NavList counts={counts} onNavigate={() => setMenuOpen(false)} />
             </nav>
             <UserPanel user={user} />
           </div>
