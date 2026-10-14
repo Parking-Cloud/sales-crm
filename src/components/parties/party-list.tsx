@@ -7,8 +7,12 @@ import { Pagination } from "@/components/ui/pagination";
 import { Table, Td, Th, Tr } from "@/components/ui/table";
 import { PARTY_CATEGORIES, PARTY_TYPE_LABELS, partyName, type PartyType } from "@/lib/parties/labels";
 import { PAGE_SIZE, type ParkingFilterOption, type PartyFilters, type PartyListItem } from "@/lib/parties/queries";
+import type { ParkingOption } from "@/lib/pipeline/queries";
+import { BulkAddToParking, SelectAllCheckbox, SelectPartyCheckbox } from "@/components/pipeline/add-to-parking";
 import { opportunityBadge } from "@/lib/pipeline/labels";
 import { DataStatusBadge, DoNotContactBadge } from "./data-status-badge";
+
+const SELECTION_FORM = "selezione-soggetti";
 
 export function listHref(filters: PartyFilters, page: number): string {
   const params = new URLSearchParams();
@@ -35,11 +39,14 @@ export function PartyList({
   total,
   filters,
   parkings,
+  activeParkings,
 }: {
   items: PartyListItem[];
   total: number;
   filters: PartyFilters;
   parkings: ParkingFilterOption[];
+  // Car parks a party can be added to (not archived).
+  activeParkings: ParkingOption[];
 }) {
   const parkingCount = filters.parcheggi.length + (filters.senzaParcheggio ? 1 : 0);
   const filtered = Boolean(filters.q || filters.tipo || filters.categoria || filters.citta || filters.soloDaVerificare || parkingCount > 0);
@@ -137,9 +144,17 @@ export function PartyList({
               {total === 1 ? "1 soggetto" : `${total.toLocaleString("it-IT")} soggetti`}
               {filters.q && " — i più simili alla ricerca per primi"}
             </p>
+            <BulkAddToParking
+              formId={SELECTION_FORM}
+              parkings={activeParkings}
+              names={Object.fromEntries(items.map((item) => [item.id, partyName(item)]))}
+            />
             <Table caption="Elenco dei soggetti">
               <thead>
                 <tr>
+                  <Th>
+                    <SelectAllCheckbox formId={SELECTION_FORM} />
+                  </Th>
                   <Th>Nome</Th>
                   <Th>
                     <Link
@@ -160,6 +175,9 @@ export function PartyList({
               <tbody>
                 {items.map((item) => (
                   <Tr key={item.id}>
+                    <Td>
+                      <SelectPartyCheckbox formId={SELECTION_FORM} partyId={item.id} label={partyName(item)} />
+                    </Td>
                     <Td wrap>
                       <span className="flex flex-wrap items-center gap-2">
                         <Link

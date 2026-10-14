@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { getCurrentUser } from "@/lib/auth/current-user";
 import { romeInstant } from "@/lib/pipeline/dates";
+import { ENTRY_STAGES, ORIGINS, type EntryStage, type Origin } from "@/lib/pipeline/entry";
 import {
   ACTIVITY_TYPES,
   CALL_OUTCOMES,
@@ -50,6 +51,42 @@ async function partyOf(opportunityId: string): Promise<string | null> {
   const supabase = await createClient();
   const { data } = await supabase.from("opportunities").select("party_id").eq("id", opportunityId).maybeSingle();
   return data?.party_id ?? null;
+}
+
+// ---------------------------------------------------------------------------
+// Entry: parties added to a car park (block 1a-7, part A)
+// ---------------------------------------------------------------------------
+
+export type AddToParkingRow = { partyId: string; esito: "creata" | "saltata"; opportunityId: string | null; motivo: string | null };
+
+const MAX_PARTIES = 200;
+
+export async function addToParking(input: {
+  partyIds: string[];
+  parkingId: string;
+  fase?: EntryStage;
+  origine?: Origin | null;
+}): Promise<Result<AddToParkingRow[]>> {
+  if (!(await getCurrentUser())) return { ok: false, message: NOT_ALLOWED };
+  const partyIds = [...new Set((input?.partyIds ?? []).filter((id) => typeof id === "string" && UUID.test(id)))];
+  if (partyIds.length === 0) return { ok: false, message: "Scegli almeno un soggetto." };
+  if (partyIds.length > MAX_PARTIES) return { ok: false, message: `Al massimo ${MAX_PARTIES} soggetti alla volta.` };
+  if (!UUID.test(input.parkingId ?? "")) return { ok: false, message: "Scegli un parcheggio." };
+  const fase = input.fase && (ENTRY_STAGES as readonly string[]).includes(input.fase) ? input.fase : "individuata";
+  const origine = input.origine && (ORIGINS as readonly string[]).includes(input.origine) ? input.origine : undefined;
+  const supabase = await createClient();
+  const { data, error } = await supabase.rpc("add_to_parking", { p_parties: partyIds, p_parking: input.parkingId, p_fase: fase, p_origine: origine });
+  if (error) return { ok: false, message: error.code === "P0002" ? "Parcheggio non trovato o archiviato." : dbMessage(error) };
+  const rows = (data ?? []).map((row) => ({
+    partyId: row.party_id,
+    esito: row.esito === "creata" ? ("creata" as const) : ("saltata" as const),
+    opportunityId: row.opportunity_id,
+    motivo: row.motivo,
+  }));
+  revalidatePath("/pipeline");
+  revalidatePath("/soggetti");
+  partyIds.forEach((id) => revalidatePath(`/soggetti/${id}`));
+  return { ok: true, data: rows };
 }
 
 // ---------------------------------------------------------------------------

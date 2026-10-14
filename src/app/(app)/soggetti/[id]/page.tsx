@@ -6,7 +6,7 @@ import { SIGN_IN_PATH } from "@/lib/auth/routes";
 import { partyName } from "@/lib/parties/labels";
 import { getParty, getPartyExtras, listContacts, listDistances, listLocations, listProvenance } from "@/lib/parties/queries";
 import { listTimeline } from "@/lib/pipeline/history";
-import { listPartyOpportunities } from "@/lib/pipeline/queries";
+import { listParkingChoices, listPartyOpportunities } from "@/lib/pipeline/queries";
 import { getMaxParkingDistance } from "@/lib/settings/queries";
 
 const UUID = /^[0-9a-f-]{36}$/i;
@@ -29,12 +29,13 @@ export default async function PartyPage({ params }: { params: Promise<{ id: stri
   if (party.merged_into_id) redirect(`/soggetti/${party.merged_into_id}`);
 
   const maxDistance = await getMaxParkingDistance();
-  const [locations, contacts, distances, extras, opportunities] = await Promise.all([
+  const [locations, contacts, distances, extras, opportunities, parkingChoices] = await Promise.all([
     listLocations(id),
     listContacts(id),
     listDistances(id, maxDistance.meters),
     getPartyExtras(party),
     listPartyOpportunities(id),
+    listParkingChoices(id),
   ]);
   const contactIds = contacts.map((contact) => contact.id);
   const [provenance, timeline] = await Promise.all([
@@ -54,6 +55,7 @@ export default async function PartyPage({ params }: { params: Promise<{ id: stri
       placeId={extras.placeId}
       noteAuthor={extras.noteAuthor}
       opportunities={opportunities}
+      parkingChoices={parkingChoices}
       timeline={timeline}
       isAdmin={user.isAdmin}
     />

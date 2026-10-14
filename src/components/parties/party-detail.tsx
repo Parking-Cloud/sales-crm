@@ -17,8 +17,9 @@ import {
 } from "@/lib/parties/labels";
 import type { Contact, Distance, Party, PartyLocation, Provenance } from "@/lib/parties/queries";
 import type { TimelineEntry } from "@/lib/pipeline/history";
+import type { ParkingChoice, PipelineItem } from "@/lib/pipeline/queries";
+import { AddToParkingButton } from "@/components/pipeline/add-to-parking";
 import { opportunityBadge } from "@/lib/pipeline/labels";
-import type { PipelineItem } from "@/lib/pipeline/queries";
 import { ActivityButton } from "@/components/pipeline/activity-dialog";
 import { NextActivity } from "@/components/pipeline/next-activity";
 import { Timeline } from "@/components/pipeline/timeline";
@@ -88,6 +89,7 @@ export function PartyDetail({
   placeId,
   noteAuthor,
   opportunities,
+  parkingChoices,
   timeline,
   isAdmin,
   dialogOpenFor,
@@ -104,6 +106,7 @@ export function PartyDetail({
   placeId: string | null;
   noteAuthor: string | null;
   opportunities: PipelineItem[];
+  parkingChoices: ParkingChoice[];
   timeline: TimelineEntry[];
   isAdmin: boolean;
   // For previews only: open the "Non contattare" dialog of this record.
@@ -392,9 +395,13 @@ export function PartyDetail({
           )}
         </Section>
 
-        <Section id="opportunita" title="Opportunità">
+        <Section
+          id="opportunita"
+          title="Opportunità"
+          action={!party.non_contattare && <AddToParkingButton partyId={party.id} partyName={name} choices={parkingChoices} />}
+        >
           {opportunities.length === 0 ? (
-            <p className="text-body text-black-60">Nessuna opportunità: nascono dall&apos;import o dal collegamento con un parcheggio.</p>
+            <p className="text-body text-black-60">Nessuna opportunità: aggiungi il soggetto a un parcheggio.</p>
           ) : (
             <ul className="flex flex-col divide-y divide-grey-60">
               {opportunities.map((item) => {

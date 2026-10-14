@@ -991,6 +991,7 @@ export type Database = {
           import_batch_id: string | null
           motivo_perdita: Database["public"]["Enums"]["loss_reason"] | null
           nota_perdita: string | null
+          origine: string | null
           parking_id: string
           party_id: string
           posti_richiesti: number | null
@@ -1012,6 +1013,7 @@ export type Database = {
           import_batch_id?: string | null
           motivo_perdita?: Database["public"]["Enums"]["loss_reason"] | null
           nota_perdita?: string | null
+          origine?: string | null
           parking_id: string
           party_id: string
           posti_richiesti?: number | null
@@ -1033,6 +1035,7 @@ export type Database = {
           import_batch_id?: string | null
           motivo_perdita?: Database["public"]["Enums"]["loss_reason"] | null
           nota_perdita?: string | null
+          origine?: string | null
           parking_id?: string
           party_id?: string
           posti_richiesti?: number | null
@@ -1607,6 +1610,20 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      add_to_parking: {
+        Args: {
+          p_fase?: Database["public"]["Enums"]["opportunity_stage"]
+          p_origine?: string
+          p_parking: string
+          p_parties: string[]
+        }
+        Returns: {
+          esito: string
+          motivo: string
+          opportunity_id: string
+          party_id: string
+        }[]
+      }
       apply_google_coordinates: { Args: { p_rows: Json }; Returns: Json }
       check_import_rows: {
         Args: { p_rows: Json }
@@ -1738,6 +1755,15 @@ export type Database = {
           parking_id: string
         }[]
       }
+      party_parking_options: {
+        Args: { p_party: string }
+        Returns: {
+          distanza_m: number
+          nome: string
+          opportunity_id: string
+          parking_id: string
+        }[]
+      }
       party_search_name: {
         Args: { cognome: string; denominazione: string; nome: string }
         Returns: string
@@ -1805,6 +1831,7 @@ export type Database = {
         | "nessun_bisogno"
         | "non_raggiungibile"
         | "altro"
+        | "non_contattare"
       offer_status: "bozza" | "inviata" | "accettata" | "rifiutata" | "scaduta"
       opportunity_outcome: "aperta" | "vinta" | "persa"
       opportunity_stage:
@@ -1831,7 +1858,7 @@ export type Database = {
         | "carnet"
         | "convenzione"
         | "servizio_aggiuntivo"
-      suppression_type: "email" | "telefono" | "dominio"
+      suppression_type: "email" | "telefono" | "dominio" | "piva" | "place_id"
       template_use: "uffici" | "attivita_commerciali" | "offerta"
       user_role: "admin" | "operatore"
     }
@@ -1982,6 +2009,7 @@ export const Constants = {
         "nessun_bisogno",
         "non_raggiungibile",
         "altro",
+        "non_contattare",
       ],
       offer_status: ["bozza", "inviata", "accettata", "rifiutata", "scaduta"],
       opportunity_outcome: ["aperta", "vinta", "persa"],
@@ -2012,7 +2040,7 @@ export const Constants = {
         "convenzione",
         "servizio_aggiuntivo",
       ],
-      suppression_type: ["email", "telefono", "dominio"],
+      suppression_type: ["email", "telefono", "dominio", "piva", "place_id"],
       template_use: ["uffici", "attivita_commerciali", "offerta"],
       user_role: ["admin", "operatore"],
     },
