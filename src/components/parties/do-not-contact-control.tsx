@@ -22,6 +22,7 @@ export function DoNotContactControl({
   isAdmin,
   initiallyOpen = false,
   size = "sm",
+  action = markDoNotContact,
 }: {
   entita: "parties" | "contacts";
   id: string;
@@ -29,9 +30,10 @@ export function DoNotContactControl({
   name: string;
   active: boolean;
   isAdmin: boolean;
-  // For previews only.
+  // For previews and end-to-end tests only.
   initiallyOpen?: boolean;
   size?: "sm" | "md";
+  action?: typeof markDoNotContact;
 }) {
   const router = useRouter();
   const reasonId = useId();
@@ -90,7 +92,7 @@ export function DoNotContactControl({
             setError("Indica da dove arriva la richiesta.");
             return;
           }
-          run(() => markDoNotContact(entita, id, partyId, reason, channel));
+          run(() => action(entita, id, partyId, reason, channel));
         }}
         onCancel={() => {
           setOpen(false);

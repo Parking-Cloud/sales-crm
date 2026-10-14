@@ -246,6 +246,7 @@ export function StageMenu({
   esito,
   subject,
   showLink = true,
+  actions,
 }: {
   opportunityId: string;
   fase: Stage;
@@ -253,6 +254,8 @@ export function StageMenu({
   // Party and car park, for labels and dialog titles.
   subject: string;
   showLink?: boolean;
+  // For previews and end-to-end tests only.
+  actions?: { move: typeof moveStage; closeLost: typeof closeLost };
 }) {
   const badge = opportunityBadge(fase, esito);
   return (
@@ -269,8 +272,8 @@ export function StageMenu({
       <div className="mt-2 flex min-w-56 flex-col gap-2 rounded-sm border border-grey-60 bg-white p-3 shadow-sm">
         {esito === "aperta" ? (
           <>
-            <MoveToMenu opportunityId={opportunityId} fase={fase} label={subject} />
-            <CloseLostButton opportunityId={opportunityId} subject={subject} />
+            <MoveToMenu opportunityId={opportunityId} fase={fase} label={subject} action={actions?.move} />
+            <CloseLostButton opportunityId={opportunityId} subject={subject} action={actions?.closeLost} />
           </>
         ) : (
           <>
