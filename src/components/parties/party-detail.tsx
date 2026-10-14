@@ -19,7 +19,7 @@ import type { Contact, Distance, Party, PartyLocation, Provenance } from "@/lib/
 import type { TimelineEntry } from "@/lib/pipeline/history";
 import type { ParkingChoice, PipelineItem } from "@/lib/pipeline/queries";
 import { AddToParkingButton } from "@/components/pipeline/add-to-parking";
-import { opportunityBadge } from "@/lib/pipeline/labels";
+import { StageMenu } from "@/components/pipeline/stage-controls";
 import { ActivityButton } from "@/components/pipeline/activity-dialog";
 import { NextActivity } from "@/components/pipeline/next-activity";
 import { Timeline } from "@/components/pipeline/timeline";
@@ -405,15 +405,17 @@ export function PartyDetail({
           ) : (
             <ul className="flex flex-col divide-y divide-grey-60">
               {opportunities.map((item) => {
-                const badge = opportunityBadge(item.fase, item.esito);
                 return (
-                  <li key={item.id} className="flex flex-col gap-2 py-3 first:pt-0 last:pb-0 md:flex-row md:items-center md:justify-between">
+                  <li key={item.id} className="flex flex-col gap-2 py-3 first:pt-0 last:pb-0 md:flex-row md:items-start md:justify-between">
                     <div className="min-w-0">
-                      <p className="flex flex-wrap items-center gap-2">
-                        <Link href={`/opportunita/${item.id}`} className="rounded-xs font-semibold text-blue-ink underline-offset-2 hover:underline">
+                      <p className="flex flex-wrap items-start gap-2">
+                        <Link
+                          href={`/opportunita/${item.id}`}
+                          className="mt-1 rounded-xs font-semibold text-blue-ink underline-offset-2 hover:underline"
+                        >
                           {item.parking}
                         </Link>
-                        <Badge tone={badge.tone}>{badge.label}</Badge>
+                        <StageMenu opportunityId={item.id} fase={item.fase} esito={item.esito} subject={`${name} · ${item.parking}`} />
                       </p>
                       <p className="text-caption text-black-80">{item.responsabile ? `Responsabile: ${item.responsabile}` : "Senza responsabile"}</p>
                       {item.esito === "aperta" && <NextActivity item={item} now={now} />}

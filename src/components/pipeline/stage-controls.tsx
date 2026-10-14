@@ -1,9 +1,11 @@
 "use client";
 
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useId, useState, useTransition } from "react";
 import { closeLost, moveStage, reopen } from "@/app/(app)/pipeline/actions";
 import { Alert } from "@/components/ui/alert";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import { Dialog } from "@/components/ui/dialog";
@@ -16,7 +18,9 @@ import {
   MANUAL_STAGES,
   STAGES,
   STAGE_LABELS,
+  opportunityBadge,
   type LossReasonKey,
+  type Outcome,
   type Stage,
 } from "@/lib/pipeline/labels";
 
@@ -229,5 +233,59 @@ export function ReopenButton({ opportunityId, fase }: { opportunityId: string; f
         <p>Torna aperta nella fase &ldquo;{STAGE_LABELS[fase]}&rdquo;. Motivo e nota della perdita vengono tolti (restano nello storico).</p>
       </ConfirmDialog>
     </>
+  );
+}
+
+// "Fase" menu of an opportunity outside the pipeline (block 1a-7, A3): on
+// the party page and on the stage badge of the party list. The same actions
+// and rules as the pipeline: move (handoff stages locked), close as lost
+// with its reason, reopen. The badge is the menu button.
+export function StageMenu({
+  opportunityId,
+  fase,
+  esito,
+  subject,
+  showLink = true,
+}: {
+  opportunityId: string;
+  fase: Stage;
+  esito: Outcome;
+  // Party and car park, for labels and dialog titles.
+  subject: string;
+  showLink?: boolean;
+}) {
+  const badge = opportunityBadge(fase, esito);
+  return (
+    <details className="group inline-block">
+      <summary
+        className="inline-flex min-h-8 cursor-pointer list-none items-center gap-1 rounded-xs [&::-webkit-details-marker]:hidden"
+        aria-label={`Fase di ${subject}: ${badge.label}. Apri il menu Fase`}
+      >
+        <Badge tone={badge.tone}>{badge.label}</Badge>
+        <span aria-hidden="true" className="text-caption text-black-60 group-open:rotate-180">
+          ▾
+        </span>
+      </summary>
+      <div className="mt-2 flex min-w-56 flex-col gap-2 rounded-sm border border-grey-60 bg-white p-3 shadow-sm">
+        {esito === "aperta" ? (
+          <>
+            <MoveToMenu opportunityId={opportunityId} fase={fase} label={subject} />
+            <CloseLostButton opportunityId={opportunityId} subject={subject} />
+          </>
+        ) : (
+          <>
+            <p className="text-caption text-black-80">
+              {esito === "persa" ? "Chiusa come persa" : "Chiusa come vinta"}, ultima fase &ldquo;{STAGE_LABELS[fase]}&rdquo;.
+            </p>
+            <ReopenButton opportunityId={opportunityId} fase={fase} />
+          </>
+        )}
+        {showLink && (
+          <Link href={`/opportunita/${opportunityId}`} className="rounded-xs text-caption font-semibold text-blue-ink underline underline-offset-2">
+            Apri l&apos;opportunità
+          </Link>
+        )}
+      </div>
+    </details>
   );
 }

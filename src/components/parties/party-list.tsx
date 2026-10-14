@@ -9,7 +9,7 @@ import { PARTY_CATEGORIES, PARTY_TYPE_LABELS, partyName, type PartyType } from "
 import { PAGE_SIZE, type ParkingFilterOption, type PartyFilters, type PartyListItem } from "@/lib/parties/queries";
 import type { ParkingOption } from "@/lib/pipeline/queries";
 import { BulkAddToParking, SelectAllCheckbox, SelectPartyCheckbox } from "@/components/pipeline/add-to-parking";
-import { opportunityBadge } from "@/lib/pipeline/labels";
+import { StageMenu } from "@/components/pipeline/stage-controls";
 import { DataStatusBadge, DoNotContactBadge } from "./data-status-badge";
 
 const SELECTION_FORM = "selezione-soggetti";
@@ -197,17 +197,23 @@ export function PartyList({
                         <span className="text-black-60">–</span>
                       ) : (
                         <ul className="flex min-w-44 flex-col gap-1">
-                          {item.parcheggi.map((parking) => {
-                            const badge = opportunityBadge(parking.fase, parking.esito);
-                            return (
-                              <li key={parking.opportunity_id} className="flex flex-wrap items-center gap-2">
-                                <Link href={`/opportunita/${parking.opportunity_id}`} className="rounded-xs font-semibold underline-offset-2 hover:underline">
-                                  {parking.parcheggio}
-                                </Link>
-                                <Badge tone={badge.tone}>{badge.label}</Badge>
-                              </li>
-                            );
-                          })}
+                          {item.parcheggi.map((parking) => (
+                            <li key={parking.opportunity_id} className="flex flex-wrap items-start gap-2">
+                              <Link
+                                href={`/opportunita/${parking.opportunity_id}`}
+                                className="mt-1 rounded-xs font-semibold underline-offset-2 hover:underline"
+                              >
+                                {parking.parcheggio}
+                              </Link>
+                              <StageMenu
+                                opportunityId={parking.opportunity_id}
+                                fase={parking.fase}
+                                esito={parking.esito}
+                                subject={`${partyName(item)} · ${parking.parcheggio}`}
+                                showLink={false}
+                              />
+                            </li>
+                          ))}
                         </ul>
                       )}
                     </Td>
