@@ -109,6 +109,27 @@ export type Database = {
           },
         ]
       }
+      api_usage: {
+        Row: {
+          chiamate: number
+          giorno: string
+          sku: string
+          updated_at: string
+        }
+        Insert: {
+          chiamate?: number
+          giorno: string
+          sku: string
+          updated_at?: string
+        }
+        Update: {
+          chiamate?: number
+          giorno?: string
+          sku?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       app_settings: {
         Row: {
           chiave: string
@@ -1535,6 +1556,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      apply_google_coordinates: { Args: { p_rows: Json }; Returns: Json }
       check_import_rows: {
         Args: { p_rows: Json }
         Returns: {
@@ -1567,6 +1589,16 @@ export type Database = {
           valore: string
         }[]
       }
+      check_places: {
+        Args: { p_places: Json }
+        Returns: {
+          motivo: string
+          nome: string
+          party_id: string
+          place_id: string
+          stato: string
+        }[]
+      }
       clear_do_not_contact: {
         Args: { p_entita: string; p_id: string }
         Returns: number
@@ -1580,6 +1612,23 @@ export type Database = {
       }
       generic_email_domains: { Args: never; Returns: string[] }
       geo_point: { Args: { lat: number; lng: number }; Returns: unknown }
+      google_coordinates_valid: {
+        Args: { p_aggiornate_il: string; p_fonte: string }
+        Returns: boolean
+      }
+      google_locations_due: {
+        Args: { p_days?: number; p_limit?: number }
+        Returns: {
+          aggiornate_il: string
+          location_id: string
+          place_id: string
+        }[]
+      }
+      google_profile_name: { Args: { meta: Json }; Returns: string }
+      import_places: {
+        Args: { p_parking: string; p_rows: Json }
+        Returns: Json
+      }
       import_rows: {
         Args: { p_file: string; p_report?: Json; p_rows: Json }
         Returns: Json
@@ -1641,6 +1690,7 @@ export type Database = {
         }[]
       }
       undo_import_batch: { Args: { p_batch: string }; Returns: Json }
+      use_api_quota: { Args: { p_n?: number; p_sku: string }; Returns: Json }
     }
     Enums: {
       activity_type: "chiamata" | "email" | "nota" | "incontro" | "cambio_fase"

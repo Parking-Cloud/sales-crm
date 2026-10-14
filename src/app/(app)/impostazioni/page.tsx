@@ -1,11 +1,13 @@
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
+import { GoogleUsageSection } from "@/components/settings/google-usage";
 import { MaxDistanceForm } from "@/components/settings/max-distance-form";
 import { getCurrentUser } from "@/lib/auth/current-user";
 import { SIGN_IN_PATH } from "@/lib/auth/routes";
 import { formatDate } from "@/lib/format";
+import { monthUsage } from "@/lib/places/queries";
 import { formatKm } from "@/lib/settings/distance";
-import { getMaxParkingDistance } from "@/lib/settings/queries";
+import { getApiLimits, getMaxParkingDistance } from "@/lib/settings/queries";
 
 export const metadata: Metadata = { title: "Impostazioni" };
 
@@ -13,7 +15,7 @@ export default async function SettingsPage() {
   const user = await getCurrentUser();
   if (!user) redirect(SIGN_IN_PATH);
 
-  const distance = await getMaxParkingDistance();
+  const [distance, limits, usage] = await Promise.all([getMaxParkingDistance(), getApiLimits(), monthUsage()]);
 
   return (
     <>
@@ -48,6 +50,8 @@ export default async function SettingsPage() {
           </p>
         )}
       </section>
+
+      <GoogleUsageSection isAdmin={user.isAdmin} limits={limits} usage={usage} />
     </>
   );
 }
