@@ -1,0 +1,33 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "commonjs",
+    "moduleResolution": "node",
+    "lib": [
+      "ES2022",
+      "DOM"
+    ],
+    "types": [
+      "node"
+    ],
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "outDir": ".test-dist",
+    "rootDir": "."
+  },
+  "include": [
+    "src/lib/import/values.ts",
+    "src/lib/import/columns.ts",
+    "src/lib/import/categories.ts",
+    "src/lib/import/loss-reasons.ts",
+    "src/lib/import/presets.ts",
+    "src/lib/import/transform.ts",
+    "src/lib/import/workbook.ts",
+    "src/lib/import/limits.ts",
+    "src/lib/import/safe-call.ts",
+    "src/lib/import/undo.ts",
+    "tests/unit/**/*.ts",
+    "tests/fixtures/**/*.ts"
+  ]
+}

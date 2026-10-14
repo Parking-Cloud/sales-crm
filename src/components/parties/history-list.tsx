@@ -22,9 +22,24 @@ const FIELD_LABELS: Record<string, string> = {
   ruolo: "Ruolo",
   canale_preferito: "Canale preferito",
   party_id: "Soggetto",
+  indirizzo: "Indirizzo",
+  cap: "CAP",
+  citta: "Città",
+  principale: "Sede principale",
+  lat: "Latitudine",
+  lng: "Longitudine",
 };
 
-const HIDDEN = new Set(["id", "created_at", "updated_at", "created_by", "dominio"]);
+const HIDDEN = new Set([
+  "id",
+  "created_at",
+  "updated_at",
+  "created_by",
+  "dominio",
+  "import_batch_id",
+  "coordinate_fonte",
+  "coordinate_aggiornate_il",
+]);
 
 const TIME = new Intl.DateTimeFormat("it-IT", { hour: "2-digit", minute: "2-digit", timeZone: "Europe/Rome" });
 
@@ -36,9 +51,13 @@ function show(value: unknown): string {
 }
 
 function describe(entry: HistoryEntry): { title: string; changes: string[] } {
-  const subject = entry.entita === "contacts" ? "il contatto" : "il soggetto";
+  const subject = entry.entita === "contacts" ? "il contatto" : entry.entita === "party_locations" ? "la sede" : "il soggetto";
   const name = (row: Record<string, unknown> | null) =>
-    row ? [row.denominazione, row.nome, row.cognome].filter(Boolean).join(" ") : "";
+    !row
+      ? ""
+      : entry.entita === "party_locations"
+        ? [row.indirizzo, row.citta].filter(Boolean).join(", ")
+        : [row.denominazione, row.nome, row.cognome].filter(Boolean).join(" ");
   if (entry.azione === "insert") return { title: `ha creato ${subject} ${name(entry.dopo)}`.trim(), changes: [] };
   if (entry.azione === "delete") return { title: `ha eliminato ${subject} ${name(entry.prima)}`.trim(), changes: [] };
 
@@ -49,7 +68,7 @@ function describe(entry: HistoryEntry): { title: string; changes: string[] } {
         ? FIELD_LABELS[key]
         : `${FIELD_LABELS[key] ?? key}: da ${show(entry.prima?.[key])} a ${show(entry.dopo?.[key])}`,
     );
-  return { title: `ha modificato ${subject}${entry.entita === "contacts" ? ` ${name(entry.dopo)}` : ""}`, changes };
+  return { title: `ha modificato ${subject}${entry.entita !== "parties" ? ` ${name(entry.dopo)}` : ""}`, changes };
 }
 
 export function HistoryList({ entries }: { entries: HistoryEntry[] }) {

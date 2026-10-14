@@ -43,3 +43,6 @@ next-env.d.ts
 
 # compiled scripts
 /scripts/dist/
+
+# compiled unit tests
+/.test-dist/

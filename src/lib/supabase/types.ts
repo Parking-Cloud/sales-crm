@@ -26,6 +26,7 @@ export type Database = {
           created_at: string
           esito: string | null
           id: string
+          import_batch_id: string | null
           opportunity_id: string | null
           party_id: string | null
           testo: string | null
@@ -40,6 +41,7 @@ export type Database = {
           created_at?: string
           esito?: string | null
           id?: string
+          import_batch_id?: string | null
           opportunity_id?: string | null
           party_id?: string | null
           testo?: string | null
@@ -54,6 +56,7 @@ export type Database = {
           created_at?: string
           esito?: string | null
           id?: string
+          import_batch_id?: string | null
           opportunity_id?: string | null
           party_id?: string | null
           testo?: string | null
@@ -77,6 +80,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "activities_import_batch_id_fkey"
+            columns: ["import_batch_id"]
+            isOneToOne: false
+            referencedRelation: "import_batches"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "activities_opportunity_id_fkey"
             columns: ["opportunity_id"]
             isOneToOne: false
@@ -93,6 +103,41 @@ export type Database = {
           {
             foreignKeyName: "activities_user_id_fkey"
             columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      app_settings: {
+        Row: {
+          chiave: string
+          created_at: string
+          id: string
+          updated_at: string
+          updated_by: string | null
+          valore: Json
+        }
+        Insert: {
+          chiave: string
+          created_at?: string
+          id?: string
+          updated_at?: string
+          updated_by?: string | null
+          valore: Json
+        }
+        Update: {
+          chiave?: string
+          created_at?: string
+          id?: string
+          updated_at?: string
+          updated_by?: string | null
+          valore?: Json
+        }
+        Relationships: [
+          {
+            foreignKeyName: "app_settings_updated_by_fkey"
+            columns: ["updated_by"]
             isOneToOne: false
             referencedRelation: "users"
             referencedColumns: ["id"]
@@ -453,6 +498,7 @@ export type Database = {
           created_by: string | null
           email: string | null
           id: string
+          import_batch_id: string | null
           nome: string | null
           non_contattare: boolean
           party_id: string
@@ -469,6 +515,7 @@ export type Database = {
           created_by?: string | null
           email?: string | null
           id?: string
+          import_batch_id?: string | null
           nome?: string | null
           non_contattare?: boolean
           party_id: string
@@ -485,6 +532,7 @@ export type Database = {
           created_by?: string | null
           email?: string | null
           id?: string
+          import_batch_id?: string | null
           nome?: string | null
           non_contattare?: boolean
           party_id?: string
@@ -498,6 +546,13 @@ export type Database = {
             columns: ["created_by"]
             isOneToOne: false
             referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "contacts_import_batch_id_fkey"
+            columns: ["import_batch_id"]
+            isOneToOne: false
+            referencedRelation: "import_batches"
             referencedColumns: ["id"]
           },
           {
@@ -719,6 +774,44 @@ export type Database = {
         }
         Relationships: []
       }
+      import_mappings: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          id: string
+          mappatura: Json
+          nome: string
+          tipo_foglio: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          mappatura: Json
+          nome: string
+          tipo_foglio: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          mappatura?: Json
+          nome?: string
+          tipo_foglio?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "import_mappings_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       offer_items: {
         Row: {
           created_at: string
@@ -799,6 +892,7 @@ export type Database = {
           created_at: string
           created_by: string | null
           id: string
+          import_batch_id: string | null
           inviata_il: string | null
           motivo_rifiuto: string | null
           opportunity_id: string
@@ -814,6 +908,7 @@ export type Database = {
           created_at?: string
           created_by?: string | null
           id?: string
+          import_batch_id?: string | null
           inviata_il?: string | null
           motivo_rifiuto?: string | null
           opportunity_id: string
@@ -829,6 +924,7 @@ export type Database = {
           created_at?: string
           created_by?: string | null
           id?: string
+          import_batch_id?: string | null
           inviata_il?: string | null
           motivo_rifiuto?: string | null
           opportunity_id?: string
@@ -844,6 +940,13 @@ export type Database = {
             columns: ["created_by"]
             isOneToOne: false
             referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "offers_import_batch_id_fkey"
+            columns: ["import_batch_id"]
+            isOneToOne: false
+            referencedRelation: "import_batches"
             referencedColumns: ["id"]
           },
           {
@@ -864,6 +967,7 @@ export type Database = {
           esito: Database["public"]["Enums"]["opportunity_outcome"]
           fase: Database["public"]["Enums"]["opportunity_stage"]
           id: string
+          import_batch_id: string | null
           motivo_perdita: Database["public"]["Enums"]["loss_reason"] | null
           parking_id: string
           party_id: string
@@ -883,6 +987,7 @@ export type Database = {
           esito?: Database["public"]["Enums"]["opportunity_outcome"]
           fase?: Database["public"]["Enums"]["opportunity_stage"]
           id?: string
+          import_batch_id?: string | null
           motivo_perdita?: Database["public"]["Enums"]["loss_reason"] | null
           parking_id: string
           party_id: string
@@ -902,6 +1007,7 @@ export type Database = {
           esito?: Database["public"]["Enums"]["opportunity_outcome"]
           fase?: Database["public"]["Enums"]["opportunity_stage"]
           id?: string
+          import_batch_id?: string | null
           motivo_perdita?: Database["public"]["Enums"]["loss_reason"] | null
           parking_id?: string
           party_id?: string
@@ -933,6 +1039,13 @@ export type Database = {
             columns: ["created_by"]
             isOneToOne: false
             referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "opportunities_import_batch_id_fkey"
+            columns: ["import_batch_id"]
+            isOneToOne: false
+            referencedRelation: "import_batches"
             referencedColumns: ["id"]
           },
           {
@@ -1134,6 +1247,7 @@ export type Database = {
           email: string | null
           form_web_url: string | null
           id: string
+          import_batch_id: string | null
           merged_into_id: string | null
           nome: string | null
           non_contattare: boolean
@@ -1156,6 +1270,7 @@ export type Database = {
           email?: string | null
           form_web_url?: string | null
           id?: string
+          import_batch_id?: string | null
           merged_into_id?: string | null
           nome?: string | null
           non_contattare?: boolean
@@ -1178,6 +1293,7 @@ export type Database = {
           email?: string | null
           form_web_url?: string | null
           id?: string
+          import_batch_id?: string | null
           merged_into_id?: string | null
           nome?: string | null
           non_contattare?: boolean
@@ -1194,6 +1310,13 @@ export type Database = {
             columns: ["created_by"]
             isOneToOne: false
             referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "parties_import_batch_id_fkey"
+            columns: ["import_batch_id"]
+            isOneToOne: false
+            referencedRelation: "import_batches"
             referencedColumns: ["id"]
           },
           {
@@ -1214,6 +1337,7 @@ export type Database = {
           created_at: string
           created_by: string | null
           id: string
+          import_batch_id: string | null
           indirizzo: string | null
           lat: number | null
           lng: number | null
@@ -1229,6 +1353,7 @@ export type Database = {
           created_at?: string
           created_by?: string | null
           id?: string
+          import_batch_id?: string | null
           indirizzo?: string | null
           lat?: number | null
           lng?: number | null
@@ -1244,6 +1369,7 @@ export type Database = {
           created_at?: string
           created_by?: string | null
           id?: string
+          import_batch_id?: string | null
           indirizzo?: string | null
           lat?: number | null
           lng?: number | null
@@ -1257,6 +1383,13 @@ export type Database = {
             columns: ["created_by"]
             isOneToOne: false
             referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "party_locations_import_batch_id_fkey"
+            columns: ["import_batch_id"]
+            isOneToOne: false
+            referencedRelation: "import_batches"
             referencedColumns: ["id"]
           },
           {
@@ -1402,6 +1535,16 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      check_import_rows: {
+        Args: { p_rows: Json }
+        Returns: {
+          livello: string
+          motivo: string
+          nome: string
+          party_id: string
+          ref: string
+        }[]
+      }
       check_party_duplicates: {
         Args: {
           p_cap?: string
@@ -1437,6 +1580,10 @@ export type Database = {
       }
       generic_email_domains: { Args: never; Returns: string[] }
       geo_point: { Args: { lat: number; lng: number }; Returns: unknown }
+      import_rows: {
+        Args: { p_file: string; p_report?: Json; p_rows: Json }
+        Returns: Json
+      }
       is_active_user: { Args: never; Returns: boolean }
       is_admin: { Args: never; Returns: boolean }
       is_generic_domain: { Args: { domain: string }; Returns: boolean }
@@ -1454,7 +1601,7 @@ export type Database = {
       normalize_phone_list: { Args: { raw: string }; Returns: string }
       normalize_piva: { Args: { raw: string }; Returns: string }
       party_location_distances: {
-        Args: { p_party_id: string }
+        Args: { p_max_m?: number; p_party_id: string }
         Returns: {
           distanza_m: number
           location_id: string
@@ -1493,6 +1640,7 @@ export type Database = {
           totale: number
         }[]
       }
+      undo_import_batch: { Args: { p_batch: string }; Returns: Json }
     }
     Enums: {
       activity_type: "chiamata" | "email" | "nota" | "incontro" | "cambio_fase"
