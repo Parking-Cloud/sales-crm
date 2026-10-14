@@ -19,10 +19,19 @@ import type { Contact, Distance, HistoryEntry, Party, PartyLocation, Provenance 
 import { TRACKED_FIELD_LABELS, type TrackedField } from "@/lib/parties/validation";
 import { DoNotContactBadge } from "./data-status-badge";
 import { DoNotContactControl } from "./do-not-contact-control";
+import { LocationCoordinates } from "./location-coordinates";
 import { HistoryList } from "./history-list";
 import { ProvenanceBadge } from "./provenance";
 
 const COORDINATE = new Intl.NumberFormat("it-IT", { minimumFractionDigits: 6, maximumFractionDigits: 6 });
+const GOOGLE_DAYS = 30;
+
+// Google coordinates are used for 30 days at most (Google Maps terms).
+function googleExpired(location: PartyLocation, now: number): boolean {
+  if (location.coordinate_fonte !== "google") return false;
+  const updated = location.coordinate_aggiornate_il ? Date.parse(location.coordinate_aggiornate_il) : Number.NaN;
+  return Number.isNaN(updated) || now - updated > GOOGLE_DAYS * 86_400_000;
+}
 
 function Section({
   id,
@@ -68,6 +77,7 @@ export function PartyDetail({
   provenance,
   distances,
   maxDistanceM,
+  now,
   history,
   isAdmin,
   dialogOpenFor,
@@ -78,6 +88,8 @@ export function PartyDetail({
   provenance: Provenance[];
   distances: Distance[];
   maxDistanceM: number;
+  // Time of the request, to tell expired Google coordinates.
+  now: number;
   history: HistoryEntry[];
   isAdmin: boolean;
   // For previews only: open the "Non contattare" dialog of this record.
@@ -207,7 +219,8 @@ export function PartyDetail({
             <ul className="flex flex-col divide-y divide-grey-60">
               {locations.map((location) => {
                 const near = distances.filter((row) => row.location_id === location.id);
-                const located = location.lat !== null && location.lng !== null;
+                const expired = googleExpired(location, now);
+                const located = location.lat !== null && location.lng !== null && !expired;
                 return (
                   <li key={location.id} className="flex flex-col gap-3 py-4 first:pt-0 last:pb-0 md:flex-row md:justify-between">
                     <div className="min-w-0">
@@ -216,13 +229,20 @@ export function PartyDetail({
                         {location.principale && <Badge tone="info">Principale</Badge>}
                       </p>
                       <p className="text-body text-black-80">{[location.cap, location.citta].filter(Boolean).join(" ") || "–"}</p>
-                      {location.lat !== null && location.lng !== null ? (
+                      {location.lat !== null && location.lng !== null && expired ? (
+                        <p className="mt-1 text-caption text-black-80">
+                          <strong>Coordinate da aggiornare</strong>: quelle di Google valgono 30 giorni. Premi Aggiorna, oppure
+                          Conferma indirizzo per usare OpenStreetMap.
+                        </p>
+                      ) : location.lat !== null && location.lng !== null ? (
                         <p className="mt-1 text-caption text-black-60">
                           {COORDINATE.format(location.lat)}, {COORDINATE.format(location.lng)} ·{" "}
                           {location.coordinate_fonte === "nominatim" ? (
                             <a href={OSM_COPYRIGHT_URL} target="_blank" rel="noopener noreferrer" className="rounded-xs underline underline-offset-2">
                               {OSM_ATTRIBUTION}
                             </a>
+                          ) : location.coordinate_fonte === "google" ? (
+                            `Coordinate da Google Maps del ${formatDate(location.coordinate_aggiornate_il)}`
                           ) : (
                             "Coordinate inserite a mano"
                           )}{" "}
@@ -264,6 +284,12 @@ export function PartyDetail({
                       >
                         Modifica sede
                       </Link>
+                      <LocationCoordinates
+                        partyId={party.id}
+                        locationId={location.id}
+                        canRefresh={expired}
+                        canConfirm={location.coordinate_fonte !== "nominatim" && Boolean(location.indirizzo || location.citta)}
+                      />
                     </div>
                   </li>
                 );
