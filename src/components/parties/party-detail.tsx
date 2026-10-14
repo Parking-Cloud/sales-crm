@@ -20,6 +20,7 @@ import { TRACKED_FIELD_LABELS, type TrackedField } from "@/lib/parties/validatio
 import { DoNotContactBadge } from "./data-status-badge";
 import { DoNotContactControl } from "./do-not-contact-control";
 import { LocationCoordinates } from "./location-coordinates";
+import { NotesCard } from "@/components/notes-card";
 import { HistoryList } from "./history-list";
 import { ProvenanceBadge } from "./provenance";
 
@@ -78,6 +79,7 @@ export function PartyDetail({
   distances,
   maxDistanceM,
   now,
+  noteAuthor,
   history,
   isAdmin,
   dialogOpenFor,
@@ -90,6 +92,7 @@ export function PartyDetail({
   maxDistanceM: number;
   // Time of the request, to tell expired Google coordinates.
   now: number;
+  noteAuthor: string | null;
   history: HistoryEntry[];
   isAdmin: boolean;
   // For previews only: open the "Non contattare" dialog of this record.
@@ -207,6 +210,8 @@ export function PartyDetail({
               )}
           </dl>
         </Section>
+
+        <NotesCard entita="parties" id={party.id} note={party.note} author={noteAuthor} updatedAt={party.note_modificate_il} />
 
         <Section
           id="sedi"

@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { NotesCard } from "@/components/notes-card";
 import { Alert } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
 import { Button, ButtonLink } from "@/components/ui/button";
@@ -117,11 +118,6 @@ export function FacilityDetail({
             </Detail>
             <Detail label="Responsabile">{facility.responsabile ?? "–"}</Detail>
             <Detail label="Ultima modifica">{formatDate(facility.updated_at)}</Detail>
-            <div className="sm:col-span-2">
-              <Detail label="Note">
-                {facility.note ? <span className="whitespace-pre-line">{facility.note}</span> : "–"}
-              </Detail>
-            </div>
           </dl>
         </Card>
 
@@ -163,6 +159,16 @@ export function FacilityDetail({
             </p>
           )}
         </Card>
+      </div>
+
+      <div className="mt-6">
+        <NotesCard
+          entita="parking_facilities"
+          id={facility.id}
+          note={facility.note}
+          author={facility.note_autore ?? null}
+          updatedAt={facility.note_modificate_il}
+        />
       </div>
 
       <section id="listino" aria-labelledby="listino-titolo" className="mt-8">
