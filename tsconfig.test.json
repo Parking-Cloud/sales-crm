@@ -27,6 +27,11 @@
     "src/lib/import/limits.ts",
     "src/lib/import/safe-call.ts",
     "src/lib/import/undo.ts",
+    "src/lib/places/categories.ts",
+    "src/lib/places/geo.ts",
+    "src/lib/places/search.ts",
+    "src/lib/google/places-api.ts",
+    "src/lib/google/refresh.ts",
     "tests/unit/**/*.ts",
     "tests/fixtures/**/*.ts"
   ]

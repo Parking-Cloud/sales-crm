@@ -8,6 +8,7 @@ import { buildPlan, finalStatus, type DuplicateHit, type PlanRow, type SheetInpu
 import { compactRows, type Cell } from "@/lib/import/values";
 import { MAX_COLUMNS, MAX_ROWS } from "@/lib/import/limits";
 import { isUuid, readUndo, type UndoResult } from "@/lib/import/undo";
+import { stopwatch } from "@/lib/server-timing";
 import { createClient } from "@/lib/supabase/server";
 
 // Import flow (CRM-12…CRM-15). Administrators only; RLS and the SQL
@@ -21,23 +22,6 @@ type Result<T> = { ok: true; data: T } | { ok: false; message: string };
 
 async function isAdmin(): Promise<boolean> {
   return Boolean((await getCurrentUser())?.isAdmin);
-}
-
-// Durations in milliseconds of the steps of one action, logged as one line.
-function stopwatch(action: string) {
-  const start = performance.now();
-  let last = start;
-  const steps: Record<string, number> = {};
-  return {
-    step(name: string) {
-      const now = performance.now();
-      steps[name] = Math.round(now - last);
-      last = now;
-    },
-    log(counts: Record<string, number>) {
-      console.info(JSON.stringify({ evento: `import.${action}`, ms: { ...steps, totale: Math.round(performance.now() - start) }, ...counts }));
-    },
-  };
 }
 
 export type SheetChoice = { name: string; rows: Cell[][]; mapping: SheetMapping; parkingId: string | null };
@@ -136,7 +120,7 @@ function emptySheet(choices: SheetChoice[], plan: PlanRow[]): string | null {
 // 2-3. Mapping applied: the plan for the preview, with the duplicate check
 // of all rows in one database call.
 export async function previewImport(input: SheetChoice[]): Promise<Result<PlanRow[]>> {
-  const time = stopwatch("anteprima");
+  const time = stopwatch("import.anteprima");
   if (!(await isAdmin())) return { ok: false, message: NOT_ADMIN };
   time.step("utente");
   const choices = sanitizeChoices(input);
@@ -190,7 +174,7 @@ function reportRows(rows: PlanRow[]): ReportRow[] {
 
 // 4. Import: the duplicate check runs again here, blocks cannot be forced.
 export async function runImport(fileName: string, rows: PlanRow[]): Promise<Result<{ batchId: string }>> {
-  const time = stopwatch("import");
+  const time = stopwatch("import.import");
   if (!(await isAdmin())) return { ok: false, message: NOT_ADMIN };
   if (typeof fileName !== "string" || !fileName.trim() || !Array.isArray(rows) || rows.length === 0) {
     return { ok: false, message: "Niente da importare." };
@@ -229,7 +213,7 @@ export async function runImport(fileName: string, rows: PlanRow[]): Promise<Resu
 
 // 6. Undo.
 export async function undoImport(batchId: string): Promise<Result<UndoResult>> {
-  const time = stopwatch("annullamento");
+  const time = stopwatch("import.annullamento");
   if (!(await isAdmin())) return { ok: false, message: "Solo l'amministratore può annullare un import." };
   if (!isUuid(batchId)) return { ok: false, message: "Import non trovato." };
   time.step("utente");

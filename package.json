@@ -11,6 +11,7 @@
     "scripts:build": "tsc -p scripts/tsconfig.json",
     "db:migrate": "npm run scripts:build && node scripts/dist/apply-migrations.js",
     "db:test": "npm run scripts:build && node scripts/dist/run-db-tests.js",
+    "google:check-types": "tsc -p tsconfig.test.json && npm run scripts:build && node scripts/dist/check-place-types.js",
     "test:unit": "tsc -p tsconfig.test.json && node --test .test-dist/tests/unit/import.test.js",
     "test:fixtures": "node tests/fixtures/build-crm-2026-fixture.mjs && tsc -p tsconfig.test.json && node .test-dist/tests/fixtures/build-import-plan.js"
   },
