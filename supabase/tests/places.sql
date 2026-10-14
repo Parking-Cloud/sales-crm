@@ -124,7 +124,10 @@ select pg_temp.record(
 -- API usage and daily limits
 -- ---------------------------------------------------------------------------
 
-update public.app_settings set valore = '3'::jsonb where chiave = 'limite_giornaliero_nearby';
+-- The limit is set 3 calls above today's real use on the database.
+insert into test_json select 'usate_prima', to_jsonb(coalesce((
+  select chiamate from public.api_usage where giorno = (now() at time zone 'Europe/Rome')::date and sku = 'nearby_search_pro'), 0));
+update public.app_settings set valore = to_jsonb(pg_temp.j('usate_prima')::text::int + 3) where chiave = 'limite_giornaliero_nearby';
 select pg_temp.act_as(pg_temp.id('operatore'));
 insert into test_json select 'q1', public.use_api_quota('nearby_search_pro', 2);
 insert into test_json select 'q2', public.use_api_quota('nearby_search_pro', 2);
@@ -135,8 +138,9 @@ reset role;
 select pg_temp.record(
   'limiti: entro il limite le chiamate sono contate, oltre il limite rifiutate e non contate',
   (pg_temp.j('q1') ->> 'ok')::boolean and not (pg_temp.j('q2') ->> 'ok')::boolean and (pg_temp.j('q3') ->> 'ok')::boolean
+  and (pg_temp.j('q3') ->> 'usate')::int = pg_temp.j('usate_prima')::text::int + 3
   and (select chiamate from public.api_usage where giorno = (now() at time zone 'Europe/Rome')::date and sku = 'nearby_search_pro')
-      = coalesce((select (value ->> 'usate')::int from test_json where key = 'q3'), -1),
+      = pg_temp.j('usate_prima')::text::int + 3,
   concat_ws(' | ', pg_temp.j('q1'), pg_temp.j('q2'), pg_temp.j('q3'))
 );
 select pg_temp.record(

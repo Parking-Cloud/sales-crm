@@ -1,6 +1,7 @@
 import { createClient } from "@/lib/supabase/server";
 import type { Tables } from "@/lib/supabase/types";
 import { isOneOf } from "@/lib/parking/labels";
+import type { Outcome, Stage } from "@/lib/pipeline/labels";
 import { PARTY_TYPE_LABELS, isPartyCategory, type PartyCategory, type PartyType } from "./labels";
 
 // Reads for the party screens, with the signed-in user's session (RLS).
@@ -13,8 +14,18 @@ export type PartyFilters = {
   categoria: PartyCategory | null;
   citta: string;
   soloDaVerificare: boolean;
+  // Car parks (ids) of the party's opportunities; "nessuno" = no car park.
+  parcheggi: string[];
+  senzaParcheggio: boolean;
+  ordina: "parcheggio" | "parcheggio_desc" | null;
   page: number;
 };
+
+const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+function list(value: string | string[] | undefined): string[] {
+  return (Array.isArray(value) ? value : value ? [value] : []).map((item) => item.trim()).filter(Boolean);
+}
 
 export function readPartyFilters(params: Record<string, string | string[] | undefined>): PartyFilters {
   const text = (name: string) => (typeof params[name] === "string" ? (params[name] as string).trim().slice(0, 120) : "");
@@ -25,6 +36,9 @@ export function readPartyFilters(params: Record<string, string | string[] | unde
     categoria: isPartyCategory(params.categoria) ? params.categoria : null,
     citta: text("citta"),
     soloDaVerificare: params.da_verificare === "1",
+    parcheggi: list(params.parcheggio).filter((value) => UUID_RE.test(value)).slice(0, 50),
+    senzaParcheggio: list(params.parcheggio).includes("nessuno"),
+    ordina: params.ordina === "parcheggio" || params.ordina === "parcheggio_desc" ? params.ordina : null,
     page: Number.isFinite(page) && page > 0 ? page : 1,
   };
 }
@@ -42,7 +56,10 @@ export type PartyListItem = {
   campi_verificati: number;
   campi_valorizzati: number;
   somiglianza: number | null;
+  parcheggi: PartyParking[];
 };
+
+export type PartyParking = { opportunity_id: string; parking_id: string; parcheggio: string; fase: Stage; esito: Outcome };
 
 export async function searchParties(filters: PartyFilters): Promise<{ items: PartyListItem[]; total: number }> {
   const supabase = await createClient();
@@ -54,6 +71,9 @@ export async function searchParties(filters: PartyFilters): Promise<{ items: Par
     p_solo_da_verificare: filters.soloDaVerificare,
     p_limit: PAGE_SIZE,
     p_offset: (filters.page - 1) * PAGE_SIZE,
+    p_parcheggi: filters.parcheggi.length > 0 ? filters.parcheggi : undefined,
+    p_senza_parcheggio: filters.senzaParcheggio,
+    p_ordina: filters.ordina ?? undefined,
   });
   if (error) throw new Error(`search_parties: ${error.code ?? error.message}`);
   const rows = data ?? [];
@@ -71,6 +91,7 @@ export async function searchParties(filters: PartyFilters): Promise<{ items: Par
       campi_verificati: row.campi_verificati,
       campi_valorizzati: row.campi_valorizzati,
       somiglianza: row.somiglianza,
+      parcheggi: Array.isArray(row.parcheggi) ? (row.parcheggi as unknown as PartyParking[]) : [],
     })),
     total: rows.length > 0 ? Number(rows[0].totale) : 0,
   };
@@ -269,4 +290,36 @@ export async function checkDuplicates(input: {
   });
   if (error) fail("check_party_duplicates", error);
   return (data ?? []).map((row) => ({ ...row, livello: row.livello as DuplicateMatch["livello"] }));
+}
+
+export type ParkingFilterOption = { id: string; nome: string };
+
+// Car parks for the party list filter: short name, archived ones last.
+export async function listParkingFilterOptions(): Promise<ParkingFilterOption[]> {
+  const supabase = await createClient();
+  const { data, error } = await supabase.from("parking_facilities").select("id, nome, nome_breve, archived_at").order("nome");
+  if (error) fail("parking_facilities", error);
+  return [...data]
+    .sort((a, b) => Number(a.archived_at !== null) - Number(b.archived_at !== null))
+    .map((row) => ({ id: row.id, nome: (row.nome_breve ?? row.nome) + (row.archived_at ? " (archiviato)" : "") }));
+}
+
+// Google place id of a party (map search import) and the name of who last
+// changed its notes.
+export async function getPartyExtras(party: Party): Promise<{ placeId: string | null; noteAuthor: string | null }> {
+  const supabase = await createClient();
+  const [ref, author] = await Promise.all([
+    supabase
+      .from("external_references")
+      .select("id_esterno")
+      .eq("sistema", "google_places")
+      .eq("entita", "parties")
+      .eq("entita_id", party.id)
+      .maybeSingle(),
+    party.note_modificate_da
+      ? supabase.from("users").select("nome, email").eq("id", party.note_modificate_da).maybeSingle()
+      : Promise.resolve({ data: null }),
+  ]);
+  const user = author.data as { nome: string | null; email: string } | null;
+  return { placeId: ref.data?.id_esterno ?? null, noteAuthor: user ? user.nome?.trim() || user.email : null };
 }

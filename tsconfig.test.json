@@ -32,6 +32,11 @@
     "src/lib/places/search.ts",
     "src/lib/google/places-api.ts",
     "src/lib/google/refresh.ts",
+    "src/lib/google/maps-link.ts",
+    "src/lib/pipeline/dates.ts",
+    "src/lib/pipeline/filters.ts",
+    "src/lib/pipeline/labels.ts",
+    "src/lib/pipeline/today.ts",
     "tests/unit/**/*.ts",
     "tests/fixtures/**/*.ts"
   ]

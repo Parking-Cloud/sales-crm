@@ -39,6 +39,10 @@ const HIDDEN = new Set([
   "import_batch_id",
   "coordinate_fonte",
   "coordinate_aggiornate_il",
+  // Notes have their own entries in the history (block 1a-6).
+  "note",
+  "note_modificate_da",
+  "note_modificate_il",
 ]);
 
 const TIME = new Intl.DateTimeFormat("it-IT", { hour: "2-digit", minute: "2-digit", timeZone: "Europe/Rome" });
@@ -50,7 +54,7 @@ function show(value: unknown): string {
   return String(value);
 }
 
-function describe(entry: HistoryEntry): { title: string; changes: string[] } {
+export function describe(entry: HistoryEntry): { title: string; changes: string[] } {
   const subject = entry.entita === "contacts" ? "il contatto" : entry.entita === "party_locations" ? "la sede" : "il soggetto";
   const name = (row: Record<string, unknown> | null) =>
     !row

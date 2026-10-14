@@ -66,6 +66,7 @@ const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
 export const FACILITY_FIELDS = [
   "nome",
+  "nome_breve",
   "tipo",
   "indirizzo",
   "cap",
@@ -75,7 +76,6 @@ export const FACILITY_FIELDS = [
   "raggio_m",
   "responsabile_id",
   "stato_campagna",
-  "note",
   "lat",
   "lng",
 ] as const;
@@ -95,6 +95,7 @@ export function validateFacility(
 
   if (raw.nome === "") errors.nome = "Inserisci il nome del parcheggio.";
   else if (raw.nome.length > 120) errors.nome = "Il nome può avere al massimo 120 caratteri.";
+  if (raw.nome_breve.length > 40) errors.nome_breve = "Il nome breve può avere al massimo 40 caratteri.";
 
   if (!isOneOf(PARKING_TYPE_LABELS, raw.tipo)) errors.tipo = "Scegli il tipo di parcheggio.";
 
@@ -132,6 +133,7 @@ export function validateFacility(
   return {
     values: {
       nome: raw.nome,
+      nome_breve: optionalText(raw.nome_breve),
       tipo: raw.tipo as FacilityValues["tipo"],
       indirizzo: raw.indirizzo,
       cap: optionalText(raw.cap),
@@ -141,7 +143,6 @@ export function validateFacility(
       raggio_m: raggio,
       responsabile_id: optionalText(raw.responsabile_id),
       stato_campagna: raw.stato_campagna as FacilityValues["stato_campagna"],
-      note: optionalText(raw.note),
       lat,
       lng,
     },

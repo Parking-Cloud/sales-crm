@@ -10,7 +10,7 @@ export type FacilityListItem = Pick<
   "id" | "nome" | "tipo" | "citta" | "posti_commerciali" | "stato_campagna" | "archived_at"
 > & { responsabile: string | null };
 
-export type Facility = Tables<"parking_facilities"> & { responsabile: string | null };
+export type Facility = Tables<"parking_facilities"> & { responsabile: string | null; note_autore?: string | null };
 
 export type Product = Tables<"parking_products">;
 
@@ -52,13 +52,15 @@ export async function getFacility(id: string): Promise<Facility | null> {
   const supabase = await createClient();
   const { data, error } = await supabase
     .from("parking_facilities")
-    .select("*, responsabile:users!parking_facilities_responsabile_id_fkey(nome, email)")
+    .select(
+      "*, responsabile:users!parking_facilities_responsabile_id_fkey(nome, email), note_autore:users!parking_facilities_note_modificate_da_fkey(nome, email)",
+    )
     .eq("id", id)
     .maybeSingle();
   if (error) throw new Error(`parking_facilities: ${error.code ?? error.message}`);
   if (!data) return null;
-  const { responsabile, ...row } = data;
-  return { ...row, responsabile: userLabel(responsabile) };
+  const { responsabile, note_autore, ...row } = data;
+  return { ...row, responsabile: userLabel(responsabile), note_autore: userLabel(note_autore) };
 }
 
 export async function listProducts(parkingId: string): Promise<Product[]> {

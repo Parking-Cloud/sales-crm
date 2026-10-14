@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { NotesCard } from "@/components/notes-card";
 import { Alert } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
 import { Button, ButtonLink } from "@/components/ui/button";
@@ -6,7 +7,8 @@ import { EmptyState } from "@/components/ui/empty-state";
 import { Field, Select } from "@/components/ui/field";
 import { formatDate, formatNumber } from "@/lib/format";
 import { OSM_ATTRIBUTION, OSM_COPYRIGHT_URL } from "@/lib/geo/osm-attribution";
-import { googleMapsLink } from "@/lib/google/maps-link";
+import { googleMapsPlaceUrl } from "@/lib/google/maps-link";
+import { facilityAddress } from "@/lib/parking/validation";
 import { seatsExceeded, subscriptionSeats } from "@/lib/parking/capacity";
 import { CAMPAIGN_STATUS_LABELS, CAMPAIGN_STATUS_TONES, PARKING_TYPE_LABELS } from "@/lib/parking/labels";
 import type { Facility, Product } from "@/lib/parking/queries";
@@ -61,6 +63,7 @@ export function FacilityDetail({
   const seats = subscriptionSeats(products);
   const hasCoordinates = facility.lat !== null && facility.lng !== null;
   const cityLine = [facility.cap, facility.citta].filter(Boolean).join(" ");
+  const mapsUrl = googleMapsPlaceUrl({ name: facility.nome, address: facilityAddress(facility) });
 
   return (
     <>
@@ -109,6 +112,16 @@ export function FacilityDetail({
             <Detail label="Indirizzo">
               {facility.indirizzo ?? "–"}
               {cityLine && <span className="block">{cityLine}</span>}
+              {mapsUrl && (
+                <a
+                  href={mapsUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="mt-1 inline-block rounded-xs font-semibold text-blue-ink underline underline-offset-2"
+                >
+                  Apri in Google Maps<span className="sr-only"> (si apre in una nuova scheda)</span>
+                </a>
+              )}
             </Detail>
             <Detail label="Capacità totale">{formatNumber(facility.capacita)}</Detail>
             <Detail label="Posti commercializzabili">{formatNumber(facility.posti_commerciali)}</Detail>
@@ -117,11 +130,6 @@ export function FacilityDetail({
             </Detail>
             <Detail label="Responsabile">{facility.responsabile ?? "–"}</Detail>
             <Detail label="Ultima modifica">{formatDate(facility.updated_at)}</Detail>
-            <div className="sm:col-span-2">
-              <Detail label="Note">
-                {facility.note ? <span className="whitespace-pre-line">{facility.note}</span> : "–"}
-              </Detail>
-            </div>
           </dl>
         </Card>
 
@@ -147,14 +155,6 @@ export function FacilityDetail({
                   </a>
                 </p>
               )}
-              <a
-                href={googleMapsLink(facility.lat!, facility.lng!)}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="mt-3 inline-block rounded-xs font-semibold text-blue-ink underline underline-offset-2"
-              >
-                Apri in Google Maps<span className="sr-only"> (si apre in una nuova scheda)</span>
-              </a>
             </>
           ) : (
             <p className="text-body text-black-60">
@@ -163,6 +163,16 @@ export function FacilityDetail({
             </p>
           )}
         </Card>
+      </div>
+
+      <div className="mt-6">
+        <NotesCard
+          entita="parking_facilities"
+          id={facility.id}
+          note={facility.note}
+          author={facility.note_autore ?? null}
+          updatedAt={facility.note_modificate_il}
+        />
       </div>
 
       <section id="listino" aria-labelledby="listino-titolo" className="mt-8">
