@@ -5,17 +5,16 @@ import { getCurrentUser } from "@/lib/auth/current-user";
 import { FIELDS, type SheetKind, type SheetMapping } from "@/lib/import/presets";
 import type { ReportRow } from "@/lib/import/queries";
 import { buildPlan, finalStatus, type DuplicateHit, type PlanRow, type SheetInput } from "@/lib/import/transform";
-import type { Cell } from "@/lib/import/values";
-import { ImportFileError, MAX_FILE_BYTES, readImportFile, type SheetData } from "@/lib/import/workbook";
+import { compactRows, type Cell } from "@/lib/import/values";
+import { MAX_COLUMNS, MAX_ROWS } from "@/lib/import/limits";
 import { createClient } from "@/lib/supabase/server";
 
 // Import flow (CRM-12…CRM-15). Administrators only; RLS and the SQL
-// functions check it again. The uploaded file is read and discarded: only
-// its rows travel between the steps, nothing is stored.
+// functions check it again. The file is read in the browser and never sent:
+// only the rows of the chosen sheets, without empty rows, reach the server.
+// Each action logs its step durations and counts (never data).
 
 const NOT_ADMIN = "Solo l'amministratore può importare file.";
-const MAX_ROWS = 5000;
-const MAX_COLUMNS = 40;
 
 type Result<T> = { ok: true; data: T } | { ok: false; message: string };
 
@@ -23,26 +22,51 @@ async function isAdmin(): Promise<boolean> {
   return Boolean((await getCurrentUser())?.isAdmin);
 }
 
-// 1. Upload: read the sheets of the file.
-export async function readUpload(form: FormData): Promise<Result<{ fileName: string; sheets: SheetData[]; truncated: boolean }>> {
-  if (!(await isAdmin())) return { ok: false, message: NOT_ADMIN };
-  const file = form.get("file");
-  if (!(file instanceof File) || file.size === 0) return { ok: false, message: "Scegli un file .xlsx o .csv." };
-  if (file.size > MAX_FILE_BYTES) return { ok: false, message: "Il file supera 5 MB." };
-  try {
-    const sheets = await readImportFile(file.name, await file.arrayBuffer());
-    let truncated = false;
-    const trimmed = sheets.map((sheet) => {
-      if (sheet.rows.length > MAX_ROWS) truncated = true;
-      return { name: sheet.name, rows: sheet.rows.slice(0, MAX_ROWS).map((row) => row.slice(0, MAX_COLUMNS)) };
-    });
-    return { ok: true, data: { fileName: file.name, sheets: trimmed, truncated } };
-  } catch (error) {
-    return { ok: false, message: error instanceof ImportFileError ? error.message : "Non è stato possibile leggere il file." };
-  }
+// Durations in milliseconds of the steps of one action, logged as one line.
+function stopwatch(action: string) {
+  const start = performance.now();
+  let last = start;
+  const steps: Record<string, number> = {};
+  return {
+    step(name: string) {
+      const now = performance.now();
+      steps[name] = Math.round(now - last);
+      last = now;
+    },
+    log(counts: Record<string, number>) {
+      console.info(JSON.stringify({ evento: `import.${action}`, ms: { ...steps, totale: Math.round(performance.now() - start) }, ...counts }));
+    },
+  };
 }
 
 export type SheetChoice = { name: string; rows: Cell[][]; mapping: SheetMapping; parkingId: string | null };
+
+// Rows come from the browser: rebuilt from scratch with the same cleaning
+// as the reader (empty rows dropped, errors and odd values empty, limits).
+function sanitizeChoices(choices: unknown): SheetChoice[] | null {
+  if (!Array.isArray(choices) || choices.length > 20) return null;
+  const clean: SheetChoice[] = [];
+  for (const choice of choices) {
+    if (!choice || typeof choice !== "object") return null;
+    const { name, rows, mapping, parkingId } = choice as Record<string, unknown>;
+    if (typeof name !== "string" || !Array.isArray(rows) || !mapping || typeof mapping !== "object") return null;
+    const { kind, headerRow, columns } = mapping as Record<string, unknown>;
+    if ((kind !== "anagrafica" && kind !== "prospect") || typeof headerRow !== "number" || !columns || typeof columns !== "object") return null;
+    const letters = Object.fromEntries(
+      FIELDS[kind].map((field) => {
+        const letter = (columns as Record<string, unknown>)[field.key];
+        return [field.key, typeof letter === "string" && /^[A-Z]{1,2}$/.test(letter) ? letter : null];
+      }),
+    );
+    clean.push({
+      name: name.slice(0, 100),
+      rows: compactRows(rows, MAX_ROWS, MAX_COLUMNS),
+      mapping: { kind, headerRow: Math.min(Math.max(1, Math.trunc(headerRow)), 50), columns: letters },
+      parkingId: typeof parkingId === "string" && parkingId ? parkingId : null,
+    });
+  }
+  return clean;
+}
 
 function validateChoices(choices: SheetChoice[]): string | null {
   if (choices.length === 0) return "Scegli almeno un foglio da importare.";
@@ -97,15 +121,45 @@ function applyHits(rows: PlanRow[], hits: Map<string, DuplicateHit[]>, keepChoic
   );
 }
 
-// 2-3. Mapping applied: the plan for the preview, with the duplicate check.
-export async function previewImport(choices: SheetChoice[]): Promise<Result<PlanRow[]>> {
+// Sheets that give no row with a name: wrong header row or wrong columns.
+function emptySheet(choices: SheetChoice[], plan: PlanRow[]): string | null {
+  for (const choice of choices) {
+    const named = plan.some((row) => row.sheet === choice.name.trim() && row.status !== "scartata");
+    if (!named) {
+      return `Foglio “${choice.name.trim()}”: nessuna riga con il nome compilato. Controlla la riga delle intestazioni e le colonne: forse il foglio non corrisponde al formato scelto.`;
+    }
+  }
+  return null;
+}
+
+// 2-3. Mapping applied: the plan for the preview, with the duplicate check
+// of all rows in one database call.
+export async function previewImport(input: SheetChoice[]): Promise<Result<PlanRow[]>> {
+  const time = stopwatch("anteprima");
   if (!(await isAdmin())) return { ok: false, message: NOT_ADMIN };
+  time.step("utente");
+  const choices = sanitizeChoices(input);
+  if (!choices) return { ok: false, message: "Dati del file non validi. Ricarica il file e riprova." };
   const invalid = validateChoices(choices);
   if (invalid) return { ok: false, message: invalid };
+  time.step("pulizia");
   try {
     const plan = buildPlan(choices satisfies SheetInput[]);
-    return { ok: true, data: applyHits(plan, await duplicateHits(plan), false) };
+    time.step("piano");
+    const empty = emptySheet(choices, plan);
+    if (empty) return { ok: false, message: empty };
+    const hits = await duplicateHits(plan);
+    time.step("doppioni");
+    const checked = applyHits(plan, hits, false);
+    time.log({
+      fogli: choices.length,
+      righe_ricevute: choices.reduce((total, choice) => total + choice.rows.filter((row) => row.length > 0).length, 0),
+      righe_piano: checked.length,
+      doppioni: checked.filter((row) => row.duplicates.length > 0).length,
+    });
+    return { ok: true, data: checked };
   } catch {
+    time.log({ errore: 1 });
     return { ok: false, message: "Controllo dei doppioni non riuscito. Riprova." };
   }
 }
@@ -135,10 +189,17 @@ function reportRows(rows: PlanRow[]): ReportRow[] {
 
 // 4. Import: the duplicate check runs again here, blocks cannot be forced.
 export async function runImport(fileName: string, rows: PlanRow[]): Promise<Result<{ batchId: string }>> {
+  const time = stopwatch("import");
   if (!(await isAdmin())) return { ok: false, message: NOT_ADMIN };
-  if (!fileName.trim() || rows.length === 0) return { ok: false, message: "Niente da importare." };
+  if (typeof fileName !== "string" || !fileName.trim() || !Array.isArray(rows) || rows.length === 0) {
+    return { ok: false, message: "Niente da importare." };
+  }
+  if (rows.length > MAX_ROWS * 2) return { ok: false, message: "Troppe righe in un solo import: dividi il file." };
+  time.step("utente");
   try {
-    const checked = applyHits(rows, await duplicateHits(rows), true).map((row) => {
+    const hits = await duplicateHits(rows);
+    time.step("doppioni");
+    const checked = applyHits(rows, hits, true).map((row) => {
       const valid = row.duplicates.some((hit) => hit.party_id === row.mergeInto);
       return row.decision === "unisci" && !row.linkTo && !valid ? { ...row, decision: "crea" as const, mergeInto: null } : row;
     });
@@ -148,6 +209,8 @@ export async function runImport(fileName: string, rows: PlanRow[]): Promise<Resu
       p_rows: checked as never,
       p_report: reportRows(checked) as never,
     });
+    time.step("scrittura");
+    time.log({ righe: rows.length, errore: error ? 1 : 0 });
     if (error) {
       return {
         ok: false,
@@ -158,6 +221,7 @@ export async function runImport(fileName: string, rows: PlanRow[]): Promise<Resu
     revalidatePath("/soggetti");
     return { ok: true, data: { batchId: (data as { batch_id: string }).batch_id } };
   } catch {
+    time.log({ righe: rows.length, errore: 1 });
     return { ok: false, message: "Import non riuscito: nessun dato è stato salvato. Riprova." };
   }
 }

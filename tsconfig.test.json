@@ -24,6 +24,7 @@
     "src/lib/import/presets.ts",
     "src/lib/import/transform.ts",
     "src/lib/import/workbook.ts",
+    "src/lib/import/limits.ts",
     "tests/unit/**/*.ts",
     "tests/fixtures/**/*.ts"
   ]

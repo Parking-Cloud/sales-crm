@@ -6,14 +6,59 @@ export type Cell = string | number | boolean | Date | null;
 // Values that mean "nothing here" in the source files.
 const PLACEHOLDERS = new Set(["non disponibile", "non disp", "non disp.", "nd", "n.d.", "n/d", "-", "--", "/", "x"]);
 
+// Excel error values, also when a formula caches them as plain text
+// (t="str"), in English and Italian.
+const ERROR_VALUES = new Set([
+  "#n/a", "#n/d", "#value!", "#valore!", "#ref!", "#rif!", "#name?", "#nome?",
+  "#div/0!", "#null!", "#nullo!", "#num!", "#calc!", "#spill!", "#espansione!",
+]);
+
+export function isErrorValue(text: string): boolean {
+  return ERROR_VALUES.has(text.trim().toLowerCase());
+}
+
 export const WEB_FORM_MARKER = "compilare form sul sito";
 
-// Trimmed text of a cell, or null when empty or a placeholder.
+// One cell as read from a file: Excel errors, blank or whitespace-only
+// text and non-finite numbers become null. Anything else is kept as it is.
+export function normalizeCell(value: unknown): Cell {
+  if (value === null || value === undefined) return null;
+  if (typeof value === "string") return value.trim() === "" || isErrorValue(value) ? null : value;
+  if (typeof value === "number") return Number.isFinite(value) ? value : null;
+  if (typeof value === "boolean") return value;
+  if (value instanceof Date) return Number.isNaN(value.getTime()) ? null : value;
+  return null;
+}
+
+// Rows without any real value (formatting only, "#N/A", spaces) become empty
+// arrays; trailing empty cells and rows are dropped. Row positions do not
+// change, so row numbers stay those of the spreadsheet.
+export function compactRows(rows: readonly unknown[], maxRows: number, maxColumns: number): Cell[][] {
+  const out: Cell[][] = [];
+  let last = -1;
+  for (let index = 0; index < Math.min(rows.length, maxRows); index++) {
+    const source = rows[index];
+    const cells: Cell[] = [];
+    let width = 0;
+    if (Array.isArray(source)) {
+      for (let c = 0; c < Math.min(source.length, maxColumns); c++) {
+        const cell = normalizeCell(source[c]);
+        cells.push(cell);
+        if (cell !== null) width = c + 1;
+      }
+    }
+    out.push(width === cells.length ? cells : cells.slice(0, width));
+    if (width > 0) last = index;
+  }
+  return out.slice(0, last + 1);
+}
+
+// Trimmed text of a cell, or null when empty, a placeholder or an Excel error.
 export function cleanText(value: Cell): string | null {
   if (value === null || value === undefined) return null;
   if (value instanceof Date) return isoDate(value);
-  const text = String(value).replace(/ /g, " ").replace(/\s+/g, " ").trim();
-  if (text === "" || PLACEHOLDERS.has(text.toLowerCase())) return null;
+  const text = String(value).replace(/\u00a0/g, " ").replace(/\s+/g, " ").trim();
+  if (text === "" || PLACEHOLDERS.has(text.toLowerCase()) || isErrorValue(text)) return null;
   return text;
 }
 

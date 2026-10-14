@@ -3,7 +3,8 @@ import type { NextConfig } from "next";
 const nextConfig: NextConfig = {
   experimental: {
     serverActions: {
-      // Import: files up to 5 MB, and the rows read from them for the preview.
+      // Import: the file is read in the browser; only the rows of the chosen
+      // sheets (preview) and the plan (import) are sent.
       bodySizeLimit: "12mb",
     },
   },

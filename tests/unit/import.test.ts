@@ -24,7 +24,7 @@ const FIXTURE = join(__dirname, "..", "..", "..", "tests", "fixtures", "crm-parc
 
 async function fixturePlan(): Promise<PlanRow[]> {
   const buffer = readFileSync(FIXTURE);
-  const sheets = await readXlsx(buffer.buffer.slice(buffer.byteOffset, buffer.byteOffset + buffer.byteLength));
+  const { sheets } = await readXlsx(buffer.buffer.slice(buffer.byteOffset, buffer.byteOffset + buffer.byteLength));
   return buildPlan(
     sheets.map((sheet) => {
       const mapping = proposeMapping(CRM_2026, sheet.name);

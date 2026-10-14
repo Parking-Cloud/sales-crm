@@ -2,15 +2,16 @@
 
 import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
-import { previewImport, readUpload, runImport } from "@/app/(app)/import/actions";
+import { previewImport, runImport } from "@/app/(app)/import/actions";
 import { Alert } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import { Field, Input, Select } from "@/components/ui/field";
+import { MAX_FILE_BYTES } from "@/lib/import/limits";
 import { CRM_2026, PRESETS, emptyMapping, proposeMapping } from "@/lib/import/presets";
 import type { ParkingOption, SavedMapping } from "@/lib/import/queries";
 import type { PlanRow } from "@/lib/import/transform";
-import type { SheetData } from "@/lib/import/workbook";
+import type { ReadResult, SheetData } from "@/lib/import/workbook";
 import { MappingStep, type SheetState } from "./mapping-step";
 import { PreviewStep } from "./preview-step";
 
@@ -34,6 +35,21 @@ function initialSheets(sheets: SheetData[], presetKey: string, defaultParkingId:
       parkingId: defaultParkingId,
     };
   });
+}
+
+// The file is read here, in the browser: it is never uploaded. The reader
+// (and exceljs) is loaded only when a file is chosen.
+async function readInBrowser(file: File): Promise<{ ok: true; data: ReadResult } | { ok: false; message: string }> {
+  try {
+    const { ImportFileError, readImportFile } = await import("@/lib/import/workbook");
+    try {
+      return { ok: true, data: await readImportFile(file.name, await file.arrayBuffer()) };
+    } catch (error) {
+      return { ok: false, message: error instanceof ImportFileError ? error.message : "Non è stato possibile leggere il file." };
+    }
+  } catch {
+    return { ok: false, message: "Non è stato possibile leggere il file. Ricarica la pagina e riprova." };
+  }
 }
 
 export function ImportWizard({
@@ -63,13 +79,22 @@ export function ImportWizard({
 
   function upload(form: FormData) {
     setError(null);
+    const file = form.get("file");
+    if (!(file instanceof File) || file.size === 0) {
+      setError("Scegli un file .xlsx o .csv.");
+      return;
+    }
+    if (file.size > MAX_FILE_BYTES) {
+      setError("Il file supera 5 MB.");
+      return;
+    }
     startTransition(async () => {
-      const result = await readUpload(form);
+      const result = await readInBrowser(file);
       if (!result.ok) {
         setError(result.message);
         return;
       }
-      setFileName(result.data.fileName);
+      setFileName(file.name);
       setSheets(initialSheets(result.data.sheets, presetKey, defaultParkingId));
       setNotice(result.data.truncated ? "Il file ha più di 5.000 righe in un foglio: si leggono solo le prime 5.000." : null);
       setPlan(null);
@@ -80,6 +105,7 @@ export function ImportWizard({
   function preview() {
     setError(null);
     startTransition(async () => {
+      // Only the chosen sheets travel, and they hold no empty rows.
       const chosen = sheets
         .filter((sheet) => sheet.include)
         .map((sheet) => ({ name: sheet.name, rows: sheet.rows, mapping: sheet.mapping, parkingId: sheet.parkingId }));
@@ -132,7 +158,7 @@ export function ImportWizard({
       {step === "carica" && (
         <form action={upload} className="flex flex-col gap-5 rounded-md border border-grey-60 bg-white p-5 shadow-sm sm:p-6">
           <div className="grid gap-5 sm:grid-cols-2">
-            <Field id="file" label="File" hint="Excel .xlsx o .csv (separato da ; o da ,), al massimo 5 MB. Il file non viene conservato." required>
+            <Field id="file" label="File" hint="Excel .xlsx o .csv (separato da ; o da ,), al massimo 5 MB. Il file viene letto sul tuo computer e non viene caricato." required>
               <Input id="file" name="file" type="file" accept=".xlsx,.csv" required hasDescription className="py-2" />
             </Field>
             <Field id="preset" label="Formato del file" hint="Propone fogli e colonne; si possono cambiare al passo successivo.">
