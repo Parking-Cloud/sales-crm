@@ -32,6 +32,7 @@
     "src/lib/places/search.ts",
     "src/lib/google/places-api.ts",
     "src/lib/google/refresh.ts",
+    "src/lib/google/maps-link.ts",
     "tests/unit/**/*.ts",
     "tests/fixtures/**/*.ts"
   ]

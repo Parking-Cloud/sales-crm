@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Checkbox, Field, Input, Select } from "@/components/ui/field";
 import { Th } from "@/components/ui/table";
 import { formatNumber } from "@/lib/format";
+import { googleMapsPlaceUrl } from "@/lib/google/maps-link";
 import { safeCall } from "@/lib/import/safe-call";
 import { SEARCH_CATEGORIES, type SearchCategory } from "@/lib/places/categories";
 import { MAX_IMPORT, MAX_RADIUS, MAX_WALKING, MIN_RADIUS } from "@/lib/places/limits";
@@ -422,6 +423,14 @@ function ResultsTable({
                   <button type="button" onClick={() => onSelect(row.placeId)} className="rounded-xs text-left font-semibold underline-offset-2 hover:underline">
                     {row.name}
                   </button>
+                  <a
+                    href={googleMapsPlaceUrl({ name: row.name, address: row.address, placeId: row.placeId }) ?? undefined}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="block rounded-xs text-caption text-blue-ink underline underline-offset-2"
+                  >
+                    Apri in Google Maps<span className="sr-only"> (si apre in una nuova scheda)</span>
+                  </a>
                 </td>
                 <td className={`${cell} whitespace-nowrap`}>{row.category}</td>
                 <td className={`${cell} min-w-56 text-black-80`}>{row.address ?? "–"}</td>

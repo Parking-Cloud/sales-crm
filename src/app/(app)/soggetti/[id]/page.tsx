@@ -45,6 +45,7 @@ export default async function PartyPage({ params }: { params: Promise<{ id: stri
       distances={distances}
       maxDistanceM={maxDistance.meters}
       now={Date.now()}
+      placeId={extras.placeId}
       noteAuthor={extras.noteAuthor}
       history={history}
       isAdmin={user.isAdmin}

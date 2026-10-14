@@ -6,7 +6,8 @@ import { EmptyState } from "@/components/ui/empty-state";
 import { Table, Td, Th, Tr } from "@/components/ui/table";
 import { formatDate, formatNumber } from "@/lib/format";
 import { OSM_ATTRIBUTION, OSM_COPYRIGHT_URL } from "@/lib/geo/osm-attribution";
-import { googleMapsLink } from "@/lib/google/maps-link";
+import { googleMapsPlaceUrl } from "@/lib/google/maps-link";
+import { facilityAddress } from "@/lib/parking/validation";
 import { formatKm } from "@/lib/settings/distance";
 import {
   CONTACT_CHANNEL_LABELS,
@@ -79,6 +80,7 @@ export function PartyDetail({
   distances,
   maxDistanceM,
   now,
+  placeId,
   noteAuthor,
   history,
   isAdmin,
@@ -92,6 +94,8 @@ export function PartyDetail({
   maxDistanceM: number;
   // Time of the request, to tell expired Google coordinates.
   now: number;
+  // Google place id of the party, when it came from the map search.
+  placeId: string | null;
   noteAuthor: string | null;
   history: HistoryEntry[];
   isAdmin: boolean;
@@ -225,6 +229,7 @@ export function PartyDetail({
               {locations.map((location) => {
                 const near = distances.filter((row) => row.location_id === location.id);
                 const expired = googleExpired(location, now);
+                const mapsUrl = googleMapsPlaceUrl({ name: partyName(party), address: facilityAddress(location), placeId });
                 const located = location.lat !== null && location.lng !== null && !expired;
                 return (
                   <li key={location.id} className="flex flex-col gap-3 py-4 first:pt-0 last:pb-0 md:flex-row md:justify-between">
@@ -234,6 +239,16 @@ export function PartyDetail({
                         {location.principale && <Badge tone="info">Principale</Badge>}
                       </p>
                       <p className="text-body text-black-80">{[location.cap, location.citta].filter(Boolean).join(" ") || "–"}</p>
+                      {mapsUrl && (
+                        <a
+                          href={mapsUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="rounded-xs text-caption font-semibold text-blue-ink underline underline-offset-2"
+                        >
+                          Apri in Google Maps<span className="sr-only"> (si apre in una nuova scheda)</span>
+                        </a>
+                      )}
                       {location.lat !== null && location.lng !== null && expired ? (
                         <p className="mt-1 text-caption text-black-80">
                           <strong>Coordinate da aggiornare</strong>: quelle di Google valgono 30 giorni. Premi Aggiorna, oppure
@@ -250,16 +265,7 @@ export function PartyDetail({
                             `Coordinate da Google Maps del ${formatDate(location.coordinate_aggiornate_il)}`
                           ) : (
                             "Coordinate inserite a mano"
-                          )}{" "}
-                          ·{" "}
-                          <a
-                            href={googleMapsLink(location.lat, location.lng)}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="rounded-xs text-blue-ink underline underline-offset-2"
-                          >
-                            Apri in Google Maps<span className="sr-only"> (si apre in una nuova scheda)</span>
-                          </a>
+                          )}
                         </p>
                       ) : (
                         <p className="mt-1 text-caption text-black-60">Coordinate non calcolate: modifica la sede per cercarle.</p>
