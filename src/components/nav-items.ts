@@ -13,6 +13,7 @@ export const NAV_ITEMS: NavItem[] = [
   { href: "/soggetti", label: "Soggetti" },
   { href: "/pipeline", label: "Pipeline" },
   { href: "/import", label: "Import" },
+  { href: "/template", label: "Template email", adminOnly: true },
   { href: "/esclusioni", label: "Esclusioni" },
   { href: "/impostazioni", label: "Impostazioni" },
 ];
