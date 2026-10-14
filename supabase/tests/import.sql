@@ -157,7 +157,6 @@ insert into plan_input values ($plan$[
   "status": "avvisi",
   "discard": null,
   "warnings": [
-   "Settore “consulenza del lavoro” non riconosciuto: categoria Altro",
    "Telefono 212345678: possibile zero iniziale perso"
   ],
   "party": {
@@ -165,7 +164,7 @@ insert into plan_input values ($plan$[
    "denominazione": "Studio Prova Associati",
    "nome": null,
    "cognome": null,
-   "categoria": "Altro",
+   "categoria": "Studi professionali",
    "sito": "studio-prova.example",
    "telefono": "212345678",
    "email": null,
@@ -788,7 +787,7 @@ insert into plan_input values ($plan$[
    "denominazione": "Studio Prova Associati",
    "nome": null,
    "cognome": null,
-   "categoria": "Altro",
+   "categoria": "Studi professionali",
    "sito": "studio-prova.example",
    "telefono": "212345678",
    "email": null,

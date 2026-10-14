@@ -8,6 +8,7 @@ export const CATEGORY_RULES: { category: string; keywords: string[] }[] = [
     keywords: [
       "commercialista",
       "consulent*",
+      "consulenz*",
       "avvocat*",
       "broker",
       "assicuraz*",

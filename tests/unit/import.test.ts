@@ -74,6 +74,8 @@ test("diary notes: one entry per date, undated text kept", () => {
 
 test("categories and loss reasons", () => {
   assert.deepEqual(categoryFor("Commercialista"), { category: "Studi professionali", matched: true });
+  assert.deepEqual(categoryFor("Consulenza fiscale"), { category: "Studi professionali", matched: true });
+  assert.deepEqual(categoryFor("Società di consulenze"), { category: "Studi professionali", matched: true });
   assert.deepEqual(categoryFor("Ristorante pizzeria"), { category: "Ristoranti", matched: true });
   assert.deepEqual(categoryFor("Fisioterapia e riabilitazione"), { category: "Centri medici", matched: true });
   assert.deepEqual(categoryFor("Corsi di formazione"), { category: "Altro", matched: true });
