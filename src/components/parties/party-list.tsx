@@ -6,31 +6,43 @@ import { Checkbox, Field, Input, Select } from "@/components/ui/field";
 import { Pagination } from "@/components/ui/pagination";
 import { Table, Td, Th, Tr } from "@/components/ui/table";
 import { PARTY_CATEGORIES, PARTY_TYPE_LABELS, partyName, type PartyType } from "@/lib/parties/labels";
-import { PAGE_SIZE, type PartyFilters, type PartyListItem } from "@/lib/parties/queries";
+import { PAGE_SIZE, type ParkingFilterOption, type PartyFilters, type PartyListItem } from "@/lib/parties/queries";
+import { opportunityBadge } from "@/lib/pipeline/labels";
 import { DataStatusBadge, DoNotContactBadge } from "./data-status-badge";
 
-function listHref(filters: PartyFilters, page: number): string {
+export function listHref(filters: PartyFilters, page: number): string {
   const params = new URLSearchParams();
   if (filters.q) params.set("q", filters.q);
   if (filters.tipo) params.set("tipo", filters.tipo);
   if (filters.categoria) params.set("categoria", filters.categoria);
   if (filters.citta) params.set("citta", filters.citta);
   if (filters.soloDaVerificare) params.set("da_verificare", "1");
+  filters.parcheggi.forEach((id) => params.append("parcheggio", id));
+  if (filters.senzaParcheggio) params.append("parcheggio", "nessuno");
+  if (filters.ordina) params.set("ordina", filters.ordina);
   if (page > 1) params.set("pagina", String(page));
   const query = params.toString();
   return query ? `/soggetti?${query}` : "/soggetti";
+}
+
+// Sort by car park: ascending, descending, then back to the default order.
+function nextSort(current: PartyFilters["ordina"]): PartyFilters["ordina"] {
+  return current === null ? "parcheggio" : current === "parcheggio" ? "parcheggio_desc" : null;
 }
 
 export function PartyList({
   items,
   total,
   filters,
+  parkings,
 }: {
   items: PartyListItem[];
   total: number;
   filters: PartyFilters;
+  parkings: ParkingFilterOption[];
 }) {
-  const filtered = Boolean(filters.q || filters.tipo || filters.categoria || filters.citta || filters.soloDaVerificare);
+  const parkingCount = filters.parcheggi.length + (filters.senzaParcheggio ? 1 : 0);
+  const filtered = Boolean(filters.q || filters.tipo || filters.categoria || filters.citta || filters.soloDaVerificare || parkingCount > 0);
   const pageCount = Math.max(1, Math.ceil(total / PAGE_SIZE));
 
   return (
@@ -80,6 +92,30 @@ export function PartyList({
         <Field id="citta" label="Città">
           <Input id="citta" name="citta" defaultValue={filters.citta} autoComplete="off" />
         </Field>
+        <fieldset className="sm:col-span-2 lg:col-span-4">
+          <details className="group rounded-sm border border-grey-60" open={parkingCount > 0}>
+            <summary className="flex min-h-(--control-h) cursor-pointer items-center justify-between gap-2 px-3 text-[14px] font-semibold md:min-h-(--control-h-sm)">
+              <span>
+                Parcheggio{parkingCount > 0 ? ` (${parkingCount} ${parkingCount === 1 ? "scelto" : "scelti"})` : ": tutti"}
+              </span>
+              <span aria-hidden="true" className="text-black-60 group-open:rotate-180">▾</span>
+            </summary>
+            <legend className="sr-only">Parcheggio</legend>
+            <div className="grid gap-x-6 gap-y-2 border-t border-grey-60 p-3 sm:grid-cols-2 lg:grid-cols-3">
+              {parkings.map((parking) => (
+                <Checkbox
+                  key={parking.id}
+                  name="parcheggio"
+                  value={parking.id}
+                  defaultChecked={filters.parcheggi.includes(parking.id)}
+                  label={parking.nome}
+                />
+              ))}
+              <Checkbox name="parcheggio" value="nessuno" defaultChecked={filters.senzaParcheggio} label={<em>Nessun parcheggio</em>} />
+            </div>
+          </details>
+        </fieldset>
+        {filters.ordina && <input type="hidden" name="ordina" value={filters.ordina} />}
         <div className="flex flex-wrap items-center justify-between gap-3 sm:col-span-2 lg:col-span-4">
           <Checkbox name="da_verificare" value="1" defaultChecked={filters.soloDaVerificare} label="Solo con dati da verificare" />
           <Button type="submit" size="md">
@@ -105,6 +141,15 @@ export function PartyList({
               <thead>
                 <tr>
                   <Th>Nome</Th>
+                  <Th>
+                    <Link
+                      href={listHref({ ...filters, ordina: nextSort(filters.ordina) }, 1)}
+                      className="rounded-xs uppercase underline-offset-2 hover:underline"
+                      aria-label={`Ordina per parcheggio${filters.ordina === "parcheggio" ? ", ora dalla A alla Z" : filters.ordina === "parcheggio_desc" ? ", ora dalla Z alla A" : ""}`}
+                    >
+                      Parcheggi {filters.ordina === "parcheggio" ? "↑" : filters.ordina === "parcheggio_desc" ? "↓" : ""}
+                    </Link>
+                  </Th>
                   <Th>Tipo</Th>
                   <Th>Categoria</Th>
                   <Th>Città</Th>
@@ -128,6 +173,25 @@ export function PartyList({
                           <Badge tone="info">Nome simile</Badge>
                         )}
                       </span>
+                    </Td>
+                    <Td wrap>
+                      {item.parcheggi.length === 0 ? (
+                        <span className="text-black-60">–</span>
+                      ) : (
+                        <ul className="flex min-w-44 flex-col gap-1">
+                          {item.parcheggi.map((parking) => {
+                            const badge = opportunityBadge(parking.fase, parking.esito);
+                            return (
+                              <li key={parking.opportunity_id} className="flex flex-wrap items-center gap-2">
+                                <Link href={`/opportunita/${parking.opportunity_id}`} className="rounded-xs font-semibold underline-offset-2 hover:underline">
+                                  {parking.parcheggio}
+                                </Link>
+                                <Badge tone={badge.tone}>{badge.label}</Badge>
+                              </li>
+                            );
+                          })}
+                        </ul>
+                      )}
                     </Td>
                     <Td>{PARTY_TYPE_LABELS[item.tipo]}</Td>
                     <Td>{item.categoria ?? "–"}</Td>

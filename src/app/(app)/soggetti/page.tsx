@@ -3,7 +3,7 @@ import { redirect } from "next/navigation";
 import { PartyList } from "@/components/parties/party-list";
 import { getCurrentUser } from "@/lib/auth/current-user";
 import { SIGN_IN_PATH } from "@/lib/auth/routes";
-import { readPartyFilters, searchParties } from "@/lib/parties/queries";
+import { listParkingFilterOptions, readPartyFilters, searchParties } from "@/lib/parties/queries";
 
 export const metadata: Metadata = { title: "Soggetti" };
 
@@ -16,6 +16,6 @@ export default async function PartiesPage({
   if (!user) redirect(SIGN_IN_PATH);
 
   const filters = readPartyFilters(await searchParams);
-  const { items, total } = await searchParties(filters);
-  return <PartyList items={items} total={total} filters={filters} />;
+  const [{ items, total }, parkings] = await Promise.all([searchParties(filters), listParkingFilterOptions()]);
+  return <PartyList items={items} total={total} filters={filters} parkings={parkings} />;
 }

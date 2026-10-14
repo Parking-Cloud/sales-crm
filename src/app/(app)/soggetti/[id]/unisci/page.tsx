@@ -75,7 +75,7 @@ export default async function MergePage({
 
   const q = typeof query.q === "string" ? query.q.trim().slice(0, 120) : "";
   const results = q
-    ? (await searchParties({ q, tipo: null, categoria: null, citta: "", soloDaVerificare: false, page: 1 })).items.filter(
+    ? (await searchParties({ q, tipo: null, categoria: null, citta: "", soloDaVerificare: false, parcheggi: [], senzaParcheggio: false, ordina: null, page: 1 })).items.filter(
         (item) => item.id !== id,
       )
     : [];

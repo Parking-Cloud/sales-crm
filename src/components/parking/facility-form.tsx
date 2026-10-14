@@ -4,7 +4,7 @@ import { useActionState } from "react";
 import { saveFacility } from "@/app/(app)/parcheggi/actions";
 import { Alert } from "@/components/ui/alert";
 import { Button, ButtonLink } from "@/components/ui/button";
-import { Field, Input, Select, Textarea } from "@/components/ui/field";
+import { Field, Input, Select } from "@/components/ui/field";
 import { decimalInputValue } from "@/lib/format";
 import { OSM_ATTRIBUTION, OSM_COPYRIGHT_URL } from "@/lib/geo/osm-attribution";
 import { INITIAL_FORM_STATE, type FormState } from "@/lib/parking/form-state";
@@ -24,6 +24,7 @@ function initialValues(facility: Facility | null): RawValues {
   const number = (value: number | null) => (value === null ? "" : String(value));
   return {
     nome: facility?.nome ?? "",
+    nome_breve: facility?.nome_breve ?? "",
     tipo: facility?.tipo ?? "",
     indirizzo: facility?.indirizzo ?? "",
     cap: facility?.cap ?? "",
@@ -33,7 +34,6 @@ function initialValues(facility: Facility | null): RawValues {
     raggio_m: number(facility?.raggio_m ?? DEFAULT_SEARCH_RADIUS_M),
     responsabile_id: facility?.responsabile_id ?? "",
     stato_campagna: facility?.stato_campagna ?? "bozza",
-    note: facility?.note ?? "",
     lat: decimalInputValue(facility?.lat),
     lng: decimalInputValue(facility?.lng),
   };
@@ -84,6 +84,9 @@ export function FacilityForm({
         </h2>
         <div className="mt-4 grid gap-5 sm:grid-cols-2">
           <div className="sm:col-span-2">{text("nome", "Nome", { required: true })}</div>
+          <div className="sm:col-span-2">
+            {text("nome_breve", "Nome breve", { hint: "Facoltativo, al massimo 40 caratteri: si usa negli elenchi e nella pipeline." })}
+          </div>
           <Field id="tipo" label="Tipo" error={errors.tipo} required>
             <Select id="tipo" name="tipo" defaultValue={values.tipo} required invalid={Boolean(errors.tipo)} hasDescription={Boolean(errors.tipo)}>
               <option value="">Scegli</option>
@@ -122,11 +125,6 @@ export function FacilityForm({
               ))}
             </Select>
           </Field>
-          <div className="sm:col-span-2">
-            <Field id="note" label="Note" error={errors.note}>
-              <Textarea id="note" name="note" defaultValue={values.note} rows={3} />
-            </Field>
-          </div>
         </div>
       </section>
 

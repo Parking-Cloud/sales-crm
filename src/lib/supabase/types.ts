@@ -990,6 +990,7 @@ export type Database = {
           id: string
           import_batch_id: string | null
           motivo_perdita: Database["public"]["Enums"]["loss_reason"] | null
+          nota_perdita: string | null
           parking_id: string
           party_id: string
           posti_richiesti: number | null
@@ -1010,6 +1011,7 @@ export type Database = {
           id?: string
           import_batch_id?: string | null
           motivo_perdita?: Database["public"]["Enums"]["loss_reason"] | null
+          nota_perdita?: string | null
           parking_id: string
           party_id: string
           posti_richiesti?: number | null
@@ -1030,6 +1032,7 @@ export type Database = {
           id?: string
           import_batch_id?: string | null
           motivo_perdita?: Database["public"]["Enums"]["loss_reason"] | null
+          nota_perdita?: string | null
           parking_id?: string
           party_id?: string
           posti_richiesti?: number | null
@@ -1114,7 +1117,10 @@ export type Database = {
           lat: number | null
           lng: number | null
           nome: string
+          nome_breve: string | null
           note: string | null
+          note_modificate_da: string | null
+          note_modificate_il: string | null
           posti_commerciali: number | null
           raggio_m: number | null
           responsabile_id: string | null
@@ -1136,7 +1142,10 @@ export type Database = {
           lat?: number | null
           lng?: number | null
           nome: string
+          nome_breve?: string | null
           note?: string | null
+          note_modificate_da?: string | null
+          note_modificate_il?: string | null
           posti_commerciali?: number | null
           raggio_m?: number | null
           responsabile_id?: string | null
@@ -1158,7 +1167,10 @@ export type Database = {
           lat?: number | null
           lng?: number | null
           nome?: string
+          nome_breve?: string | null
           note?: string | null
+          note_modificate_da?: string | null
+          note_modificate_il?: string | null
           posti_commerciali?: number | null
           raggio_m?: number | null
           responsabile_id?: string | null
@@ -1170,6 +1182,13 @@ export type Database = {
           {
             foreignKeyName: "parking_facilities_created_by_fkey"
             columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "parking_facilities_note_modificate_da_fkey"
+            columns: ["note_modificate_da"]
             isOneToOne: false
             referencedRelation: "users"
             referencedColumns: ["id"]
@@ -1272,6 +1291,9 @@ export type Database = {
           merged_into_id: string | null
           nome: string | null
           non_contattare: boolean
+          note: string | null
+          note_modificate_da: string | null
+          note_modificate_il: string | null
           parcheggio_privato: Database["public"]["Enums"]["private_parking"]
           piva: string | null
           sito: string | null
@@ -1295,6 +1317,9 @@ export type Database = {
           merged_into_id?: string | null
           nome?: string | null
           non_contattare?: boolean
+          note?: string | null
+          note_modificate_da?: string | null
+          note_modificate_il?: string | null
           parcheggio_privato?: Database["public"]["Enums"]["private_parking"]
           piva?: string | null
           sito?: string | null
@@ -1318,6 +1343,9 @@ export type Database = {
           merged_into_id?: string | null
           nome?: string | null
           non_contattare?: boolean
+          note?: string | null
+          note_modificate_da?: string | null
+          note_modificate_il?: string | null
           parcheggio_privato?: Database["public"]["Enums"]["private_parking"]
           piva?: string | null
           sito?: string | null
@@ -1345,6 +1373,13 @@ export type Database = {
             columns: ["merged_into_id"]
             isOneToOne: false
             referencedRelation: "parties"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "parties_note_modificate_da_fkey"
+            columns: ["note_modificate_da"]
+            isOneToOne: false
+            referencedRelation: "users"
             referencedColumns: ["id"]
           },
         ]
@@ -1467,8 +1502,11 @@ export type Database = {
           created_at: string
           created_by: string | null
           id: string
+          nota: string | null
           opportunity_id: string | null
+          party_id: string | null
           scadenza: string | null
+          tipo: Database["public"]["Enums"]["activity_type"]
           titolo: string
           updated_at: string
         }
@@ -1478,8 +1516,11 @@ export type Database = {
           created_at?: string
           created_by?: string | null
           id?: string
+          nota?: string | null
           opportunity_id?: string | null
+          party_id?: string | null
           scadenza?: string | null
+          tipo?: Database["public"]["Enums"]["activity_type"]
           titolo: string
           updated_at?: string
         }
@@ -1489,8 +1530,11 @@ export type Database = {
           created_at?: string
           created_by?: string | null
           id?: string
+          nota?: string | null
           opportunity_id?: string | null
+          party_id?: string | null
           scadenza?: string | null
+          tipo?: Database["public"]["Enums"]["activity_type"]
           titolo?: string
           updated_at?: string
         }
@@ -1514,6 +1558,13 @@ export type Database = {
             columns: ["opportunity_id"]
             isOneToOne: false
             referencedRelation: "opportunities"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "tasks_party_id_fkey"
+            columns: ["party_id"]
+            isOneToOne: false
+            referencedRelation: "parties"
             referencedColumns: ["id"]
           },
         ]
@@ -1603,6 +1654,17 @@ export type Database = {
         Args: { p_entita: string; p_id: string }
         Returns: number
       }
+      complete_task: {
+        Args: {
+          p_esito?: string
+          p_prossima_il?: string
+          p_prossima_tipo?: Database["public"]["Enums"]["activity_type"]
+          p_task: string
+          p_testo?: string
+        }
+        Returns: Json
+      }
+      delete_party: { Args: { p_party: string }; Returns: Json }
       do_not_contact_values: {
         Args: { p_entita: string; p_id: string }
         Returns: {
@@ -1637,6 +1699,23 @@ export type Database = {
       is_admin: { Args: never; Returns: boolean }
       is_generic_domain: { Args: { domain: string }; Returns: boolean }
       is_valid_email: { Args: { value: string }; Returns: boolean }
+      log_activity: {
+        Args: {
+          p_esito?: string
+          p_opportunity: string
+          p_party: string
+          p_prossima_il?: string
+          p_prossima_nota?: string
+          p_prossima_tipo?: Database["public"]["Enums"]["activity_type"]
+          p_testo?: string
+          p_tipo: Database["public"]["Enums"]["activity_type"]
+        }
+        Returns: Json
+      }
+      loss_reason_label: {
+        Args: { p_reason: Database["public"]["Enums"]["loss_reason"] }
+        Returns: string
+      }
       mark_do_not_contact: {
         Args: { p_entita: string; p_id: string; p_motivo: string }
         Returns: number
@@ -1649,6 +1728,7 @@ export type Database = {
       normalize_phone: { Args: { raw: string }; Returns: string }
       normalize_phone_list: { Args: { raw: string }; Returns: string }
       normalize_piva: { Args: { raw: string }; Returns: string }
+      party_delete_summary: { Args: { p_party: string }; Returns: Json }
       party_location_distances: {
         Args: { p_max_m?: number; p_party_id: string }
         Returns: {
@@ -1663,13 +1743,20 @@ export type Database = {
         Returns: string
       }
       party_tracked_fields: { Args: never; Returns: string[] }
+      save_notes: {
+        Args: { p_entita: string; p_id: string; p_note: string }
+        Returns: undefined
+      }
       search_parties: {
         Args: {
           p_categoria?: string
           p_citta?: string
           p_limit?: number
           p_offset?: number
+          p_ordina?: string
+          p_parcheggi?: string[]
           p_query?: string
+          p_senza_parcheggio?: boolean
           p_solo_da_verificare?: boolean
           p_tipo?: Database["public"]["Enums"]["party_type"]
         }
@@ -1683,11 +1770,16 @@ export type Database = {
           id: string
           nome: string
           non_contattare: boolean
+          parcheggi: Json
           somiglianza: number
           telefono: string
           tipo: Database["public"]["Enums"]["party_type"]
           totale: number
         }[]
+      }
+      stage_label: {
+        Args: { p_fase: Database["public"]["Enums"]["opportunity_stage"] }
+        Returns: string
       }
       undo_import_batch: { Args: { p_batch: string }; Returns: Json }
       use_api_quota: { Args: { p_n?: number; p_sku: string }; Returns: Json }
