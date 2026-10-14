@@ -27,6 +27,7 @@ import {
   type ProvenanceInput,
   type TrackedField,
 } from "@/lib/parties/validation";
+import { readPipelineEntry } from "@/lib/pipeline/entry";
 import { createClient } from "@/lib/supabase/server";
 
 const SAVE_FAILED = "Salvataggio non riuscito. Riprova; se il problema continua, avvisa l'amministratore.";
@@ -84,8 +85,10 @@ export async function saveParty(previous: PartyFormState, form: FormData): Promi
   }
 
   const { values, location, errors } = validateParty(form);
-  if (!values) {
-    return { version, status: "error", message: "Controlla i campi evidenziati.", fieldErrors: errors, values: raw };
+  // Car park of interest: new parties only.
+  const pipeline = existing ? { entry: null, errors: {} } : readPipelineEntry(raw);
+  if (!values || Object.keys(pipeline.errors).length > 0) {
+    return { version, status: "error", message: "Controlla i campi evidenziati.", fieldErrors: { ...errors, ...pipeline.errors }, values: raw };
   }
 
   // Duplicate check, always in the database (public.check_party_duplicates).
@@ -123,6 +126,15 @@ export async function saveParty(previous: PartyFormState, form: FormData): Promi
         .from("party_locations")
         .insert({ party_id: partyId, ...location, principale: true });
       if (locationError) return { version, status: "error", message: SAVE_FAILED, values: raw };
+    }
+    if (pipeline.entry) {
+      const { error: entryError } = await supabase.rpc("add_to_parking", {
+        p_parties: [partyId],
+        p_parking: pipeline.entry.parkingId,
+        p_fase: pipeline.entry.fase,
+        p_origine: pipeline.entry.origine ?? undefined,
+      });
+      if (entryError) return { version, status: "error", message: SAVE_FAILED, values: raw };
     }
   }
 

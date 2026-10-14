@@ -126,6 +126,10 @@ export const PARTY_FIELDS = [
   "indirizzo",
   "cap",
   "citta",
+  // New party only: car park of interest (block 1a-7, A2).
+  "parcheggio_interesse",
+  "origine",
+  "fase_iniziale",
 ] as const;
 
 export type PartyValues = {

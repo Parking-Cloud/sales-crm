@@ -16,6 +16,8 @@ import {
 } from "@/lib/parties/labels";
 import type { DataSource, Party, Provenance } from "@/lib/parties/queries";
 import { TRACKED_FIELD_LABELS, type TrackedField } from "@/lib/parties/validation";
+import { ENTRY_STAGE_OPTIONS, ORIGINS, ORIGIN_LABELS, defaultStageFor, type Origin } from "@/lib/pipeline/entry";
+import type { ParkingOption } from "@/lib/pipeline/queries";
 import { DuplicatePanel } from "./duplicate-panel";
 import { ProvenancePicker } from "./provenance";
 
@@ -37,6 +39,9 @@ function initialValues(party: Party | null): RawValues {
     indirizzo: "",
     cap: "",
     citta: "",
+    parcheggio_interesse: "",
+    origine: "",
+    fase_iniziale: "",
   };
 }
 
@@ -44,12 +49,15 @@ export function PartyForm({
   party,
   sources,
   provenance = [],
+  parkings = [],
   initialState = INITIAL_PARTY_FORM_STATE,
   action = saveParty,
 }: {
   party: Party | null;
   sources: DataSource[];
   provenance?: Provenance[];
+  // New party: car parks for "Parcheggio di interesse".
+  parkings?: ParkingOption[];
   // For previews only.
   initialState?: PartyFormState;
   action?: typeof saveParty;
@@ -74,6 +82,7 @@ export function PartyForm({
         isNew={!party}
         partyId={party?.id ?? null}
       />
+      {!party && <PipelineEntryFields values={values} errors={state.fieldErrors ?? {}} parkings={parkings} />}
       <div className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
         <ButtonLink href={party ? `/soggetti/${party.id}` : "/soggetti"} size="md">
           Annulla
@@ -234,5 +243,88 @@ function PartyFields({
         </section>
       )}
     </>
+  );
+}
+
+// New party only (block 1a-7, A2): optional car park of interest. When it is
+// chosen an opportunity is created too; "Contatto in entrata" proposes the
+// stage "Interessata". The duplicate check still runs first.
+function PipelineEntryFields({
+  values,
+  errors,
+  parkings,
+}: {
+  values: RawValues;
+  errors: Record<string, string>;
+  parkings: ParkingOption[];
+}) {
+  const [parkingId, setParkingId] = useState(values.parcheggio_interesse ?? "");
+  const [origine, setOrigine] = useState(values.origine ?? "");
+  const [fase, setFase] = useState(values.fase_iniziale || defaultStageFor((origine || null) as Origin | null));
+  const disabled = parkingId === "";
+  return (
+    <section className="rounded-md border border-grey-60 bg-white p-5 shadow-sm sm:p-6" aria-labelledby="sezione-parcheggio">
+      <h2 id="sezione-parcheggio" className="text-h4 font-semibold">
+        Parcheggio di interesse
+      </h2>
+      <p className="mt-1 text-caption text-black-60">
+        Facoltativo. Se lo scegli nasce anche l&apos;opportunità su quel parcheggio, assegnata a te.
+      </p>
+      <div className="mt-4 grid gap-5 sm:grid-cols-3">
+        <Field id="parcheggio_interesse" label="Parcheggio" error={errors.parcheggio_interesse}>
+          <Select
+            id="parcheggio_interesse"
+            name="parcheggio_interesse"
+            value={parkingId}
+            onChange={(event) => setParkingId(event.target.value)}
+            invalid={Boolean(errors.parcheggio_interesse)}
+          >
+            <option value="">Nessuno</option>
+            {parkings.map((parking) => (
+              <option key={parking.id} value={parking.id}>
+                {parking.nome}
+              </option>
+            ))}
+          </Select>
+        </Field>
+        <Field id="origine" label="Origine" error={errors.origine}>
+          <Select
+            id="origine"
+            name="origine"
+            value={origine}
+            disabled={disabled}
+            onChange={(event) => {
+              setOrigine(event.target.value);
+              setFase(defaultStageFor((event.target.value || null) as Origin | null));
+            }}
+            invalid={Boolean(errors.origine)}
+          >
+            <option value="">Non indicata</option>
+            {ORIGINS.map((origin) => (
+              <option key={origin} value={origin}>
+                {ORIGIN_LABELS[origin]}
+              </option>
+            ))}
+          </Select>
+        </Field>
+        <Field id="fase_iniziale" label="Fase iniziale" hint="Proposta in base all'origine." error={errors.fase_iniziale}>
+          <Select
+            id="fase_iniziale"
+            name="fase_iniziale"
+            value={fase}
+            disabled={disabled}
+            onChange={(event) => setFase(event.target.value)}
+            hasDescription
+            invalid={Boolean(errors.fase_iniziale)}
+          >
+            {ENTRY_STAGE_OPTIONS.map((option) => (
+              <option key={option.value} value={option.value}>
+                {option.label}
+              </option>
+            ))}
+          </Select>
+        </Field>
+      </div>
+    </section>
   );
 }

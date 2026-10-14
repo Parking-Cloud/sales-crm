@@ -37,6 +37,7 @@
     "src/lib/pipeline/filters.ts",
     "src/lib/pipeline/labels.ts",
     "src/lib/pipeline/today.ts",
+    "src/lib/pipeline/entry.ts",
     "tests/unit/**/*.ts",
     "tests/fixtures/**/*.ts"
   ]
