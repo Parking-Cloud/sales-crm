@@ -1,6 +1,7 @@
 // Builds tests/fixtures/crm-parcheggio-2026-finto.xlsx: a FAKE file with the
 // structure of the "CRM parcheggio, formato 2026" preset and all its known
-// defects. Every name, email, phone and site below is invented.
+// defects. Every name, email, phone and site below is invented. IDs are in
+// the 90000 range so they never match those of a real file already imported.
 //
 // Like the real file it also has: about 100 real rows; the anagrafica sheet
 // formatted down to row 993 and column X (empty cells with a style only),
@@ -30,39 +31,39 @@ anagrafica.addRow([
 const d = (y, m, day) => new Date(Date.UTC(y, m - 1, day));
 const rows = [
   // 2: very interested, phone stored as a number (mobile), two emails, diary notes
-  ["Very interested", 73, "Azienda Esempio Srl ", "Commercialista ", "Mario Esempio", "Titolare", "www.azienda-esempio.example",
+  ["Very interested", 90073, "Azienda Esempio Srl ", "Commercialista ", "Mario Esempio", "Titolare", "www.azienda-esempio.example",
     "info@azienda-esempio.example // amministrazione@azienda-esempio.example", 3471234567, d(2026, 9, 24), d(2026, 10, 5),
     "Inviata", "Chiamati", "24/09/2026: prima chiamata, interessati  05/10/2026: chiedono un'offerta per 5 posti", null, 5],
   // 3: not interested, landline stored as a number (leading zero lost), placeholders
-  ["Not interested", 301, "Studio Prova Associati", "consulenza del lavoro", "Non disp ", null, "studio-prova.example",
+  ["Not interested", 90301, "Studio Prova Associati", "consulenza del lavoro", "Non disp ", null, "studio-prova.example",
     "Non disponibile", 212345678, "25/09/2026", null, "Da inviare", "Chiamati", "25/09/2026: si spostano con i mezzi pubblici", null, "ND"],
   // 4: empty status, web form instead of email, two phones without a contact person
-  [null, 659, "Hotel Esempio Centro", "Hotel", null, null, "https://www.hotel-esempio.example",
+  [null, 90659, "Hotel Esempio Centro", "Hotel", null, null, "https://www.hotel-esempio.example",
     "Compilare form sul sito", "02 1234 5678 // 02 8765 4321", null, null, null, "Da Chiamare", null, null, null],
   // 5: interested, two dates in one cell, note without a date
-  ["Interested", 660, "Pizzeria Esempio", "Ristorante pizzeria", "Luca Prova", "Gestore", null,
+  ["Interested", 90660, "Pizzeria Esempio", "Ristorante pizzeria", "Luca Prova", "Gestore", null,
     "pizzeria.esempio@example.com", "-", "28/09/2026//01/10/2026", "01/10/2026", "Inviata", null,
     "Richiamare a fine mese per parlare con il titolare", null, null],
   // 6: completely empty row
   [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null],
   // 7: data without a company name: discarded
-  [null, 700, "   ", "Ufficio", null, null, null, "senza.nome@example.com", null, null, null, null, null, null, null, null],
+  [null, 90700, "   ", "Ufficio", null, null, null, "senza.nome@example.com", null, null, null, null, null, null, null, null],
   // 8: not interested, already has a parking
-  ["Not interested", 701, "Centro Medico Esempio", "Fisioterapia e riabilitazione", "Sara Esempio", "Segreteria", null,
+  ["Not interested", 90701, "Centro Medico Esempio", "Fisioterapia e riabilitazione", "Sara Esempio", "Segreteria", null,
     "segreteria@centro-medico.example", "0298765432", "02/10/2026", "02/10/2026", null, "Chiamati",
     "02/10/2026: hanno già un parcheggio interno per i dipendenti", null, null],
   // 9: contacted by date only, category from keywords
-  [null, 702, "Formazione Esempio Srl", "Corsi di formazione", null, null, null, null, null, "29/09/2026", null, null, null, null, null, null],
+  [null, 90702, "Formazione Esempio Srl", "Corsi di formazione", null, null, null, null, null, "29/09/2026", null, null, null, null, null, null],
   // 10: sector without a matching keyword
-  [null, 703, "Bottega Esempio", "Artigianato del legno", null, null, null, null, null, null, null, null, null, null, null, null],
+  [null, 90703, "Bottega Esempio", "Artigianato del legno", null, null, null, null, null, null, null, null, null, null, null, null],
   // 11: the same company again (row 2)
-  ["Interested", 704, "Azienda Esempio S.r.l.", "Commercialista", "Paolo Esempio", "Amministrazione", null,
+  ["Interested", 90704, "Azienda Esempio S.r.l.", "Commercialista", "Paolo Esempio", "Amministrazione", null,
     null, null, "03/10/2026", null, null, "Chiamati", null, null, null],
   // 12: not interested for price, with a date one year off
-  ["Not interested", 705, "Agenzia Prova Immobiliare", "Agenzia immobiliare", null, null, null, "info@agenzia-prova.example",
+  ["Not interested", 90705, "Agenzia Prova Immobiliare", "Agenzia immobiliare", null, null, null, "info@agenzia-prova.example",
     "+39 02 5555 1234", "30/09/2026", null, null, "Chiamati", "15/03/2025: troppo caro per loro", null, null],
   // 13: very interested, IT company (non continuous IDs)
-  ["Very interested", 1200, "Informatica Esempio Spa", "Fornitore informatico", "Elena Prova", "Office manager", "informatica-esempio.example/contatti",
+  ["Very interested", 91200, "Informatica Esempio Spa", "Fornitore informatico", "Elena Prova", "Office manager", "informatica-esempio.example/contatti",
     "elena.prova@informatica-esempio.example", "02-4444-5555", "01/10/2026", "06/10/2026", "Inviata", "Chiamati", null, null, 12],
 ];
 
@@ -81,7 +82,7 @@ for (let i = 0; i < GENERATED; i++) {
   const day = 1 + (i % 9);
   const state = STATES[i % STATES.length];
   rows.push([
-    state, 2000 + i, name, SECTORS[i % SECTORS.length], i % 3 === 0 ? `Referente ${WORDS[i % WORDS.length]}` : null,
+    state, 92000 + i, name, SECTORS[i % SECTORS.length], i % 3 === 0 ? `Referente ${WORDS[i % WORDS.length]}` : null,
     i % 3 === 0 ? "Responsabile" : null, i < 53 ? `www.${slug}.example` : null, `info@${slug}.example`,
     `02 7000 ${String(1000 + i)}`, `0${day}/10/2026`, null, i % 2 === 0 ? "Inviata" : null, "Chiamati",
     state === "Not interested" ? `0${day}/10/2026: non hanno bisogno di posti auto` : null, null, i % 5 === 0 ? 2 + (i % 7) : null,

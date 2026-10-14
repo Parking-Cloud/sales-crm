@@ -26,6 +26,7 @@
     "src/lib/import/workbook.ts",
     "src/lib/import/limits.ts",
     "src/lib/import/safe-call.ts",
+    "src/lib/import/undo.ts",
     "tests/unit/**/*.ts",
     "tests/fixtures/**/*.ts"
   ]

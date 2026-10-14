@@ -16,5 +16,7 @@ export default async function BatchPage({ params }: { params: Promise<{ id: stri
   if (!UUID.test(id)) notFound();
   const batch = await getBatch(id);
   if (!batch) notFound();
-  return <BatchSummary batch={batch} remaining={await batchRowCounts(id)} isAdmin={user.isAdmin} />;
+  // A cancelled import shows only what is saved on the batch: its rows are gone.
+  const remaining = batch.annullato_il ? null : await batchRowCounts(id);
+  return <BatchSummary batch={batch} remaining={remaining} isAdmin={user.isAdmin} />;
 }

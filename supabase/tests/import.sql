@@ -99,7 +99,7 @@ insert into plan_input values ($plan$[
    "email": "info@azienda-esempio.example",
    "form_web_url": null
   },
-  "externalId": "Anagrafica Attvità Commerciali#73",
+  "externalId": "Anagrafica Attvità Commerciali#90073",
   "contact": {
    "nome": "Mario",
    "cognome": "Esempio",
@@ -170,7 +170,7 @@ insert into plan_input values ($plan$[
    "email": null,
    "form_web_url": null
   },
-  "externalId": "Anagrafica Attvità Commerciali#301",
+  "externalId": "Anagrafica Attvità Commerciali#90301",
   "contact": null,
   "opportunity": {
    "fase": "contattata",
@@ -223,7 +223,7 @@ insert into plan_input values ($plan$[
    "email": null,
    "form_web_url": "https://www.hotel-esempio.example"
   },
-  "externalId": "Anagrafica Attvità Commerciali#659",
+  "externalId": "Anagrafica Attvità Commerciali#90659",
   "contact": null,
   "opportunity": {
    "fase": "da_contattare",
@@ -260,7 +260,7 @@ insert into plan_input values ($plan$[
    "email": "pizzeria.esempio@example.com",
    "form_web_url": null
   },
-  "externalId": "Anagrafica Attvità Commerciali#660",
+  "externalId": "Anagrafica Attvità Commerciali#90660",
   "contact": {
    "nome": "Luca",
    "cognome": "Prova",
@@ -355,7 +355,7 @@ insert into plan_input values ($plan$[
    "email": "segreteria@centro-medico.example",
    "form_web_url": null
   },
-  "externalId": "Anagrafica Attvità Commerciali#701",
+  "externalId": "Anagrafica Attvità Commerciali#90701",
   "contact": {
    "nome": "Sara",
    "cognome": "Esempio",
@@ -413,7 +413,7 @@ insert into plan_input values ($plan$[
    "email": null,
    "form_web_url": null
   },
-  "externalId": "Anagrafica Attvità Commerciali#702",
+  "externalId": "Anagrafica Attvità Commerciali#90702",
   "contact": null,
   "opportunity": {
    "fase": "contattata",
@@ -454,7 +454,7 @@ insert into plan_input values ($plan$[
    "email": null,
    "form_web_url": null
   },
-  "externalId": "Anagrafica Attvità Commerciali#703",
+  "externalId": "Anagrafica Attvità Commerciali#90703",
   "contact": null,
   "opportunity": {
    "fase": "da_contattare",
@@ -493,7 +493,7 @@ insert into plan_input values ($plan$[
    "email": null,
    "form_web_url": null
   },
-  "externalId": "Anagrafica Attvità Commerciali#704",
+  "externalId": "Anagrafica Attvità Commerciali#90704",
   "contact": {
    "nome": "Paolo",
    "cognome": "Esempio",
@@ -546,7 +546,7 @@ insert into plan_input values ($plan$[
    "email": "info@agenzia-prova.example",
    "form_web_url": null
   },
-  "externalId": "Anagrafica Attvità Commerciali#705",
+  "externalId": "Anagrafica Attvità Commerciali#90705",
   "contact": null,
   "opportunity": {
    "fase": "contattata",
@@ -597,7 +597,7 @@ insert into plan_input values ($plan$[
    "email": "elena.prova@informatica-esempio.example",
    "form_web_url": null
   },
-  "externalId": "Anagrafica Attvità Commerciali#1200",
+  "externalId": "Anagrafica Attvità Commerciali#91200",
   "contact": {
    "nome": "Elena",
    "cognome": "Prova",
@@ -654,7 +654,7 @@ insert into plan_input values ($plan$[
    "email": "info@alfa-servizi.example",
    "form_web_url": null
   },
-  "externalId": "Anagrafica Attvità Commerciali#2000",
+  "externalId": "Anagrafica Attvità Commerciali#92000",
   "contact": {
    "nome": "Referente",
    "cognome": "Alfa",
@@ -710,7 +710,7 @@ insert into plan_input values ($plan$[
    "email": "info@beta-servizi.example",
    "form_web_url": null
   },
-  "externalId": "Anagrafica Attvità Commerciali#2001",
+  "externalId": "Anagrafica Attvità Commerciali#92001",
   "contact": null,
   "opportunity": {
    "fase": "interessata",
@@ -755,7 +755,7 @@ insert into plan_input values ($plan$[
    "email": "info@gamma-servizi.example",
    "form_web_url": null
   },
-  "externalId": "Anagrafica Attvità Commerciali#2002",
+  "externalId": "Anagrafica Attvità Commerciali#92002",
   "contact": null,
   "opportunity": {
    "fase": "contattata",
@@ -811,7 +811,7 @@ insert into plan_input values ($plan$[
    "email": "info@delta-servizi.example",
    "form_web_url": null
   },
-  "externalId": "Anagrafica Attvità Commerciali#2003",
+  "externalId": "Anagrafica Attvità Commerciali#92003",
   "contact": {
    "nome": "Referente",
    "cognome": "Delta",
@@ -862,7 +862,7 @@ insert into plan_input values ($plan$[
    "email": "info@epsilon-servizi.example",
    "form_web_url": null
   },
-  "externalId": "Anagrafica Attvità Commerciali#2004",
+  "externalId": "Anagrafica Attvità Commerciali#92004",
   "contact": null,
   "opportunity": {
    "fase": "contattata",
@@ -912,7 +912,7 @@ insert into plan_input values ($plan$[
    "email": "info@zeta-servizi.example",
    "form_web_url": null
   },
-  "externalId": "Anagrafica Attvità Commerciali#2005",
+  "externalId": "Anagrafica Attvità Commerciali#92005",
   "contact": null,
   "opportunity": {
    "fase": "interessata",
@@ -957,7 +957,7 @@ insert into plan_input values ($plan$[
    "email": "info@eta-servizi.example",
    "form_web_url": null
   },
-  "externalId": "Anagrafica Attvità Commerciali#2006",
+  "externalId": "Anagrafica Attvità Commerciali#92006",
   "contact": {
    "nome": "Referente",
    "cognome": "Eta",
@@ -1019,7 +1019,7 @@ insert into plan_input values ($plan$[
    "email": "info@theta-servizi.example",
    "form_web_url": null
   },
-  "externalId": "Anagrafica Attvità Commerciali#2007",
+  "externalId": "Anagrafica Attvità Commerciali#92007",
   "contact": null,
   "opportunity": {
    "fase": "interessata",
@@ -1064,7 +1064,7 @@ insert into plan_input values ($plan$[
    "email": "info@iota-servizi.example",
    "form_web_url": null
   },
-  "externalId": "Anagrafica Attvità Commerciali#2008",
+  "externalId": "Anagrafica Attvità Commerciali#92008",
   "contact": null,
   "opportunity": {
    "fase": "contattata",
@@ -1116,7 +1116,7 @@ insert into plan_input values ($plan$[
    "email": "info@kappa-servizi.example",
    "form_web_url": null
   },
-  "externalId": "Anagrafica Attvità Commerciali#2009",
+  "externalId": "Anagrafica Attvità Commerciali#92009",
   "contact": {
    "nome": "Referente",
    "cognome": "Kappa",
@@ -1167,7 +1167,7 @@ insert into plan_input values ($plan$[
    "email": "info@lambda-servizi.example",
    "form_web_url": null
   },
-  "externalId": "Anagrafica Attvità Commerciali#2010",
+  "externalId": "Anagrafica Attvità Commerciali#92010",
   "contact": null,
   "opportunity": {
    "fase": "contattata",
@@ -1223,7 +1223,7 @@ insert into plan_input values ($plan$[
    "email": "info@sigma-servizi.example",
    "form_web_url": null
   },
-  "externalId": "Anagrafica Attvità Commerciali#2011",
+  "externalId": "Anagrafica Attvità Commerciali#92011",
   "contact": null,
   "opportunity": {
    "fase": "interessata",
@@ -1268,7 +1268,7 @@ insert into plan_input values ($plan$[
    "email": "info@alfa-consulenze.example",
    "form_web_url": null
   },
-  "externalId": "Anagrafica Attvità Commerciali#2012",
+  "externalId": "Anagrafica Attvità Commerciali#92012",
   "contact": {
    "nome": "Referente",
    "cognome": "Alfa",
@@ -1324,7 +1324,7 @@ insert into plan_input values ($plan$[
    "email": "info@beta-consulenze.example",
    "form_web_url": null
   },
-  "externalId": "Anagrafica Attvità Commerciali#2013",
+  "externalId": "Anagrafica Attvità Commerciali#92013",
   "contact": null,
   "opportunity": {
    "fase": "interessata",
@@ -1369,7 +1369,7 @@ insert into plan_input values ($plan$[
    "email": "info@gamma-consulenze.example",
    "form_web_url": null
   },
-  "externalId": "Anagrafica Attvità Commerciali#2014",
+  "externalId": "Anagrafica Attvità Commerciali#92014",
   "contact": null,
   "opportunity": {
    "fase": "contattata",
@@ -1425,7 +1425,7 @@ insert into plan_input values ($plan$[
    "email": "info@delta-consulenze.example",
    "form_web_url": null
   },
-  "externalId": "Anagrafica Attvità Commerciali#2015",
+  "externalId": "Anagrafica Attvità Commerciali#92015",
   "contact": {
    "nome": "Referente",
    "cognome": "Delta",
@@ -1476,7 +1476,7 @@ insert into plan_input values ($plan$[
    "email": "info@epsilon-consulenze.example",
    "form_web_url": null
   },
-  "externalId": "Anagrafica Attvità Commerciali#2016",
+  "externalId": "Anagrafica Attvità Commerciali#92016",
   "contact": null,
   "opportunity": {
    "fase": "contattata",
@@ -1526,7 +1526,7 @@ insert into plan_input values ($plan$[
    "email": "info@zeta-consulenze.example",
    "form_web_url": null
   },
-  "externalId": "Anagrafica Attvità Commerciali#2017",
+  "externalId": "Anagrafica Attvità Commerciali#92017",
   "contact": null,
   "opportunity": {
    "fase": "interessata",
@@ -1571,7 +1571,7 @@ insert into plan_input values ($plan$[
    "email": "info@eta-consulenze.example",
    "form_web_url": null
   },
-  "externalId": "Anagrafica Attvità Commerciali#2018",
+  "externalId": "Anagrafica Attvità Commerciali#92018",
   "contact": {
    "nome": "Referente",
    "cognome": "Eta",
@@ -1635,7 +1635,7 @@ insert into plan_input values ($plan$[
    "email": "info@theta-consulenze.example",
    "form_web_url": null
   },
-  "externalId": "Anagrafica Attvità Commerciali#2019",
+  "externalId": "Anagrafica Attvità Commerciali#92019",
   "contact": null,
   "opportunity": {
    "fase": "interessata",
@@ -1680,7 +1680,7 @@ insert into plan_input values ($plan$[
    "email": "info@iota-consulenze.example",
    "form_web_url": null
   },
-  "externalId": "Anagrafica Attvità Commerciali#2020",
+  "externalId": "Anagrafica Attvità Commerciali#92020",
   "contact": null,
   "opportunity": {
    "fase": "contattata",
@@ -1730,7 +1730,7 @@ insert into plan_input values ($plan$[
    "email": "info@kappa-consulenze.example",
    "form_web_url": null
   },
-  "externalId": "Anagrafica Attvità Commerciali#2021",
+  "externalId": "Anagrafica Attvità Commerciali#92021",
   "contact": {
    "nome": "Referente",
    "cognome": "Kappa",
@@ -1781,7 +1781,7 @@ insert into plan_input values ($plan$[
    "email": "info@lambda-consulenze.example",
    "form_web_url": null
   },
-  "externalId": "Anagrafica Attvità Commerciali#2022",
+  "externalId": "Anagrafica Attvità Commerciali#92022",
   "contact": null,
   "opportunity": {
    "fase": "contattata",
@@ -1837,7 +1837,7 @@ insert into plan_input values ($plan$[
    "email": "info@sigma-consulenze.example",
    "form_web_url": null
   },
-  "externalId": "Anagrafica Attvità Commerciali#2023",
+  "externalId": "Anagrafica Attvità Commerciali#92023",
   "contact": null,
   "opportunity": {
    "fase": "interessata",
@@ -1882,7 +1882,7 @@ insert into plan_input values ($plan$[
    "email": "info@alfa-logistica.example",
    "form_web_url": null
   },
-  "externalId": "Anagrafica Attvità Commerciali#2024",
+  "externalId": "Anagrafica Attvità Commerciali#92024",
   "contact": {
    "nome": "Referente",
    "cognome": "Alfa",
@@ -1938,7 +1938,7 @@ insert into plan_input values ($plan$[
    "email": "info@beta-logistica.example",
    "form_web_url": null
   },
-  "externalId": "Anagrafica Attvità Commerciali#2025",
+  "externalId": "Anagrafica Attvità Commerciali#92025",
   "contact": null,
   "opportunity": {
    "fase": "interessata",
@@ -1983,7 +1983,7 @@ insert into plan_input values ($plan$[
    "email": "info@gamma-logistica.example",
    "form_web_url": null
   },
-  "externalId": "Anagrafica Attvità Commerciali#2026",
+  "externalId": "Anagrafica Attvità Commerciali#92026",
   "contact": null,
   "opportunity": {
    "fase": "contattata",
@@ -2039,7 +2039,7 @@ insert into plan_input values ($plan$[
    "email": "info@delta-logistica.example",
    "form_web_url": null
   },
-  "externalId": "Anagrafica Attvità Commerciali#2027",
+  "externalId": "Anagrafica Attvità Commerciali#92027",
   "contact": {
    "nome": "Referente",
    "cognome": "Delta",
@@ -2090,7 +2090,7 @@ insert into plan_input values ($plan$[
    "email": "info@epsilon-logistica.example",
    "form_web_url": null
   },
-  "externalId": "Anagrafica Attvità Commerciali#2028",
+  "externalId": "Anagrafica Attvità Commerciali#92028",
   "contact": null,
   "opportunity": {
    "fase": "contattata",
@@ -2142,7 +2142,7 @@ insert into plan_input values ($plan$[
    "email": "info@zeta-logistica.example",
    "form_web_url": null
   },
-  "externalId": "Anagrafica Attvità Commerciali#2029",
+  "externalId": "Anagrafica Attvità Commerciali#92029",
   "contact": null,
   "opportunity": {
    "fase": "interessata",
@@ -2187,7 +2187,7 @@ insert into plan_input values ($plan$[
    "email": "info@eta-logistica.example",
    "form_web_url": null
   },
-  "externalId": "Anagrafica Attvità Commerciali#2030",
+  "externalId": "Anagrafica Attvità Commerciali#92030",
   "contact": {
    "nome": "Referente",
    "cognome": "Eta",
@@ -2249,7 +2249,7 @@ insert into plan_input values ($plan$[
    "email": "info@theta-logistica.example",
    "form_web_url": null
   },
-  "externalId": "Anagrafica Attvità Commerciali#2031",
+  "externalId": "Anagrafica Attvità Commerciali#92031",
   "contact": null,
   "opportunity": {
    "fase": "interessata",
@@ -2294,7 +2294,7 @@ insert into plan_input values ($plan$[
    "email": "info@iota-logistica.example",
    "form_web_url": null
   },
-  "externalId": "Anagrafica Attvità Commerciali#2032",
+  "externalId": "Anagrafica Attvità Commerciali#92032",
   "contact": null,
   "opportunity": {
    "fase": "contattata",
@@ -2344,7 +2344,7 @@ insert into plan_input values ($plan$[
    "email": "info@kappa-logistica.example",
    "form_web_url": null
   },
-  "externalId": "Anagrafica Attvità Commerciali#2033",
+  "externalId": "Anagrafica Attvità Commerciali#92033",
   "contact": {
    "nome": "Referente",
    "cognome": "Kappa",
@@ -2395,7 +2395,7 @@ insert into plan_input values ($plan$[
    "email": "info@lambda-logistica.example",
    "form_web_url": null
   },
-  "externalId": "Anagrafica Attvità Commerciali#2034",
+  "externalId": "Anagrafica Attvità Commerciali#92034",
   "contact": null,
   "opportunity": {
    "fase": "contattata",
@@ -2451,7 +2451,7 @@ insert into plan_input values ($plan$[
    "email": "info@sigma-logistica.example",
    "form_web_url": null
   },
-  "externalId": "Anagrafica Attvità Commerciali#2035",
+  "externalId": "Anagrafica Attvità Commerciali#92035",
   "contact": null,
   "opportunity": {
    "fase": "interessata",
@@ -2496,7 +2496,7 @@ insert into plan_input values ($plan$[
    "email": "info@alfa-impianti.example",
    "form_web_url": null
   },
-  "externalId": "Anagrafica Attvità Commerciali#2036",
+  "externalId": "Anagrafica Attvità Commerciali#92036",
   "contact": {
    "nome": "Referente",
    "cognome": "Alfa",
@@ -2552,7 +2552,7 @@ insert into plan_input values ($plan$[
    "email": "info@beta-impianti.example",
    "form_web_url": null
   },
-  "externalId": "Anagrafica Attvità Commerciali#2037",
+  "externalId": "Anagrafica Attvità Commerciali#92037",
   "contact": null,
   "opportunity": {
    "fase": "interessata",
@@ -2597,7 +2597,7 @@ insert into plan_input values ($plan$[
    "email": "info@gamma-impianti.example",
    "form_web_url": null
   },
-  "externalId": "Anagrafica Attvità Commerciali#2038",
+  "externalId": "Anagrafica Attvità Commerciali#92038",
   "contact": null,
   "opportunity": {
    "fase": "contattata",
@@ -2655,7 +2655,7 @@ insert into plan_input values ($plan$[
    "email": "info@delta-impianti.example",
    "form_web_url": null
   },
-  "externalId": "Anagrafica Attvità Commerciali#2039",
+  "externalId": "Anagrafica Attvità Commerciali#92039",
   "contact": {
    "nome": "Referente",
    "cognome": "Delta",
@@ -2706,7 +2706,7 @@ insert into plan_input values ($plan$[
    "email": "info@epsilon-impianti.example",
    "form_web_url": null
   },
-  "externalId": "Anagrafica Attvità Commerciali#2040",
+  "externalId": "Anagrafica Attvità Commerciali#92040",
   "contact": null,
   "opportunity": {
    "fase": "contattata",
@@ -2756,7 +2756,7 @@ insert into plan_input values ($plan$[
    "email": "info@zeta-impianti.example",
    "form_web_url": null
   },
-  "externalId": "Anagrafica Attvità Commerciali#2041",
+  "externalId": "Anagrafica Attvità Commerciali#92041",
   "contact": null,
   "opportunity": {
    "fase": "interessata",
@@ -2801,7 +2801,7 @@ insert into plan_input values ($plan$[
    "email": "info@eta-impianti.example",
    "form_web_url": null
   },
-  "externalId": "Anagrafica Attvità Commerciali#2042",
+  "externalId": "Anagrafica Attvità Commerciali#92042",
   "contact": {
    "nome": "Referente",
    "cognome": "Eta",
@@ -2863,7 +2863,7 @@ insert into plan_input values ($plan$[
    "email": "info@theta-impianti.example",
    "form_web_url": null
   },
-  "externalId": "Anagrafica Attvità Commerciali#2043",
+  "externalId": "Anagrafica Attvità Commerciali#92043",
   "contact": null,
   "opportunity": {
    "fase": "interessata",
@@ -2908,7 +2908,7 @@ insert into plan_input values ($plan$[
    "email": "info@iota-impianti.example",
    "form_web_url": null
   },
-  "externalId": "Anagrafica Attvità Commerciali#2044",
+  "externalId": "Anagrafica Attvità Commerciali#92044",
   "contact": null,
   "opportunity": {
    "fase": "contattata",
@@ -2958,7 +2958,7 @@ insert into plan_input values ($plan$[
    "email": "info@kappa-impianti.example",
    "form_web_url": null
   },
-  "externalId": "Anagrafica Attvità Commerciali#2045",
+  "externalId": "Anagrafica Attvità Commerciali#92045",
   "contact": {
    "nome": "Referente",
    "cognome": "Kappa",
@@ -3009,7 +3009,7 @@ insert into plan_input values ($plan$[
    "email": "info@lambda-impianti.example",
    "form_web_url": null
   },
-  "externalId": "Anagrafica Attvità Commerciali#2046",
+  "externalId": "Anagrafica Attvità Commerciali#92046",
   "contact": null,
   "opportunity": {
    "fase": "contattata",
@@ -3065,7 +3065,7 @@ insert into plan_input values ($plan$[
    "email": "info@sigma-impianti.example",
    "form_web_url": null
   },
-  "externalId": "Anagrafica Attvità Commerciali#2047",
+  "externalId": "Anagrafica Attvità Commerciali#92047",
   "contact": null,
   "opportunity": {
    "fase": "interessata",
@@ -3110,7 +3110,7 @@ insert into plan_input values ($plan$[
    "email": "info@alfa-edilizia.example",
    "form_web_url": null
   },
-  "externalId": "Anagrafica Attvità Commerciali#2048",
+  "externalId": "Anagrafica Attvità Commerciali#92048",
   "contact": {
    "nome": "Referente",
    "cognome": "Alfa",
@@ -3168,7 +3168,7 @@ insert into plan_input values ($plan$[
    "email": "info@beta-edilizia.example",
    "form_web_url": null
   },
-  "externalId": "Anagrafica Attvità Commerciali#2049",
+  "externalId": "Anagrafica Attvità Commerciali#92049",
   "contact": null,
   "opportunity": {
    "fase": "interessata",
@@ -3213,7 +3213,7 @@ insert into plan_input values ($plan$[
    "email": "info@gamma-edilizia.example",
    "form_web_url": null
   },
-  "externalId": "Anagrafica Attvità Commerciali#2050",
+  "externalId": "Anagrafica Attvità Commerciali#92050",
   "contact": null,
   "opportunity": {
    "fase": "contattata",
@@ -3269,7 +3269,7 @@ insert into plan_input values ($plan$[
    "email": "info@delta-edilizia.example",
    "form_web_url": null
   },
-  "externalId": "Anagrafica Attvità Commerciali#2051",
+  "externalId": "Anagrafica Attvità Commerciali#92051",
   "contact": {
    "nome": "Referente",
    "cognome": "Delta",
@@ -3320,7 +3320,7 @@ insert into plan_input values ($plan$[
    "email": "info@epsilon-edilizia.example",
    "form_web_url": null
   },
-  "externalId": "Anagrafica Attvità Commerciali#2052",
+  "externalId": "Anagrafica Attvità Commerciali#92052",
   "contact": null,
   "opportunity": {
    "fase": "contattata",
@@ -3370,7 +3370,7 @@ insert into plan_input values ($plan$[
    "email": "info@zeta-edilizia.example",
    "form_web_url": null
   },
-  "externalId": "Anagrafica Attvità Commerciali#2053",
+  "externalId": "Anagrafica Attvità Commerciali#92053",
   "contact": null,
   "opportunity": {
    "fase": "interessata",
@@ -3415,7 +3415,7 @@ insert into plan_input values ($plan$[
    "email": "info@eta-edilizia.example",
    "form_web_url": null
   },
-  "externalId": "Anagrafica Attvità Commerciali#2054",
+  "externalId": "Anagrafica Attvità Commerciali#92054",
   "contact": {
    "nome": "Referente",
    "cognome": "Eta",
@@ -3477,7 +3477,7 @@ insert into plan_input values ($plan$[
    "email": "info@theta-edilizia.example",
    "form_web_url": null
   },
-  "externalId": "Anagrafica Attvità Commerciali#2055",
+  "externalId": "Anagrafica Attvità Commerciali#92055",
   "contact": null,
   "opportunity": {
    "fase": "interessata",
@@ -3522,7 +3522,7 @@ insert into plan_input values ($plan$[
    "email": "info@iota-edilizia.example",
    "form_web_url": null
   },
-  "externalId": "Anagrafica Attvità Commerciali#2056",
+  "externalId": "Anagrafica Attvità Commerciali#92056",
   "contact": null,
   "opportunity": {
    "fase": "contattata",
@@ -3572,7 +3572,7 @@ insert into plan_input values ($plan$[
    "email": "info@kappa-edilizia.example",
    "form_web_url": null
   },
-  "externalId": "Anagrafica Attvità Commerciali#2057",
+  "externalId": "Anagrafica Attvità Commerciali#92057",
   "contact": {
    "nome": "Referente",
    "cognome": "Kappa",
@@ -3623,7 +3623,7 @@ insert into plan_input values ($plan$[
    "email": "info@lambda-edilizia.example",
    "form_web_url": null
   },
-  "externalId": "Anagrafica Attvità Commerciali#2058",
+  "externalId": "Anagrafica Attvità Commerciali#92058",
   "contact": null,
   "opportunity": {
    "fase": "contattata",
@@ -3681,7 +3681,7 @@ insert into plan_input values ($plan$[
    "email": "info@sigma-edilizia.example",
    "form_web_url": null
   },
-  "externalId": "Anagrafica Attvità Commerciali#2059",
+  "externalId": "Anagrafica Attvità Commerciali#92059",
   "contact": null,
   "opportunity": {
    "fase": "interessata",
@@ -3726,7 +3726,7 @@ insert into plan_input values ($plan$[
    "email": "info@alfa-tessile.example",
    "form_web_url": null
   },
-  "externalId": "Anagrafica Attvità Commerciali#2060",
+  "externalId": "Anagrafica Attvità Commerciali#92060",
   "contact": {
    "nome": "Referente",
    "cognome": "Alfa",
@@ -3782,7 +3782,7 @@ insert into plan_input values ($plan$[
    "email": "info@beta-tessile.example",
    "form_web_url": null
   },
-  "externalId": "Anagrafica Attvità Commerciali#2061",
+  "externalId": "Anagrafica Attvità Commerciali#92061",
   "contact": null,
   "opportunity": {
    "fase": "interessata",
@@ -3827,7 +3827,7 @@ insert into plan_input values ($plan$[
    "email": "info@gamma-tessile.example",
    "form_web_url": null
   },
-  "externalId": "Anagrafica Attvità Commerciali#2062",
+  "externalId": "Anagrafica Attvità Commerciali#92062",
   "contact": null,
   "opportunity": {
    "fase": "contattata",
@@ -3883,7 +3883,7 @@ insert into plan_input values ($plan$[
    "email": "info@delta-tessile.example",
    "form_web_url": null
   },
-  "externalId": "Anagrafica Attvità Commerciali#2063",
+  "externalId": "Anagrafica Attvità Commerciali#92063",
   "contact": {
    "nome": "Referente",
    "cognome": "Delta",
@@ -3934,7 +3934,7 @@ insert into plan_input values ($plan$[
    "email": "info@epsilon-tessile.example",
    "form_web_url": null
   },
-  "externalId": "Anagrafica Attvità Commerciali#2064",
+  "externalId": "Anagrafica Attvità Commerciali#92064",
   "contact": null,
   "opportunity": {
    "fase": "contattata",
@@ -3984,7 +3984,7 @@ insert into plan_input values ($plan$[
    "email": "info@zeta-tessile.example",
    "form_web_url": null
   },
-  "externalId": "Anagrafica Attvità Commerciali#2065",
+  "externalId": "Anagrafica Attvità Commerciali#92065",
   "contact": null,
   "opportunity": {
    "fase": "interessata",
@@ -4029,7 +4029,7 @@ insert into plan_input values ($plan$[
    "email": "info@eta-tessile.example",
    "form_web_url": null
   },
-  "externalId": "Anagrafica Attvità Commerciali#2066",
+  "externalId": "Anagrafica Attvità Commerciali#92066",
   "contact": {
    "nome": "Referente",
    "cognome": "Eta",
@@ -4091,7 +4091,7 @@ insert into plan_input values ($plan$[
    "email": "info@theta-tessile.example",
    "form_web_url": null
   },
-  "externalId": "Anagrafica Attvità Commerciali#2067",
+  "externalId": "Anagrafica Attvità Commerciali#92067",
   "contact": null,
   "opportunity": {
    "fase": "interessata",
@@ -4136,7 +4136,7 @@ insert into plan_input values ($plan$[
    "email": "info@iota-tessile.example",
    "form_web_url": null
   },
-  "externalId": "Anagrafica Attvità Commerciali#2068",
+  "externalId": "Anagrafica Attvità Commerciali#92068",
   "contact": null,
   "opportunity": {
    "fase": "contattata",
@@ -4188,7 +4188,7 @@ insert into plan_input values ($plan$[
    "email": "info@kappa-tessile.example",
    "form_web_url": null
   },
-  "externalId": "Anagrafica Attvità Commerciali#2069",
+  "externalId": "Anagrafica Attvità Commerciali#92069",
   "contact": {
    "nome": "Referente",
    "cognome": "Kappa",
@@ -4239,7 +4239,7 @@ insert into plan_input values ($plan$[
    "email": "info@lambda-tessile.example",
    "form_web_url": null
   },
-  "externalId": "Anagrafica Attvità Commerciali#2070",
+  "externalId": "Anagrafica Attvità Commerciali#92070",
   "contact": null,
   "opportunity": {
    "fase": "contattata",
@@ -4295,7 +4295,7 @@ insert into plan_input values ($plan$[
    "email": "info@sigma-tessile.example",
    "form_web_url": null
   },
-  "externalId": "Anagrafica Attvità Commerciali#2071",
+  "externalId": "Anagrafica Attvità Commerciali#92071",
   "contact": null,
   "opportunity": {
    "fase": "interessata",
@@ -5644,7 +5644,13 @@ select pg_temp.record(
   (pg_temp.j('undo1') ->> 'ok')::boolean = false
   and exists (select 1 from jsonb_array_elements(pg_temp.j('undo1') -> 'blockers') b where b ->> 'tabella' = 'party_locations')
   and exists (select 1 from jsonb_array_elements(pg_temp.j('undo1') -> 'blockers') b where b ->> 'tabella' = 'activities')
-  and (select count(*) from public.parties where import_batch_id = pg_temp.id('batch')) = 86,
+  and (select count(*) from public.parties where import_batch_id = pg_temp.id('batch')) = 86
+  -- Changes by hand: one cause without batch, every blocker with its party.
+  and (pg_temp.j('undo1') ->> 'totale')::int = 2
+  and jsonb_array_length(pg_temp.j('undo1') -> 'cause') = 1
+  and (pg_temp.j('undo1') -> 'cause' -> 0 ->> 'batch_id') is null
+  and not exists (select 1 from jsonb_array_elements(pg_temp.j('undo1') -> 'blockers') b
+                  where b ->> 'party_id' is null or b ->> 'soggetto' is null or b ->> 'descrizione' is null),
   pg_temp.j('undo1') -> 'blockers' ->> 0
 );
 
@@ -5702,6 +5708,71 @@ select pg_temp.expect_error(
   '42501'
 );
 reset role;
+
+-- ---------------------------------------------------------------------------
+-- Undo of a large import blocked by a second import (batch A, then batch B
+-- adding opportunities, activities and contacts to A's parties)
+-- ---------------------------------------------------------------------------
+
+select pg_temp.act_as(pg_temp.id('admin'));
+insert into test_json
+select 'resA', public.import_rows('crm-copia-finto.xlsx', pg_temp.j('plan'), '[]'::jsonb);
+insert into test_ids select 'batchA', (pg_temp.j('resA') ->> 'batch_id')::uuid;
+-- B: the same rows merged into A's parties, on a second car park.
+insert into test_json
+select 'planB', jsonb_agg(r || jsonb_build_object(
+  'decision', 'unisci', 'linkTo', null, 'parkingId', '00000000-0000-4000-8000-0000000000f2',
+  'mergeInto', (select p.id from public.parties p where p.import_batch_id = pg_temp.id('batchA')
+                and p.denominazione is not distinct from r -> 'party' ->> 'denominazione'
+                and p.nome is not distinct from r -> 'party' ->> 'nome' limit 1)))
+from jsonb_array_elements(pg_temp.j('plan')) r
+where r ->> 'status' <> 'scartata' and r ->> 'decision' = 'crea' and r ->> 'linkTo' is null;
+reset role;
+insert into public.parking_facilities (id, nome, tipo) values ('00000000-0000-4000-8000-0000000000f2', 'Parcheggio Esempio Due', 'autorimessa');
+select pg_temp.act_as(pg_temp.id('admin'));
+insert into test_json
+select 'resB', public.import_rows('crm-originale-finto.xlsx', pg_temp.j('planB'), '[]'::jsonb);
+insert into test_ids select 'batchB', (pg_temp.j('resB') ->> 'batch_id')::uuid;
+insert into test_json select 'undoA1', public.undo_import_batch(pg_temp.id('batchA'));
+reset role;
+
+select pg_temp.record(
+  'annullamento bloccato da un altro import: tutti i blocchi contati, causa = import B, ogni blocco con soggetto',
+  (pg_temp.j('undoA1') ->> 'ok')::boolean = false
+  and (pg_temp.j('undoA1') ->> 'totale')::int > 50
+  and (pg_temp.j('undoA1') ->> 'totale')::int = jsonb_array_length(pg_temp.j('undoA1') -> 'blockers')
+  and jsonb_array_length(pg_temp.j('undoA1') -> 'cause') = 1
+  and (pg_temp.j('undoA1') -> 'cause' -> 0 ->> 'batch_id')::uuid = pg_temp.id('batchB')
+  and pg_temp.j('undoA1') -> 'cause' -> 0 ->> 'file' = 'crm-originale-finto.xlsx'
+  and not exists (select 1 from jsonb_array_elements(pg_temp.j('undoA1') -> 'blockers') b
+                  where b ->> 'party_id' is null or b ->> 'soggetto' is null or b ->> 'descrizione' is null
+                     or (b ->> 'batch_id')::uuid is distinct from pg_temp.id('batchB'))
+  and (select count(*) from public.parties where import_batch_id = pg_temp.id('batchA')) = 86,
+  (pg_temp.j('undoA1') - 'blockers')::text
+);
+
+select pg_temp.act_as(pg_temp.id('admin'));
+insert into test_json select 'undoB', public.undo_import_batch(pg_temp.id('batchB'));
+insert into test_json select 'undoA2', public.undo_import_batch(pg_temp.id('batchA'));
+reset role;
+
+select pg_temp.record(
+  'annullato prima l''import B, l''import A si annulla: nessuna riga rimasta di A né di B',
+  (pg_temp.j('undoB') ->> 'ok')::boolean
+  and (pg_temp.j('undoA2') ->> 'ok')::boolean
+  and (pg_temp.j('undoA2') -> 'eliminati' ->> 'soggetti')::int = 86
+  and not exists (select 1 from public.parties where import_batch_id in (pg_temp.id('batchA'), pg_temp.id('batchB')))
+  and not exists (select 1 from public.opportunities where import_batch_id in (pg_temp.id('batchA'), pg_temp.id('batchB')))
+  and not exists (select 1 from public.activities where import_batch_id in (pg_temp.id('batchA'), pg_temp.id('batchB')))
+  and not exists (select 1 from public.contacts where import_batch_id in (pg_temp.id('batchA'), pg_temp.id('batchB')))
+  and (select count(*) from public.import_batches where id in (pg_temp.id('batchA'), pg_temp.id('batchB')) and annullato_il is not null) = 2,
+  concat_ws(' | ', pg_temp.j('undoB') -> 'eliminati', pg_temp.j('undoA2') -> 'eliminati')
+);
+
+select pg_temp.record(
+  'batch annullato: conteggi dell''import ancora leggibili sul batch',
+  (select (conteggi ->> 'righe')::int = 102 and annullato_il is not null from public.import_batches where id = pg_temp.id('batchA'))
+);
 
 -- ---------------------------------------------------------------------------
 -- Report: one result set (the last one), also returned by the Management API.

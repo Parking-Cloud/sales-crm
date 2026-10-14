@@ -9,6 +9,7 @@ import { lossReasonFor, offerRejectionReason } from "../../src/lib/import/loss-r
 import { CRM_2026, proposeMapping } from "../../src/lib/import/presets";
 import { buildPlan, type PlanRow } from "../../src/lib/import/transform";
 import { safeCall, TIMEOUT_MESSAGE } from "../../src/lib/import/safe-call";
+import { readUndo } from "../../src/lib/import/undo";
 import {
   cleanText,
   compactRows,
@@ -139,6 +140,40 @@ test("server action calls: errors and timeouts become a message", async () => {
   assert.deepEqual(await safeCall(async () => undefined as never), { ok: false, message: TIMEOUT_MESSAGE });
 });
 
+test("undo result: done, blocked with odd values, unknown", () => {
+  assert.deepEqual(readUndo({ ok: true, totale: 0, cause: [], blockers: [], eliminati: { soggetti: 75, attivita: 113 } }), {
+    blocked: null,
+    eliminati: { soggetti: 75, attivita: 113 },
+  });
+  const party = "00000000-0000-4000-8000-000000000001";
+  const batch = "00000000-0000-4000-8000-000000000002";
+  const blocked = readUndo({
+    ok: false,
+    totale: 262,
+    cause: [{ batch_id: batch, file: "originale.xlsx", created_at: "2026-10-14T09:00:00Z", n: 262 }, { batch_id: null, n: "x" }],
+    blockers: [
+      { tabella: "activities", id: "a", descrizione: null, party_id: party, soggetto: { richText: [] }, batch_id: batch },
+      null,
+      "testo",
+    ],
+  });
+  assert.deepEqual(blocked, {
+    blocked: {
+      totale: 262,
+      cause: [
+        { batchId: batch, file: "originale.xlsx", createdAt: "2026-10-14T09:00:00Z", n: 262 },
+        { batchId: null, file: null, createdAt: null, n: 0 },
+      ],
+      blockers: [
+        { tabella: "activities", id: "a", descrizione: "Modifica dopo l'import", partyId: party, soggetto: "Soggetto senza nome", batchId: batch },
+      ],
+    },
+    eliminati: {},
+  });
+  assert.equal(readUndo(null), null);
+  assert.equal(readUndo({ blockers: [] }), null);
+});
+
 test("CSV: whitespace-only rows dropped, row numbers kept", () => {
   const encoder = new TextEncoder();
   const { sheets } = readCsv(encoder.encode("Nome;Settore\n ; \nAzienda Esempio Srl;#N/A\n;\n").buffer as ArrayBuffer, "prova.csv");
@@ -199,7 +234,7 @@ test("fixture: anagrafica rows", async () => {
   assert.equal(first.contact?.email, "amministrazione@azienda-esempio.example");
   assert.equal(first.opportunity.fase, "interessata");
   assert.equal(first.opportunity.posti_richiesti, 5);
-  assert.equal(first.externalId, "Anagrafica Attvità Commerciali#73");
+  assert.equal(first.externalId, "Anagrafica Attvità Commerciali#90073");
   assert.deepEqual(
     first.activities.map((activity) => [activity.tipo, activity.data]),
     [["chiamata", "2026-09-24"], ["email", "2026-09-24"], ["nota", "2026-09-24"], ["nota", "2026-10-05"]],

@@ -4,8 +4,23 @@ import { Badge } from "@/components/ui/badge";
 import { buttonClasses } from "@/components/ui/button";
 import { formatDate, formatNumber } from "@/lib/format";
 import type { Batch } from "@/lib/import/queries";
-import type { UndoBlocker } from "@/app/(app)/import/actions";
+import type { undoImport } from "@/app/(app)/import/actions";
+import type { UndoBlocked } from "@/lib/import/undo";
 import { UndoControl } from "./undo-control";
+
+const DATE_TIME = new Intl.DateTimeFormat("it-IT", {
+  day: "2-digit",
+  month: "2-digit",
+  year: "numeric",
+  hour: "2-digit",
+  minute: "2-digit",
+  timeZone: "Europe/Rome",
+});
+
+function formatDateTime(value: string): string {
+  const date = new Date(value);
+  return Number.isNaN(date.getTime()) ? "–" : DATE_TIME.format(date).replace(",", " alle");
+}
 
 function Stat({ label, value }: { label: string; value: number | undefined }) {
   return (
@@ -23,13 +38,15 @@ export function BatchSummary({
   undoPreview,
 }: {
   batch: Batch;
-  remaining: Record<string, number>;
+  // Rows still present; null for a cancelled import (nothing is read).
+  remaining: Record<string, number> | null;
   isAdmin: boolean;
-  // For previews only.
-  undoPreview?: { open?: boolean; blockers?: UndoBlocker[] };
+  // For previews and end-to-end tests only.
+  undoPreview?: { open?: boolean; blocked?: UndoBlocked; action?: typeof undoImport };
 }) {
-  const counts = batch.conteggi;
-  const reportRows = counts.report?.length ?? 0;
+  const counts = batch.conteggi ?? {};
+  const cancelled = Boolean(batch.annullato_il);
+  const reportRows = Array.isArray(counts.report) ? counts.report.length : 0;
   return (
     <>
       <p className="text-caption">
@@ -44,11 +61,18 @@ export function BatchSummary({
           {batch.utente && <> · {batch.utente}</>}
         </span>
         {batch.annullato_il ? (
-          <Badge tone="neutral">Annullato il {formatDate(batch.annullato_il)}</Badge>
+          <Badge tone="neutral">Annullato</Badge>
         ) : (
           <Badge tone="success">Importato</Badge>
         )}
       </p>
+
+      {batch.annullato_il && (
+        <Alert tone="info" title={`Import annullato il ${formatDateTime(batch.annullato_il)}`} className="mt-6">
+          Soggetti, contatti, opportunità, attività e offerte creati da questo import sono stati cancellati. I numeri
+          qui sotto sono quelli registrati al momento dell&apos;import.
+        </Alert>
+      )}
 
       <dl className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-4">
         <Stat label="Righe lette" value={counts.righe} />
@@ -62,10 +86,12 @@ export function BatchSummary({
       </dl>
 
       <div className="mt-6 flex flex-col gap-4">
-        <Alert tone="warning" title="Permessi email da ristabilire">
-          L&apos;import non crea permessi per l&apos;email. Prima di scrivere a un contatto importato, registra il
-          permesso (richiesta in chiamata, contatto in entrata o consenso).
-        </Alert>
+        {!cancelled && (
+          <Alert tone="warning" title="Permessi email da ristabilire">
+            L&apos;import non crea permessi per l&apos;email. Prima di scrivere a un contatto importato, registra il
+            permesso (richiesta in chiamata, contatto in entrata o consenso).
+          </Alert>
+        )}
         {reportRows > 0 && (
           <div>
             <a href={`/import/${batch.id}/report`} className={buttonClasses("secondary", "md", "h-auto py-2 text-left whitespace-normal!")} download>
@@ -73,15 +99,15 @@ export function BatchSummary({
             </a>
           </div>
         )}
-        {!batch.annullato_il && (
+        {!cancelled && remaining && (
           <p className="text-caption text-black-60">
             Ancora presenti da questo import: {formatNumber(remaining.parties ?? 0)} soggetti, {formatNumber(remaining.contacts ?? 0)} contatti,{" "}
             {formatNumber(remaining.opportunities ?? 0)} opportunità, {formatNumber(remaining.activities ?? 0)} attività,{" "}
             {formatNumber(remaining.offers ?? 0)} offerte.
           </p>
         )}
-        {isAdmin && !batch.annullato_il && (
-          <UndoControl batchId={batch.id} initiallyOpen={undoPreview?.open} initialBlockers={undoPreview?.blockers ?? null} />
+        {isAdmin && !cancelled && (
+          <UndoControl batchId={batch.id} initiallyOpen={undoPreview?.open} initialBlocked={undoPreview?.blocked ?? null} action={undoPreview?.action} />
         )}
       </div>
     </>

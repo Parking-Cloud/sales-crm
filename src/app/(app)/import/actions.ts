@@ -7,6 +7,7 @@ import type { ReportRow } from "@/lib/import/queries";
 import { buildPlan, finalStatus, type DuplicateHit, type PlanRow, type SheetInput } from "@/lib/import/transform";
 import { compactRows, type Cell } from "@/lib/import/values";
 import { MAX_COLUMNS, MAX_ROWS } from "@/lib/import/limits";
+import { isUuid, readUndo, type UndoResult } from "@/lib/import/undo";
 import { createClient } from "@/lib/supabase/server";
 
 // Import flow (CRM-12…CRM-15). Administrators only; RLS and the SQL
@@ -227,20 +228,47 @@ export async function runImport(fileName: string, rows: PlanRow[]): Promise<Resu
 }
 
 // 6. Undo.
-export type UndoBlocker = { tabella: string; id: string; descrizione: string };
-
-export async function undoImport(batchId: string): Promise<Result<{ blockers: UndoBlocker[] }>> {
+export async function undoImport(batchId: string): Promise<Result<UndoResult>> {
+  const time = stopwatch("annullamento");
   if (!(await isAdmin())) return { ok: false, message: "Solo l'amministratore può annullare un import." };
-  const supabase = await createClient();
-  const { data, error } = await supabase.rpc("undo_import_batch", { p_batch: batchId });
-  if (error) {
-    return { ok: false, message: error.code === "22023" ? "Questo import è già stato annullato." : "Annullamento non riuscito: nessun dato è stato cancellato." };
+  if (!isUuid(batchId)) return { ok: false, message: "Import non trovato." };
+  time.step("utente");
+  try {
+    const supabase = await createClient();
+    const { data, error } = await supabase.rpc("undo_import_batch", { p_batch: batchId });
+    time.step("database");
+    if (error) {
+      time.log({ errore: 1 });
+      return {
+        ok: false,
+        message:
+          error.code === "22023"
+            ? "Questo import è già stato annullato."
+            : error.code === "P0002"
+              ? "Import non trovato."
+              : "Annullamento non riuscito: nessun dato è stato cancellato. Riprova.",
+      };
+    }
+    const result = readUndo(data);
+    if (!result) {
+      time.log({ errore: 1 });
+      return { ok: false, message: "Annullamento non riuscito: risposta non riconosciuta. Ricarica la pagina per vedere lo stato dell'import." };
+    }
+    time.log({
+      bloccato: result.blocked ? 1 : 0,
+      blocchi: result.blocked?.totale ?? 0,
+      ...Object.fromEntries(Object.entries(result.eliminati).map(([key, value]) => [`eliminati_${key}`, value])),
+    });
+    if (!result.blocked) {
+      revalidatePath("/import");
+      revalidatePath(`/import/${batchId}`);
+      revalidatePath("/soggetti", "layout");
+    }
+    return { ok: true, data: result };
+  } catch {
+    time.log({ errore: 1 });
+    return { ok: false, message: "Annullamento non riuscito: nessun dato è stato cancellato. Riprova." };
   }
-  const result = data as { ok: boolean; blockers: UndoBlocker[] };
-  revalidatePath("/import");
-  revalidatePath(`/import/${batchId}`);
-  revalidatePath("/soggetti");
-  return { ok: true, data: { blockers: result.ok ? [] : result.blockers } };
 }
 
 // Saved mappings (CRM-13).
