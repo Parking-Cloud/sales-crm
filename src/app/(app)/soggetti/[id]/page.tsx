@@ -4,7 +4,9 @@ import { PartyDetail } from "@/components/parties/party-detail";
 import { getCurrentUser } from "@/lib/auth/current-user";
 import { SIGN_IN_PATH } from "@/lib/auth/routes";
 import { partyName } from "@/lib/parties/labels";
-import { getParty, getPartyExtras, listContacts, listDistances, listHistory, listLocations, listProvenance } from "@/lib/parties/queries";
+import { getParty, getPartyExtras, listContacts, listDistances, listLocations, listProvenance } from "@/lib/parties/queries";
+import { listTimeline } from "@/lib/pipeline/history";
+import { listPartyOpportunities } from "@/lib/pipeline/queries";
 import { getMaxParkingDistance } from "@/lib/settings/queries";
 
 const UUID = /^[0-9a-f-]{36}$/i;
@@ -27,14 +29,18 @@ export default async function PartyPage({ params }: { params: Promise<{ id: stri
   if (party.merged_into_id) redirect(`/soggetti/${party.merged_into_id}`);
 
   const maxDistance = await getMaxParkingDistance();
-  const [locations, contacts, distances, extras] = await Promise.all([
+  const [locations, contacts, distances, extras, opportunities] = await Promise.all([
     listLocations(id),
     listContacts(id),
     listDistances(id, maxDistance.meters),
     getPartyExtras(party),
+    listPartyOpportunities(id),
   ]);
   const contactIds = contacts.map((contact) => contact.id);
-  const [provenance, history] = await Promise.all([listProvenance(id, contactIds), listHistory(id, contactIds, locations.map((location) => location.id))]);
+  const [provenance, timeline] = await Promise.all([
+    listProvenance(id, contactIds),
+    listTimeline({ partyId: id, contactIds, locationIds: locations.map((location) => location.id) }),
+  ]);
 
   return (
     <PartyDetail
@@ -47,7 +53,8 @@ export default async function PartyPage({ params }: { params: Promise<{ id: stri
       now={Date.now()}
       placeId={extras.placeId}
       noteAuthor={extras.noteAuthor}
-      history={history}
+      opportunities={opportunities}
+      timeline={timeline}
       isAdmin={user.isAdmin}
     />
   );

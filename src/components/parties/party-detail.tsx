@@ -2,7 +2,6 @@ import Link from "next/link";
 import { Alert } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
 import { ButtonLink } from "@/components/ui/button";
-import { EmptyState } from "@/components/ui/empty-state";
 import { Table, Td, Th, Tr } from "@/components/ui/table";
 import { formatDate, formatNumber } from "@/lib/format";
 import { OSM_ATTRIBUTION, OSM_COPYRIGHT_URL } from "@/lib/geo/osm-attribution";
@@ -16,14 +15,19 @@ import {
   PRIVATE_PARKING_LABELS,
   partyName,
 } from "@/lib/parties/labels";
-import type { Contact, Distance, HistoryEntry, Party, PartyLocation, Provenance } from "@/lib/parties/queries";
+import type { Contact, Distance, Party, PartyLocation, Provenance } from "@/lib/parties/queries";
+import type { TimelineEntry } from "@/lib/pipeline/history";
+import { opportunityBadge } from "@/lib/pipeline/labels";
+import type { PipelineItem } from "@/lib/pipeline/queries";
+import { ActivityButton } from "@/components/pipeline/activity-dialog";
+import { NextActivity } from "@/components/pipeline/next-activity";
+import { Timeline } from "@/components/pipeline/timeline";
 import { TRACKED_FIELD_LABELS, type TrackedField } from "@/lib/parties/validation";
 import { DoNotContactBadge } from "./data-status-badge";
 import { DeletePartyControl } from "./delete-party-control";
 import { DoNotContactControl } from "./do-not-contact-control";
 import { LocationCoordinates } from "./location-coordinates";
 import { NotesCard } from "@/components/notes-card";
-import { HistoryList } from "./history-list";
 import { ProvenanceBadge } from "./provenance";
 
 const COORDINATE = new Intl.NumberFormat("it-IT", { minimumFractionDigits: 6, maximumFractionDigits: 6 });
@@ -83,7 +87,8 @@ export function PartyDetail({
   now,
   placeId,
   noteAuthor,
-  history,
+  opportunities,
+  timeline,
   isAdmin,
   dialogOpenFor,
 }: {
@@ -98,7 +103,8 @@ export function PartyDetail({
   // Google place id of the party, when it came from the map search.
   placeId: string | null;
   noteAuthor: string | null;
-  history: HistoryEntry[];
+  opportunities: PipelineItem[];
+  timeline: TimelineEntry[];
   isAdmin: boolean;
   // For previews only: open the "Non contattare" dialog of this record.
   dialogOpenFor?: string;
@@ -144,6 +150,7 @@ export function PartyDetail({
           </div>
         </div>
         <div className="flex flex-wrap gap-2">
+          <ActivityButton opportunityId={null} partyId={party.id} subject={name} />
           <ButtonLink href={`/soggetti/${party.id}/modifica`}>Modifica</ButtonLink>
           <DoNotContactControl
             entita="parties"
@@ -386,7 +393,32 @@ export function PartyDetail({
         </Section>
 
         <Section id="opportunita" title="Opportunità">
-          <EmptyState title="Disponibile nei prossimi rilasci" />
+          {opportunities.length === 0 ? (
+            <p className="text-body text-black-60">Nessuna opportunità: nascono dall&apos;import o dal collegamento con un parcheggio.</p>
+          ) : (
+            <ul className="flex flex-col divide-y divide-grey-60">
+              {opportunities.map((item) => {
+                const badge = opportunityBadge(item.fase, item.esito);
+                return (
+                  <li key={item.id} className="flex flex-col gap-2 py-3 first:pt-0 last:pb-0 md:flex-row md:items-center md:justify-between">
+                    <div className="min-w-0">
+                      <p className="flex flex-wrap items-center gap-2">
+                        <Link href={`/opportunita/${item.id}`} className="rounded-xs font-semibold text-blue-ink underline-offset-2 hover:underline">
+                          {item.parking}
+                        </Link>
+                        <Badge tone={badge.tone}>{badge.label}</Badge>
+                      </p>
+                      <p className="text-caption text-black-80">{item.responsabile ? `Responsabile: ${item.responsabile}` : "Senza responsabile"}</p>
+                      {item.esito === "aperta" && <NextActivity item={item} now={now} />}
+                    </div>
+                    {item.esito === "aperta" && (
+                      <ActivityButton opportunityId={item.id} partyId={party.id} subject={`${name} · ${item.parking}`} />
+                    )}
+                  </li>
+                );
+              })}
+            </ul>
+          )}
         </Section>
 
         <Section id="provenienza" title="Provenienza dei dati">
@@ -422,8 +454,8 @@ export function PartyDetail({
           )}
         </Section>
 
-        <Section id="cronologia" title="Cronologia delle modifiche">
-          <HistoryList entries={history} />
+        <Section id="storico" title="Storico">
+          <Timeline entries={timeline} />
         </Section>
       </div>
     </>
