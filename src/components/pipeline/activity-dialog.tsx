@@ -2,7 +2,8 @@
 
 import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
-import { logActivity, moveStage } from "@/app/(app)/pipeline/actions";
+import { listCallRecipients, type CallRecipient } from "@/app/(app)/email/actions";
+import { logActivity, moveStage, type ActivityResult } from "@/app/(app)/pipeline/actions";
 import { Alert } from "@/components/ui/alert";
 import { Button, type ButtonSize } from "@/components/ui/button";
 import { Dialog } from "@/components/ui/dialog";
@@ -11,12 +12,16 @@ import { safeCall } from "@/lib/import/safe-call";
 import { addDays, romeDay } from "@/lib/pipeline/dates";
 import { ACTIVITY_LABELS, ACTIVITY_TYPES, CALL_OUTCOMES, CALL_OUTCOME_LABELS, type ActivityKind, type CallOutcome } from "@/lib/pipeline/labels";
 
-type Actions = { log: typeof logActivity; move: typeof moveStage };
+type Actions = { log: typeof logActivity; move: typeof moveStage; recipients?: typeof listCallRecipients };
+
+const GENERAL = "generale";
 
 // "Registra chiamata" (CRM-18) in 2 clicks: open, then one of the outcomes,
 // which saves. The next activity is prefilled for tomorrow at 9:00: used by
 // "Richiamare" (where it is required) and, when ticked, by the others.
 // Other kinds (email, meeting, note) are chosen in the same dialog.
+// With "Risposto", "Ha chiesto di ricevere l'email" also registers the email
+// permission (block 1a-7, B4) and proposes to prepare the email right away.
 export function ActivityButton({
   opportunityId,
   partyId,
@@ -48,8 +53,15 @@ export function ActivityButton({
   const [ora, setOra] = useState("09:00");
   const [prossimaTipo, setProssimaTipo] = useState<ActivityKind>("chiamata");
   const [error, setError] = useState<string | null>(null);
-  const [propose, setPropose] = useState(false);
+  const [after, setAfter] = useState<ActivityResult | null>(null);
+  const [alsoContacted, setAlsoContacted] = useState(true);
+  const [askedEmail, setAskedEmail] = useState(false);
+  const [recipients, setRecipients] = useState<CallRecipient[] | null>(null);
+  const [recipientKey, setRecipientKey] = useState("");
+  const [recipientEmail, setRecipientEmail] = useState("");
   const [pending, startTransition] = useTransition();
+  const loadRecipients = actions.recipients ?? listCallRecipients;
+  const recipient = recipients?.find((item) => (item.id ?? GENERAL) === recipientKey) ?? null;
 
   function reset() {
     setTipo("chiamata");
@@ -59,13 +71,42 @@ export function ActivityButton({
     setOra("09:00");
     setProssimaTipo("chiamata");
     setError(null);
-    setPropose(false);
+    setAfter(null);
+    setAlsoContacted(true);
+    setAskedEmail(false);
+    setRecipients(null);
+    setRecipientKey("");
+    setRecipientEmail("");
+  }
+
+  function close() {
+    setOpen(false);
+    reset();
+  }
+
+  function toggleAskedEmail(checked: boolean) {
+    setAskedEmail(checked);
+    if (!checked || recipients) return;
+    startTransition(async () => {
+      const result = await safeCall(() => loadRecipients({ partyId, opportunityId }));
+      if (!result.ok) return setError(result.message);
+      const list = result.data.recipients.filter((item) => item.disponibile);
+      setRecipients(list);
+      const preferred =
+        list.find((item) => item.id === result.data.contactId) ?? list.find((item) => item.id !== null && item.email) ?? list.find((item) => item.id !== null) ?? list[0];
+      setRecipientKey(preferred ? (preferred.id ?? GENERAL) : "");
+    });
   }
 
   function save(esito: CallOutcome | null) {
     setError(null);
     const withNext = esito === "richiamare" || planNext;
     if (esito === "richiamare" && !giorno) return setError('Con "Richiamare" indica quando richiamare.');
+    const permesso = esito === "risposto" && askedEmail ? recipient : null;
+    if (esito === "risposto" && askedEmail) {
+      if (!permesso) return setError("Scegli a chi mandare l'email.");
+      if (!permesso.email && !recipientEmail.trim()) return setError("Scrivi l'indirizzo email che ti ha dato.");
+    }
     startTransition(async () => {
       const result = await safeCall(() =>
         actions.log({
@@ -77,29 +118,38 @@ export function ActivityButton({
           prossimaGiorno: withNext ? giorno : "",
           prossimaOra: withNext ? ora : "",
           prossimaTipo: esito === "richiamare" ? "chiamata" : prossimaTipo,
+          permesso: permesso ? { contactId: permesso.id, email: permesso.email ? "" : recipientEmail.trim() } : null,
         }),
       );
       if (!result.ok) return setError(result.message);
       router.refresh();
-      if (result.data.proponiContattata && opportunityId) {
-        setPropose(true);
+      if ((result.data.proponiContattata && opportunityId) || result.data.permesso) {
+        setAfter(result.data);
         return;
       }
-      setOpen(false);
-      reset();
+      close();
     });
   }
 
-  function toContacted() {
-    if (!opportunityId) return;
+  // After the call: optionally "Contattata", then close or prepare the email.
+  function finish(move: boolean, then?: string) {
     startTransition(async () => {
-      const result = await safeCall(() => actions.move(opportunityId, "contattata"));
-      if (!result.ok) return setError(result.message);
-      router.refresh();
-      setOpen(false);
-      reset();
+      if (move && opportunityId) {
+        const result = await safeCall(() => actions.move(opportunityId, "contattata"));
+        if (!result.ok) return setError(result.message);
+      }
+      if (then) router.push(then);
+      else router.refresh();
+      close();
     });
   }
+
+  const contactedQuestion = Boolean(after?.proponiContattata && opportunityId);
+  const permissionDone = after?.permesso?.registrato === true;
+  const emailHref =
+    after?.partyId && after.permesso?.registrato
+      ? `/email/prepara?soggetto=${after.partyId}&contatto=${after.permesso.contactId ?? GENERAL}${opportunityId ? `&opportunita=${opportunityId}` : ""}`
+      : null;
 
   return (
     <>
@@ -108,29 +158,34 @@ export function ActivityButton({
       </Button>
       <Dialog
         open={open}
-        title={propose ? "Chiamata registrata" : `${tipo === "chiamata" ? "Chiamata" : "Attività"}: ${subject}`}
+        title={after ? "Chiamata registrata" : `${tipo === "chiamata" ? "Chiamata" : "Attività"}: ${subject}`}
         busy={pending}
-        onClose={() => {
-          setOpen(false);
-          reset();
-        }}
+        onClose={close}
         footer={
-          propose ? (
-            <>
-              <Button
-                size="md"
-                disabled={pending}
-                onClick={() => {
-                  setOpen(false);
-                  reset();
-                }}
-              >
-                Lascia la fase com&apos;è
+          after ? (
+            permissionDone && emailHref ? (
+              <>
+                <Button size="md" disabled={pending} onClick={() => finish(contactedQuestion && alsoContacted)}>
+                  Chiudi
+                </Button>
+                <Button variant="primary" size="md" disabled={pending} onClick={() => finish(contactedQuestion && alsoContacted, emailHref)}>
+                  Prepara l&apos;email
+                </Button>
+              </>
+            ) : contactedQuestion ? (
+              <>
+                <Button size="md" disabled={pending} onClick={() => finish(false)}>
+                  Lascia la fase com&apos;è
+                </Button>
+                <Button variant="primary" size="md" disabled={pending} onClick={() => finish(true)}>
+                  Passa a Contattata
+                </Button>
+              </>
+            ) : (
+              <Button variant="primary" size="md" disabled={pending} onClick={() => finish(false)}>
+                Chiudi
               </Button>
-              <Button variant="primary" size="md" disabled={pending} onClick={toContacted}>
-                Passa a Contattata
-              </Button>
-            </>
+            )
           ) : (
             // The outcomes stay in the footer, always in view: on a phone
             // too the call is saved with the second click.
@@ -157,15 +212,7 @@ export function ActivityButton({
                 </div>
               )}
               <div className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
-                <Button
-                  size={tipo === "chiamata" ? "sm" : "md"}
-                  variant={tipo === "chiamata" ? "ghost" : "secondary"}
-                  disabled={pending}
-                  onClick={() => {
-                    setOpen(false);
-                    reset();
-                  }}
-                >
+                <Button size={tipo === "chiamata" ? "sm" : "md"} variant={tipo === "chiamata" ? "ghost" : "secondary"} disabled={pending} onClick={close}>
                   Annulla
                 </Button>
                 {tipo !== "chiamata" && (
@@ -178,10 +225,25 @@ export function ActivityButton({
           )
         }
       >
-        {propose ? (
-          <p className="text-body">
-            È la prima chiamata con risposta su questa opportunità, che è ancora tra le prime fasi. Vuoi passarla a &ldquo;Contattata&rdquo;?
-          </p>
+        {after ? (
+          <div className="flex flex-col gap-3">
+            {after.permesso?.registrato && <Alert tone="success">Permesso email registrato: puoi preparare l&apos;email adesso.</Alert>}
+            {after.permesso && !after.permesso.registrato && <Alert tone="warning">{after.permesso.messaggio}</Alert>}
+            {contactedQuestion &&
+              (permissionDone ? (
+                <Checkbox
+                  checked={alsoContacted}
+                  onChange={(event) => setAlsoContacted(event.target.checked)}
+                  label="Passa anche l'opportunità a &ldquo;Contattata&rdquo;"
+                  hint="È la prima chiamata con risposta e l'opportunità è ancora tra le prime fasi."
+                />
+              ) : (
+                <p className="text-body">
+                  È la prima chiamata con risposta su questa opportunità, che è ancora tra le prime fasi. Vuoi passarla a &ldquo;Contattata&rdquo;?
+                </p>
+              ))}
+            {error && <Alert tone="critical">{error}</Alert>}
+          </div>
         ) : (
           <div className="flex flex-col gap-4">
             <div className="grid gap-4 sm:grid-cols-[1fr_2fr]">
@@ -241,6 +303,46 @@ export function ActivityButton({
                 hint="Con &ldquo;Richiamare&rdquo; si pianifica sempre, alla data indicata."
               />
             </fieldset>
+
+            {tipo === "chiamata" && (
+              <div className="rounded-sm border border-grey-60 p-3">
+                <Checkbox
+                  checked={askedEmail}
+                  onChange={(event) => toggleAskedEmail(event.target.checked)}
+                  label="Ha chiesto di ricevere l'email"
+                  hint="Vale con l'esito Risposto: registra il permesso email e propone di preparare l'email."
+                />
+                {askedEmail && recipients && (
+                  <div className="mt-3 grid gap-3 sm:grid-cols-2">
+                    {recipients.length === 0 ? (
+                      <p className="text-caption text-error-ink sm:col-span-2">Nessun destinatario disponibile: tutti da non contattare.</p>
+                    ) : (
+                      <Field id="permesso-destinatario" label="A chi">
+                        <Select id="permesso-destinatario" value={recipientKey} onChange={(event) => setRecipientKey(event.target.value)}>
+                          {recipients.map((item) => (
+                            <option key={item.id ?? GENERAL} value={item.id ?? GENERAL}>
+                              {item.nome}
+                              {item.email ? ` – ${item.email}` : " – senza email"}
+                            </option>
+                          ))}
+                        </Select>
+                      </Field>
+                    )}
+                    {recipient && !recipient.email && (
+                      <Field id="permesso-indirizzo" label="Indirizzo email" required>
+                        <Input
+                          id="permesso-indirizzo"
+                          type="email"
+                          inputMode="email"
+                          value={recipientEmail}
+                          onChange={(event) => setRecipientEmail(event.target.value)}
+                        />
+                      </Field>
+                    )}
+                  </div>
+                )}
+              </div>
+            )}
           </div>
         )}
       </Dialog>

@@ -5,6 +5,7 @@ import { getCurrentUser } from "@/lib/auth/current-user";
 import { SIGN_IN_PATH } from "@/lib/auth/routes";
 import { partyName } from "@/lib/parties/labels";
 import { getParty, getPartyExtras, listContacts, listDistances, listLocations, listProvenance } from "@/lib/parties/queries";
+import { listPartyPermissions } from "@/lib/email/queries";
 import { listTimeline } from "@/lib/pipeline/history";
 import { listParkingChoices, listPartyOpportunities } from "@/lib/pipeline/queries";
 import { getMaxParkingDistance } from "@/lib/settings/queries";
@@ -38,9 +39,10 @@ export default async function PartyPage({ params }: { params: Promise<{ id: stri
     listParkingChoices(id),
   ]);
   const contactIds = contacts.map((contact) => contact.id);
-  const [provenance, timeline] = await Promise.all([
+  const [provenance, timeline, permissions] = await Promise.all([
     listProvenance(id, contactIds),
     listTimeline({ partyId: id, contactIds, locationIds: locations.map((location) => location.id) }),
+    listPartyPermissions(id, contactIds),
   ]);
 
   return (
@@ -56,6 +58,7 @@ export default async function PartyPage({ params }: { params: Promise<{ id: stri
       noteAuthor={extras.noteAuthor}
       opportunities={opportunities}
       parkingChoices={parkingChoices}
+      permissions={permissions}
       timeline={timeline}
       isAdmin={user.isAdmin}
     />

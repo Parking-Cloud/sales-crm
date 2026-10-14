@@ -28,6 +28,8 @@ import { DoNotContactBadge } from "./data-status-badge";
 import { DeletePartyControl } from "./delete-party-control";
 import { DoNotContactControl } from "./do-not-contact-control";
 import { GdprEraseControl } from "./gdpr-erase-control";
+import { PermissionBadge, RegisterPermissionButton } from "@/components/email/permission-controls";
+import type { EmailPermission } from "@/lib/email/queries";
 import { LocationCoordinates } from "./location-coordinates";
 import { NotesCard } from "@/components/notes-card";
 import { ProvenanceBadge } from "./provenance";
@@ -91,6 +93,7 @@ export function PartyDetail({
   noteAuthor,
   opportunities,
   parkingChoices,
+  permissions,
   timeline,
   isAdmin,
   dialogOpenFor,
@@ -108,6 +111,8 @@ export function PartyDetail({
   noteAuthor: string | null;
   opportunities: PipelineItem[];
   parkingChoices: ParkingChoice[];
+  // Active email permissions of the party and its contacts.
+  permissions: EmailPermission[];
   timeline: TimelineEntry[];
   isAdmin: boolean;
   // For previews only: open the "Non contattare" dialog of this record.
@@ -116,7 +121,8 @@ export function PartyDetail({
   const name = partyName(party);
   const company = party.tipo === "azienda";
   const erased = party.gdpr_cancellato_il !== null;
-
+  const emailHref = `/email/prepara?soggetto=${party.id}`;
+  const permissionOf = (contactId: string | null) => permissions.find((row) => row.contactId === contactId) ?? null;
   const partyProvenance = (field: TrackedField) =>
     provenance.find((row) => row.entita === "parties" && row.entita_id === party.id && row.campo === field);
   const contactProvenance = (contactId: string) =>
@@ -160,6 +166,7 @@ export function PartyDetail({
         ) : (
           <div className="flex flex-wrap gap-2">
             <ActivityButton opportunityId={null} partyId={party.id} subject={name} />
+            {!party.non_contattare && <ButtonLink href={emailHref}>Prepara email</ButtonLink>}
             <ButtonLink href={`/soggetti/${party.id}/modifica`}>Modifica</ButtonLink>
             <DoNotContactControl
               entita="parties"
@@ -202,9 +209,15 @@ export function PartyDetail({
             {tracked(
               "email",
               party.email && (
-                <a href={`mailto:${party.email}`} className="rounded-xs text-blue-ink underline underline-offset-2">
-                  {party.email}
-                </a>
+                <span className="flex flex-col items-start gap-1">
+                  <a href={`mailto:${party.email}`} className="rounded-xs text-blue-ink underline underline-offset-2">
+                    {party.email}
+                  </a>
+                  <PermissionBadge permission={permissionOf(null)} />
+                  {!permissionOf(null) && !party.non_contattare && !erased && (
+                    <RegisterPermissionButton partyId={party.id} contactId={null} name={`${name} (indirizzo generale)`} hasEmail />
+                  )}
+                </span>
               ),
               Boolean(party.email),
             )}
@@ -355,6 +368,7 @@ export function PartyDetail({
                   <Th>Email</Th>
                   <Th>Telefono</Th>
                   <Th>Canale preferito</Th>
+                  <Th>Permesso email</Th>
                   <Th>Provenienza</Th>
                   <Th>
                     <span className="sr-only">Azioni</span>
@@ -380,6 +394,14 @@ export function PartyDetail({
                       <Td>{contact.email ?? "–"}</Td>
                       <Td wrap>{contact.telefono ?? "–"}</Td>
                       <Td>{contact.canale_preferito ? CONTACT_CHANNEL_LABELS[contact.canale_preferito] : "–"}</Td>
+                      <Td wrap>
+                        <span className="flex flex-col items-start gap-1">
+                          <PermissionBadge permission={permissionOf(contact.id)} />
+                          {!permissionOf(contact.id) && !contact.non_contattare && !party.non_contattare && (
+                            <RegisterPermissionButton partyId={party.id} contactId={contact.id} name={contactName} hasEmail={Boolean(contact.email)} />
+                          )}
+                        </span>
+                      </Td>
                       <Td wrap>
                         <ProvenanceBadge provenance={contactProvenance(contact.id)} />
                       </Td>

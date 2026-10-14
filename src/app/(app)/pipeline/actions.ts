@@ -169,6 +169,17 @@ export type ActivityInput = {
   prossimaGiorno: string;
   prossimaOra: string;
   prossimaTipo: ActivityKind;
+  // "Ha chiesto di ricevere l'email" (block 1a-7, B4): with "risposto" the
+  // email permission is registered too, for the contact (null: the party's
+  // own address), with the address when it was missing.
+  permesso?: { contactId: string | null; email: string } | null;
+};
+
+export type ActivityResult = {
+  proponiContattata: boolean;
+  // Party of the activity, for the "Prepara email" link.
+  partyId: string | null;
+  permesso: { registrato: true; contactId: string | null } | { registrato: false; messaggio: string } | null;
 };
 
 function nextInstant(day: string, time: string): Date | null | "invalid" {
@@ -177,7 +188,7 @@ function nextInstant(day: string, time: string): Date | null | "invalid" {
   return romeInstant(day, time || "09:00");
 }
 
-export async function logActivity(input: ActivityInput): Promise<Result<{ proponiContattata: boolean }>> {
+export async function logActivity(input: ActivityInput): Promise<Result<ActivityResult>> {
   const time = stopwatch("pipeline.attivita");
   if (!(await getCurrentUser())) return { ok: false, message: NOT_ALLOWED };
   const opportunityId = input?.opportunityId && UUID.test(input.opportunityId) ? input.opportunityId : null;
@@ -204,8 +215,36 @@ export async function logActivity(input: ActivityInput): Promise<Result<{ propon
   });
   time.log({ chiamata: input.tipo === "chiamata" ? 1 : 0, prossima: next ? 1 : 0, errore: error ? 1 : 0 });
   if (error) return { ok: false, message: dbMessage(error) };
-  refresh(opportunityId, partyId ?? (opportunityId ? await partyOf(opportunityId) : null));
-  return { ok: true, data: { proponiContattata: Boolean((data as { proponi_contattata?: boolean } | null)?.proponi_contattata) } };
+  const party = partyId ?? (opportunityId ? await partyOf(opportunityId) : null);
+
+  let permesso: ActivityResult["permesso"] = null;
+  const asked = esito === "risposto" ? input.permesso : null;
+  if (asked && party && (asked.contactId === null || UUID.test(asked.contactId))) {
+    const { error: permissionError } = await supabase.rpc("register_email_permission", {
+      // One of the two: the contact, or the party's own address.
+      p_contact: asked.contactId as string,
+      p_party: (asked.contactId ? null : party) as string,
+      p_base: "richiesta_in_chiamata",
+      p_fonte: "Chiamata",
+      p_email: asked.email?.trim().slice(0, 254) || undefined,
+    });
+    permesso = permissionError
+      ? {
+          registrato: false,
+          messaggio:
+            permissionError.code === "42501"
+              ? "Permesso email non registrato: contatto da non contattare o in lista di esclusione."
+              : permissionError.message?.includes("email")
+                ? "Permesso email non registrato: indirizzo mancante o non valido."
+                : "Permesso email non registrato. Riprova dalla scheda del soggetto.",
+        }
+      : { registrato: true, contactId: asked.contactId };
+  }
+  refresh(opportunityId, party);
+  return {
+    ok: true,
+    data: { proponiContattata: Boolean((data as { proponi_contattata?: boolean } | null)?.proponi_contattata), partyId: party, permesso },
+  };
 }
 
 export async function completeTask(input: {
