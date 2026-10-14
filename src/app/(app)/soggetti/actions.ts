@@ -28,6 +28,7 @@ import {
   type TrackedField,
 } from "@/lib/parties/validation";
 import { readPipelineEntry } from "@/lib/pipeline/entry";
+import { isOppositionChannel } from "@/lib/suppression/labels";
 import { createClient } from "@/lib/supabase/server";
 
 const SAVE_FAILED = "Salvataggio non riuscito. Riprova; se il problema continua, avvisa l'amministratore.";
@@ -314,15 +315,25 @@ export async function markDoNotContact(
   id: string,
   partyId: string,
   motivo: string,
-): Promise<{ ok: boolean; message?: string }> {
+  canale: string,
+): Promise<{ ok: boolean; message?: string; closed?: number }> {
   if (!(await getCurrentUser())) return { ok: false, message: NOT_ALLOWED };
   if (motivo.trim() === "") return { ok: false, message: "Scrivi il motivo." };
+  if (!isOppositionChannel(canale)) return { ok: false, message: "Indica da dove arriva la richiesta." };
   const supabase = await createClient();
-  const { error } = await supabase.rpc("mark_do_not_contact", { p_entita: entita, p_id: id, p_motivo: motivo.trim() });
+  const { data, error } = await supabase.rpc("mark_do_not_contact", {
+    p_entita: entita,
+    p_id: id,
+    p_motivo: motivo.trim().slice(0, 1000),
+    p_canale: canale,
+  });
   if (error) return { ok: false, message: error.code === "42501" ? NOT_ALLOWED : SAVE_FAILED };
   revalidatePath(`/soggetti/${partyId}`);
   revalidatePath("/soggetti");
-  return { ok: true };
+  revalidatePath("/pipeline");
+  revalidatePath("/oggi");
+  revalidatePath("/esclusioni");
+  return { ok: true, closed: Number((data as { opportunita_chiuse?: number } | null)?.opportunita_chiuse ?? 0) };
 }
 
 export async function clearDoNotContact(
@@ -410,3 +421,4 @@ export async function deleteParty(partyId: string): Promise<{ ok: true; data: De
   revalidatePath("/pipeline");
   return { ok: true, data: readSummary(data) };
 }
+

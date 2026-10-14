@@ -9,6 +9,7 @@ import { NAV_ITEMS } from "./nav-items";
 export type ShellUser = {
   name: string;
   roleLabel: string;
+  isAdmin: boolean;
 };
 
 function Brand() {
@@ -23,12 +24,12 @@ function Brand() {
 // Counters next to menu entries, by href (e.g. overdue reminders on "Oggi").
 export type NavCounts = Record<string, { count: number; label: string }>;
 
-function NavList({ counts, onNavigate }: { counts: NavCounts; onNavigate?: () => void }) {
+function NavList({ counts, isAdmin, onNavigate }: { counts: NavCounts; isAdmin: boolean; onNavigate?: () => void }) {
   const pathname = usePathname();
 
   return (
     <ul className="flex flex-col gap-1">
-      {NAV_ITEMS.map((item) => {
+      {NAV_ITEMS.filter((item) => isAdmin || !item.adminOnly).map((item) => {
         const active =
           pathname === item.href || pathname.startsWith(`${item.href}/`);
         return (
@@ -148,7 +149,7 @@ export function AppShell({
           <Brand />
         </div>
         <nav aria-label="Navigazione principale" className="flex-1 overflow-y-auto px-3 py-4">
-          <NavList counts={counts} />
+          <NavList counts={counts} isAdmin={user.isAdmin} />
         </nav>
         <UserPanel user={user} />
       </aside>
@@ -199,7 +200,7 @@ export function AppShell({
               </button>
             </div>
             <nav aria-label="Navigazione principale" className="flex-1 overflow-y-auto px-3 py-4">
-              <NavList counts={counts} onNavigate={() => setMenuOpen(false)} />
+              <NavList counts={counts} isAdmin={user.isAdmin} onNavigate={() => setMenuOpen(false)} />
             </nav>
             <UserPanel user={user} />
           </div>

@@ -6,11 +6,13 @@ import { clearDoNotContact, markDoNotContact } from "@/app/(app)/soggetti/action
 import { Alert } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
-import { Textarea } from "@/components/ui/field";
+import { Select, Textarea } from "@/components/ui/field";
+import { OPPOSITION_CHANNELS, OPPOSITION_CHANNEL_LABELS } from "@/lib/suppression/labels";
 
-// "Non contattare" for a party or a contact: confirmation with a mandatory
-// reason; the values go to the suppression list. Only administrators see
-// "Togli non contattare".
+// "Non contattare" for a party or a contact (any user): reason and channel
+// the request came from are required; the values go to the suppression
+// list, open opportunities are closed as lost and emails and imports are
+// blocked. Only administrators see "Togli non contattare".
 export function DoNotContactControl({
   entita,
   id,
@@ -33,6 +35,8 @@ export function DoNotContactControl({
 }) {
   const router = useRouter();
   const reasonId = useId();
+  const channelId = useId();
+  const [channel, setChannel] = useState("");
   const [open, setOpen] = useState(initiallyOpen);
   const [reason, setReason] = useState("");
   const [error, setError] = useState<string | null>(null);
@@ -48,6 +52,7 @@ export function DoNotContactControl({
       }
       setOpen(false);
       setReason("");
+      setChannel("");
       router.refresh();
     });
   }
@@ -81,7 +86,11 @@ export function DoNotContactControl({
             setError("Scrivi il motivo.");
             return;
           }
-          run(() => markDoNotContact(entita, id, partyId, reason));
+          if (!channel) {
+            setError("Indica da dove arriva la richiesta.");
+            return;
+          }
+          run(() => markDoNotContact(entita, id, partyId, reason, channel));
         }}
         onCancel={() => {
           setOpen(false);
@@ -89,10 +98,31 @@ export function DoNotContactControl({
         }}
       >
         <p>
-          Telefoni, email{entita === "parties" ? ", dominio del sito e recapiti dei contatti" : ""} entrano nella
-          lista di esclusione: nessuno potrà più contattarli e i nuovi doppioni verranno bloccati. Solo
-          l&apos;amministratore può annullarlo.
+          {entita === "parties"
+            ? "Telefoni, email, dominio del sito, partita IVA, luogo Google e recapiti dei contatti"
+            : "Telefoni ed email del contatto"}{" "}
+          entrano nella lista di esclusione. Da subito:
         </p>
+        <ul className="mt-2 list-disc pl-5">
+          <li>
+            le opportunità aperte {entita === "parties" ? "del soggetto" : "collegate al contatto"} si chiudono come perse
+            (&ldquo;ha chiesto di non essere contattato&rdquo;) e i loro promemoria si chiudono;
+          </li>
+          <li>non si possono più preparare email;</li>
+          <li>gli import da file e dalla mappa con gli stessi dati vengono bloccati.</li>
+        </ul>
+        <p className="mt-2">Solo l&apos;amministratore può annullarlo.</p>
+        <label htmlFor={channelId} className="mt-4 block text-label font-semibold tracking-[0.08em] text-black-80 uppercase">
+          Da dove arriva la richiesta<span aria-hidden="true" className="ml-0.5 text-error">*</span>
+        </label>
+        <Select id={channelId} className="mt-2" value={channel} onChange={(event) => setChannel(event.target.value)}>
+          <option value="">Scegli…</option>
+          {OPPOSITION_CHANNELS.map((option) => (
+            <option key={option} value={option}>
+              {OPPOSITION_CHANNEL_LABELS[option]}
+            </option>
+          ))}
+        </Select>
         <label htmlFor={reasonId} className="mt-4 block text-label font-semibold tracking-[0.08em] text-black-80 uppercase">
           Motivo<span aria-hidden="true" className="ml-0.5 text-error">*</span>
         </label>
