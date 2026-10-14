@@ -19,6 +19,7 @@ import {
 import type { Contact, Distance, HistoryEntry, Party, PartyLocation, Provenance } from "@/lib/parties/queries";
 import { TRACKED_FIELD_LABELS, type TrackedField } from "@/lib/parties/validation";
 import { DoNotContactBadge } from "./data-status-badge";
+import { DeletePartyControl } from "./delete-party-control";
 import { DoNotContactControl } from "./do-not-contact-control";
 import { LocationCoordinates } from "./location-coordinates";
 import { NotesCard } from "@/components/notes-card";
@@ -154,6 +155,7 @@ export function PartyDetail({
             initiallyOpen={dialogOpenFor === party.id}
           />
           {isAdmin && <ButtonLink href={`/soggetti/${party.id}/unisci`}>Unisci con un altro</ButtonLink>}
+          {isAdmin && <DeletePartyControl partyId={party.id} partyName={name} />}
         </div>
       </div>
 

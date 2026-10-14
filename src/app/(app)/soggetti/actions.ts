@@ -356,3 +356,45 @@ export async function mergeParties(
   revalidatePath(`/soggetti/${keepId}`);
   return { ok: true };
 }
+
+// ---------------------------------------------------------------------------
+// Delete a party (A4, administrators only; not the GDPR erasure)
+// ---------------------------------------------------------------------------
+
+export type DeleteSummary = { sedi: number; contatti: number; opportunita: number; attivita: number; offerte: number; uniti: number };
+
+function readSummary(data: unknown): DeleteSummary {
+  const raw = (data && typeof data === "object" ? data : {}) as Record<string, unknown>;
+  const n = (key: string) => (typeof raw[key] === "number" ? (raw[key] as number) : 0);
+  return { sedi: n("sedi"), contatti: n("contatti"), opportunita: n("opportunita"), attivita: n("attivita"), offerte: n("offerte"), uniti: n("uniti") };
+}
+
+export async function partyDeleteSummary(partyId: string): Promise<{ ok: true; data: DeleteSummary } | { ok: false; message: string }> {
+  const user = await getCurrentUser();
+  if (!user?.isAdmin) return { ok: false, message: "Solo l'amministratore può eliminare un soggetto." };
+  const supabase = await createClient();
+  const { data, error } = await supabase.rpc("party_delete_summary", { p_party: partyId });
+  if (error) return { ok: false, message: "Riepilogo non disponibile. Riprova." };
+  return { ok: true, data: readSummary(data) };
+}
+
+export async function deleteParty(partyId: string): Promise<{ ok: true; data: DeleteSummary } | { ok: false; message: string }> {
+  const user = await getCurrentUser();
+  if (!user?.isAdmin) return { ok: false, message: "Solo l'amministratore può eliminare un soggetto." };
+  const supabase = await createClient();
+  const { data, error } = await supabase.rpc("delete_party", { p_party: partyId });
+  if (error) {
+    return {
+      ok: false,
+      message:
+        error.code === "42501"
+          ? "Solo l'amministratore può eliminare un soggetto."
+          : error.code === "23503"
+            ? "Il soggetto ha un'offerta già passata al backoffice: non si può eliminare."
+            : "Eliminazione non riuscita: nessun dato è stato cancellato. Riprova.",
+    };
+  }
+  revalidatePath("/soggetti");
+  revalidatePath("/pipeline");
+  return { ok: true, data: readSummary(data) };
+}
