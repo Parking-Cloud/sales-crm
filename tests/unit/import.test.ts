@@ -27,7 +27,7 @@ async function fixturePlan(): Promise<PlanRow[]> {
   const { sheets } = await readXlsx(buffer.buffer.slice(buffer.byteOffset, buffer.byteOffset + buffer.byteLength));
   return buildPlan(
     sheets.map((sheet) => {
-      const mapping = proposeMapping(CRM_2026, sheet.name);
+      const mapping = proposeMapping(CRM_2026, sheet);
       assert.ok(mapping, `foglio riconosciuto: ${sheet.name}`);
       return { name: sheet.name, rows: sheet.rows, mapping, parkingId: "parcheggio-finto" };
     }),

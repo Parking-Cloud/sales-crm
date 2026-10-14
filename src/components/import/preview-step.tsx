@@ -6,6 +6,7 @@ import { Badge, type BadgeTone } from "@/components/ui/badge";
 import { Input, Select } from "@/components/ui/field";
 import { Table, Td, Th, Tr } from "@/components/ui/table";
 import type { PlanRow, RowStatus } from "@/lib/import/transform";
+import { toText } from "@/lib/import/values";
 import { PARTY_CATEGORIES } from "@/lib/parties/labels";
 
 const STATUS: Record<RowStatus, { label: string; tone: BadgeTone }> = {
@@ -25,8 +26,13 @@ const PHASES: Record<string, string> = {
 
 const OFFERS: Record<string, string> = { inviata: "inviata", accettata: "accettata", rifiutata: "rifiutata" };
 
+// Every value shown goes through toText: never an object in the page.
 function rowName(row: PlanRow): string {
-  return row.party.denominazione ?? ([row.party.nome, row.party.cognome].filter(Boolean).join(" ") || "Senza nome");
+  return (
+    toText(row.party.denominazione) ||
+    [toText(row.party.nome), toText(row.party.cognome)].filter(Boolean).join(" ") ||
+    "Senza nome"
+  );
 }
 
 function summary(row: PlanRow): string {
@@ -36,7 +42,7 @@ function summary(row: PlanRow): string {
   ];
   if (row.contact) parts.push("contatto");
   if (row.activities.length > 0) parts.push(`${row.activities.length} attività`);
-  if (row.offer) parts.push(`offerta ${OFFERS[row.offer.stato]}`);
+  if (row.offer) parts.push(`offerta ${OFFERS[row.offer.stato] ?? toText(row.offer.stato)}`);
   return parts.join(" · ");
 }
 
@@ -92,7 +98,7 @@ export function PreviewStep({ rows, onChange }: { rows: PlanRow[]; onChange: (ro
               <Tr key={row.ref}>
                 <Td>
                   <span className="block font-semibold">{row.kind === "anagrafica" ? "Anagrafica" : "Prospect"}</span>
-                  <span className="text-caption text-black-60">riga {row.row}</span>
+                  <span className="text-caption text-black-60">riga {toText(row.row)}</span>
                 </Td>
                 <Td wrap>
                   {editable && row.needsTypeChoice ? (
@@ -125,12 +131,12 @@ export function PreviewStep({ rows, onChange }: { rows: PlanRow[]; onChange: (ro
                         <span className="grid grid-cols-2 gap-2">
                           <Input
                             aria-label={`Nome: ${rowName(row)}`}
-                            value={row.party.nome ?? ""}
+                            value={toText(row.party.nome)}
                             onChange={(event) => update(row.ref, (current) => ({ ...current, party: { ...current.party, nome: event.target.value || null } }))}
                           />
                           <Input
                             aria-label={`Cognome: ${rowName(row)}`}
-                            value={row.party.cognome ?? ""}
+                            value={toText(row.party.cognome)}
                             onChange={(event) => update(row.ref, (current) => ({ ...current, party: { ...current.party, cognome: event.target.value || null } }))}
                           />
                         </span>
@@ -141,14 +147,14 @@ export function PreviewStep({ rows, onChange }: { rows: PlanRow[]; onChange: (ro
                   ) : (
                     <span className="font-semibold">{row.status === "scartata" ? "–" : rowName(row)}</span>
                   )}
-                  {row.linkTo && <span className="block text-caption text-black-60">Stesso soggetto della riga {row.linkTo.split(":").pop()} dell&apos;anagrafica</span>}
+                  {row.linkTo && <span className="block text-caption text-black-60">Stesso soggetto della riga {toText(row.linkTo).split(":").pop()} dell&apos;anagrafica</span>}
                 </Td>
                 <Td>
                   {editable ? (
                     <Select
                       className="min-w-48"
                       aria-label={`Categoria: ${rowName(row)}`}
-                      value={row.party.categoria ?? ""}
+                      value={toText(row.party.categoria)}
                       onChange={(event) => update(row.ref, (current) => ({ ...current, party: { ...current.party, categoria: event.target.value || null } }))}
                     >
                       <option value="">Non indicata</option>
@@ -159,7 +165,7 @@ export function PreviewStep({ rows, onChange }: { rows: PlanRow[]; onChange: (ro
                       ))}
                     </Select>
                   ) : (
-                    (row.party.categoria ?? "–")
+                    (toText(row.party.categoria) || "–")
                   )}
                 </Td>
                 <Td>
@@ -170,13 +176,13 @@ export function PreviewStep({ rows, onChange }: { rows: PlanRow[]; onChange: (ro
                 </Td>
                 <Td wrap>
                   <div className="flex min-w-64 flex-col gap-2 text-caption">
-                    {row.discard && <p className="font-semibold">{row.discard}</p>}
+                    {row.discard && <p className="font-semibold">{toText(row.discard)}</p>}
                     {block && (
                       <p>
-                        <strong>Esclusa: {block.motivo}.</strong>{" "}
+                        <strong>Esclusa: {toText(block.motivo)}.</strong>{" "}
                         {block.party_id && (
                           <Link href={`/soggetti/${block.party_id}`} className="rounded-xs text-blue-ink underline underline-offset-2">
-                            Apri {block.nome ?? "il soggetto"}
+                            Apri {toText(block.nome) || "il soggetto"}
                           </Link>
                         )}
                       </p>
@@ -184,7 +190,7 @@ export function PreviewStep({ rows, onChange }: { rows: PlanRow[]; onChange: (ro
                     {!block && warning.length > 0 && (
                       <fieldset className="flex flex-col gap-1">
                         <legend className="font-semibold">
-                          Possibile doppione: {warning.map((hit) => `${hit.motivo.toLowerCase()} (${hit.nome ?? "soggetto"})`).join("; ")}
+                          Possibile doppione: {warning.map((hit) => `${toText(hit.motivo).toLowerCase()} (${toText(hit.nome) || "soggetto"})`).join("; ")}
                         </legend>
                         <label className="flex items-center gap-2">
                           <input
@@ -205,7 +211,7 @@ export function PreviewStep({ rows, onChange }: { rows: PlanRow[]; onChange: (ro
                               onChange={() => update(row.ref, (current) => ({ ...current, decision: "unisci", mergeInto: hit.party_id }))}
                               className="size-4 accent-brand-blue"
                             />
-                            Unisci all&apos;esistente: {hit.nome}
+                            Unisci all&apos;esistente: {toText(hit.nome)}
                           </label>
                         ))}
                         <label className="flex items-center gap-2">
@@ -222,8 +228,8 @@ export function PreviewStep({ rows, onChange }: { rows: PlanRow[]; onChange: (ro
                     )}
                     {row.warnings.length > 0 && (
                       <ul className="list-disc pl-4 text-black-80">
-                        {row.warnings.map((text) => (
-                          <li key={text}>{text}</li>
+                        {row.warnings.map((text, index) => (
+                          <li key={index}>{toText(text)}</li>
                         ))}
                       </ul>
                     )}

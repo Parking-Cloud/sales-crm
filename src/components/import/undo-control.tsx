@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
 import { undoImport, type UndoBlocker } from "@/app/(app)/import/actions";
+import { safeCall } from "@/lib/import/safe-call";
 import { Alert } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
@@ -31,7 +32,7 @@ export function UndoControl({
   function run() {
     setError(null);
     startTransition(async () => {
-      const result = await undoImport(batchId);
+      const result = await safeCall(() => undoImport(batchId));
       setOpen(false);
       if (!result.ok) {
         setError(result.message);

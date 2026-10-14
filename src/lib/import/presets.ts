@@ -2,6 +2,9 @@
 // column feeds which field. Mappings are editable in the UI and can be saved
 // with a name (public.import_mappings).
 
+import { columnIndex } from "./columns";
+import { cleanText, type Cell } from "./values";
+
 export type SheetKind = "anagrafica" | "prospect";
 
 export type FieldDef = { key: string; label: string; required?: boolean };
@@ -55,7 +58,14 @@ export type SheetMapping = {
 export type Preset = {
   key: string;
   label: string;
-  sheets: { kind: SheetKind; matches: (sheetName: string) => boolean; mapping: SheetMapping }[];
+  sheets: {
+    kind: SheetKind;
+    matches: (sheetName: string) => boolean;
+    // Header cells that identify the format: column letter -> words the
+    // header must contain (in the header row of the mapping).
+    headers: Record<string, string>;
+    mapping: SheetMapping;
+  }[];
 };
 
 export function normalizeSheetName(name: string): string {
@@ -77,6 +87,7 @@ export const CRM_2026: Preset = {
     {
       kind: "anagrafica",
       matches: (name) => normalizeSheetName(name).includes("anagrafica"),
+      headers: { C: "nome azienda" },
       mapping: {
         kind: "anagrafica",
         headerRow: 1,
@@ -102,6 +113,7 @@ export const CRM_2026: Preset = {
     {
       kind: "prospect",
       matches: (name) => normalizeSheetName(name).includes("prospect"),
+      headers: { B: "prospect" },
       mapping: {
         kind: "prospect",
         headerRow: 5,
@@ -125,10 +137,19 @@ export const CRM_2026: Preset = {
 
 export const PRESETS: Preset[] = [CRM_2026];
 
-// Mapping proposed by a preset for a sheet, or null if the preset has none.
-export function proposeMapping(preset: Preset, sheetName: string): SheetMapping | null {
-  const match = preset.sheets.find((sheet) => sheet.matches(sheetName));
-  return match ? structuredClone(match.mapping) : null;
+export const FORMAT_MISMATCH = "Questo foglio non corrisponde al formato scelto";
+
+// Mapping proposed by a preset for a sheet: the sheet name and its header
+// cells must both match. Null when the sheet does not follow the preset
+// (e.g. "Mail Template" or "Tabella Tariffe" in the CRM file).
+export function proposeMapping(preset: Preset, sheet: { name: string; rows: Cell[][] }): SheetMapping | null {
+  const match = preset.sheets.find((candidate) => candidate.matches(sheet.name));
+  if (!match) return null;
+  const header = sheet.rows[match.mapping.headerRow - 1] ?? [];
+  const ok = Object.entries(match.headers).every(([letter, words]) =>
+    normalizeSheetName(cleanText(header[columnIndex(letter)] ?? null) ?? "").includes(words),
+  );
+  return ok ? structuredClone(match.mapping) : null;
 }
 
 // Empty mapping for sheets the preset does not know (e.g. a CSV).

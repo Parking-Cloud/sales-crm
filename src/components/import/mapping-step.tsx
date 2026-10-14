@@ -6,9 +6,10 @@ import { Alert } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Checkbox, Field, Input, Select } from "@/components/ui/field";
 import { columnLetter } from "@/lib/import/columns";
-import { FIELDS, SHEET_KIND_LABELS, emptyMapping, type SheetKind, type SheetMapping } from "@/lib/import/presets";
+import { FIELDS, FORMAT_MISMATCH, SHEET_KIND_LABELS, emptyMapping, type SheetKind, type SheetMapping } from "@/lib/import/presets";
 import type { ParkingOption, SavedMapping } from "@/lib/import/queries";
-import { cleanText, type Cell } from "@/lib/import/values";
+import { safeCall } from "@/lib/import/safe-call";
+import { cleanText, toText, type Cell } from "@/lib/import/values";
 
 export type SheetState = {
   name: string;
@@ -16,14 +17,18 @@ export type SheetState = {
   include: boolean;
   mapping: SheetMapping;
   parkingId: string | null;
+  // false: a format was chosen and this sheet does not follow it.
+  formatOk: boolean | null;
 };
 
+// Columns with a header or with data; a column without a header shows its
+// letter only.
 function columnOptions(rows: Cell[][], headerRow: number): { letter: string; label: string }[] {
   const header = rows[headerRow - 1] ?? [];
-  const width = Math.max(header.length, ...rows.slice(0, 50).map((row) => row.length), 1);
+  const width = rows.reduce((max, row) => Math.max(max, row.length), Math.max(header.length, 1));
   return Array.from({ length: width }, (_, index) => {
     const letter = columnLetter(index);
-    const title = cleanText(header[index] ?? null);
+    const title = toText(cleanText(header[index] ?? null));
     return { letter, label: title ? `${letter} — ${title}` : letter };
   });
 }
@@ -55,7 +60,7 @@ function SheetCard({
     <section className="rounded-md border border-grey-60 bg-white p-5 shadow-sm sm:p-6" aria-labelledby={id("titolo")}>
       <div className="flex flex-wrap items-center justify-between gap-3">
         <h3 id={id("titolo")} className="text-h4 font-semibold break-all">
-          Foglio &ldquo;{sheet.name}&rdquo;
+          Foglio &ldquo;{toText(sheet.name)}&rdquo;
         </h3>
         <Checkbox
           checked={sheet.include}
@@ -63,6 +68,11 @@ function SheetCard({
           label="Importa questo foglio"
         />
       </div>
+      {sheet.formatOk === false && (
+        <Alert tone="info" className="mt-4">
+          {FORMAT_MISMATCH}: non viene importato. Se serve, includilo e scegli le colonne a mano.
+        </Alert>
+      )}
       {sheet.include && (
         <div className="mt-4 flex flex-col gap-5">
           <div className="grid gap-4 sm:grid-cols-3">
@@ -170,7 +180,7 @@ function SheetCard({
               disabled={pending || saveName.trim() === ""}
               onClick={() =>
                 startTransition(async () => {
-                  const result = await saveMapping(saveName, kind, sheet.mapping);
+                  const result = await safeCall(() => saveMapping(saveName, kind, sheet.mapping));
                   setMessage(result.ok ? { tone: "success", text: "Mappatura salvata." } : { tone: "critical", text: result.message });
                 })
               }

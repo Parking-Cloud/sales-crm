@@ -62,6 +62,16 @@ export function cleanText(value: Cell): string | null {
   return text;
 }
 
+// Any value shown in the interface, as a string: never an object.
+export function toText(value: unknown): string {
+  if (value === null || value === undefined) return "";
+  if (typeof value === "string") return value;
+  if (typeof value === "number") return Number.isFinite(value) ? String(value) : "";
+  if (typeof value === "boolean") return value ? "Sì" : "No";
+  if (value instanceof Date) return Number.isNaN(value.getTime()) ? "" : isoDate(value).split("-").reverse().join("/");
+  return "";
+}
+
 // Several values in one cell, separated by "//" (or a line break).
 export function splitMulti(value: Cell): string[] {
   if (value === null || value === undefined) return [];

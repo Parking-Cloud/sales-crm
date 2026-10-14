@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useState, useTransition } from "react";
+import { useEffect, useRef, useState, useTransition } from "react";
 import { previewImport, runImport } from "@/app/(app)/import/actions";
 import { Alert } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
@@ -10,7 +10,9 @@ import { Field, Input, Select } from "@/components/ui/field";
 import { MAX_FILE_BYTES } from "@/lib/import/limits";
 import { CRM_2026, PRESETS, emptyMapping, proposeMapping } from "@/lib/import/presets";
 import type { ParkingOption, SavedMapping } from "@/lib/import/queries";
+import { safeCall } from "@/lib/import/safe-call";
 import type { PlanRow } from "@/lib/import/transform";
+import { toText } from "@/lib/import/values";
 import type { ReadResult, SheetData } from "@/lib/import/workbook";
 import { MappingStep, type SheetState } from "./mapping-step";
 import { PreviewStep } from "./preview-step";
@@ -26,13 +28,14 @@ const STEPS: { key: Step; label: string }[] = [
 function initialSheets(sheets: SheetData[], presetKey: string, defaultParkingId: string | null): SheetState[] {
   const preset = PRESETS.find((item) => item.key === presetKey);
   return sheets.map((sheet) => {
-    const mapping = preset ? proposeMapping(preset, sheet.name) : null;
+    const mapping = preset ? proposeMapping(preset, sheet) : null;
     return {
       name: sheet.name,
       rows: sheet.rows,
-      include: Boolean(mapping) || sheets.length === 1,
+      include: Boolean(mapping) || (!preset && sheets.length === 1),
       mapping: mapping ?? emptyMapping("anagrafica"),
       parkingId: defaultParkingId,
+      formatOk: preset ? Boolean(mapping) : null,
     };
   });
 }
@@ -57,12 +60,14 @@ export function ImportWizard({
   mappings,
   defaultParkingId,
   initial,
+  actions = { preview: previewImport, run: runImport },
 }: {
   parkings: ParkingOption[];
   mappings: SavedMapping[];
   defaultParkingId: string | null;
-  // For previews only.
+  // For previews and end-to-end tests only.
   initial?: { step: Step; fileName: string; sheets: SheetState[]; plan: PlanRow[] | null; confirmOpen?: boolean };
+  actions?: { preview: typeof previewImport; run: typeof runImport };
 }) {
   const router = useRouter();
   const [step, setStep] = useState<Step>(initial?.step ?? "carica");
@@ -74,6 +79,12 @@ export function ImportWizard({
   const [notice, setNotice] = useState<string | null>(null);
   const [confirmOpen, setConfirmOpen] = useState(initial?.confirmOpen ?? false);
   const [pending, startTransition] = useTransition();
+  const errorRef = useRef<HTMLDivElement>(null);
+
+  // The buttons are at the bottom, the message at the top: bring it into view.
+  useEffect(() => {
+    if (error) errorRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
+  }, [error]);
 
   const importable = plan?.filter((row) => row.status !== "scartata" && row.decision !== "escludi") ?? [];
 
@@ -109,7 +120,7 @@ export function ImportWizard({
       const chosen = sheets
         .filter((sheet) => sheet.include)
         .map((sheet) => ({ name: sheet.name, rows: sheet.rows, mapping: sheet.mapping, parkingId: sheet.parkingId }));
-      const result = await previewImport(chosen);
+      const result = await safeCall(() => actions.preview(chosen));
       if (!result.ok) {
         setError(result.message);
         return;
@@ -123,7 +134,7 @@ export function ImportWizard({
     if (!plan) return;
     setError(null);
     startTransition(async () => {
-      const result = await runImport(fileName, plan);
+      const result = await safeCall(() => actions.run(fileName, plan));
       if (!result.ok) {
         setConfirmOpen(false);
         setError(result.message);
@@ -152,7 +163,11 @@ export function ImportWizard({
         ))}
       </ol>
 
-      {error && <Alert tone="critical">{error}</Alert>}
+      {error && (
+        <div ref={errorRef}>
+          <Alert tone="critical">{error}</Alert>
+        </div>
+      )}
       {notice && <Alert tone="warning">{notice}</Alert>}
 
       {step === "carica" && (
@@ -183,7 +198,7 @@ export function ImportWizard({
       {step === "mappa" && (
         <>
           <p className="text-body text-black-60">
-            File <strong>{fileName}</strong>: scegli i fogli da importare, il parcheggio di ogni foglio e le colonne.
+            File <strong>{toText(fileName)}</strong>: scegli i fogli da importare, il parcheggio di ogni foglio e le colonne.
           </p>
           <MappingStep sheets={sheets} parkings={parkings} mappings={mappings} onChange={setSheets} />
           <div className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">

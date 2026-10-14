@@ -25,6 +25,7 @@
     "src/lib/import/transform.ts",
     "src/lib/import/workbook.ts",
     "src/lib/import/limits.ts",
+    "src/lib/import/safe-call.ts",
     "tests/unit/**/*.ts",
     "tests/fixtures/**/*.ts"
   ]
