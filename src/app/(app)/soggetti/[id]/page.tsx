@@ -43,6 +43,7 @@ export default async function PartyPage({ params }: { params: Promise<{ id: stri
       provenance={provenance}
       distances={distances}
       maxDistanceM={maxDistance.meters}
+      now={Date.now()}
       history={history}
       isAdmin={user.isAdmin}
     />
