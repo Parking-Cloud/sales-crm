@@ -27,6 +27,7 @@ import { TRACKED_FIELD_LABELS, type TrackedField } from "@/lib/parties/validatio
 import { DoNotContactBadge } from "./data-status-badge";
 import { DeletePartyControl } from "./delete-party-control";
 import { DoNotContactControl } from "./do-not-contact-control";
+import { GdprEraseControl } from "./gdpr-erase-control";
 import { LocationCoordinates } from "./location-coordinates";
 import { NotesCard } from "@/components/notes-card";
 import { ProvenanceBadge } from "./provenance";
@@ -114,6 +115,8 @@ export function PartyDetail({
 }) {
   const name = partyName(party);
   const company = party.tipo === "azienda";
+  const erased = party.gdpr_cancellato_il !== null;
+
   const partyProvenance = (field: TrackedField) =>
     provenance.find((row) => row.entita === "parties" && row.entita_id === party.id && row.campo === field);
   const contactProvenance = (contactId: string) =>
@@ -152,24 +155,36 @@ export function PartyDetail({
             {party.non_contattare && <DoNotContactBadge />}
           </div>
         </div>
-        <div className="flex flex-wrap gap-2">
-          <ActivityButton opportunityId={null} partyId={party.id} subject={name} />
-          <ButtonLink href={`/soggetti/${party.id}/modifica`}>Modifica</ButtonLink>
-          <DoNotContactControl
-            entita="parties"
-            id={party.id}
-            partyId={party.id}
-            name={name}
-            active={party.non_contattare}
-            isAdmin={isAdmin}
-            initiallyOpen={dialogOpenFor === party.id}
-          />
-          {isAdmin && <ButtonLink href={`/soggetti/${party.id}/unisci`}>Unisci con un altro</ButtonLink>}
-          {isAdmin && <DeletePartyControl partyId={party.id} partyName={name} />}
-        </div>
+        {erased ? (
+          <div className="flex flex-wrap gap-2">{isAdmin && <DeletePartyControl partyId={party.id} partyName={name} />}</div>
+        ) : (
+          <div className="flex flex-wrap gap-2">
+            <ActivityButton opportunityId={null} partyId={party.id} subject={name} />
+            <ButtonLink href={`/soggetti/${party.id}/modifica`}>Modifica</ButtonLink>
+            <DoNotContactControl
+              entita="parties"
+              id={party.id}
+              partyId={party.id}
+              name={name}
+              active={party.non_contattare}
+              isAdmin={isAdmin}
+              initiallyOpen={dialogOpenFor === party.id}
+            />
+            {isAdmin && <ButtonLink href={`/soggetti/${party.id}/unisci`}>Unisci con un altro</ButtonLink>}
+            {isAdmin && <GdprEraseControl entita="parties" id={party.id} partyId={party.id} name={name} />}
+            {isAdmin && <DeletePartyControl partyId={party.id} partyName={name} />}
+          </div>
+        )}
       </div>
 
-      {party.non_contattare && (
+      {erased && (
+        <Alert tone="info" title="Dati cancellati per richiesta GDPR" className="mt-6">
+          Cancellati il {formatDate(party.gdpr_cancellato_il)}. Restano solo l&apos;identificativo e lo storico senza dati
+          personali; i recapiti sono in lista di esclusione in forma non leggibile.
+        </Alert>
+      )}
+
+      {party.non_contattare && !erased && (
         <Alert tone="critical" title="Non contattare" className="mt-6">
           Questo soggetto ha chiesto di non essere contattato. I suoi recapiti sono nella lista di esclusione.
         </Alert>
@@ -385,6 +400,7 @@ export function PartyDetail({
                             isAdmin={isAdmin}
                             initiallyOpen={dialogOpenFor === contact.id}
                           />
+                          {isAdmin && <GdprEraseControl entita="contacts" id={contact.id} partyId={party.id} name={contactName} />}
                         </span>
                       </Td>
                     </Tr>

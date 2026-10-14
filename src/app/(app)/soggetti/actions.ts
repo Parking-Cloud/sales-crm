@@ -31,6 +31,7 @@ import { readPipelineEntry } from "@/lib/pipeline/entry";
 import { isOppositionChannel } from "@/lib/suppression/labels";
 import { createClient } from "@/lib/supabase/server";
 
+const UUID_PATTERN = /^[0-9a-f-]{36}$/i;
 const SAVE_FAILED = "Salvataggio non riuscito. Riprova; se il problema continua, avvisa l'amministratore.";
 const NOT_ALLOWED = "Non hai i permessi per questa operazione.";
 
@@ -422,3 +423,27 @@ export async function deleteParty(partyId: string): Promise<{ ok: true; data: De
   return { ok: true, data: readSummary(data) };
 }
 
+// ---------------------------------------------------------------------------
+// GDPR erasure (CRM-31, administrators)
+// ---------------------------------------------------------------------------
+
+export type GdprResult = { soggetti: number; contatti: number; sedi: number; opportunita: number; email: number; valori_in_esclusione: number };
+
+export async function gdprErase(
+  entita: "parties" | "contacts",
+  id: string,
+  partyId: string,
+): Promise<{ ok: true; data: GdprResult } | { ok: false; message: string }> {
+  const user = await getCurrentUser();
+  if (!user?.isAdmin) return { ok: false, message: "Solo l'amministratore può cancellare per richiesta GDPR." };
+  if ((entita !== "parties" && entita !== "contacts") || !UUID_PATTERN.test(id)) return { ok: false, message: "Record non trovato." };
+  const supabase = await createClient();
+  const { data, error } = await supabase.rpc("gdpr_erase", { p_entita: entita, p_id: id });
+  if (error) return { ok: false, message: error.code === "42501" ? NOT_ALLOWED : error.code === "P0002" ? "Record non trovato." : SAVE_FAILED };
+  revalidatePath(`/soggetti/${partyId}`);
+  revalidatePath("/soggetti");
+  revalidatePath("/pipeline");
+  revalidatePath("/oggi");
+  revalidatePath("/esclusioni");
+  return { ok: true, data: data as GdprResult };
+}
