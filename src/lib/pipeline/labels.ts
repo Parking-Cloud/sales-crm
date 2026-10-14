@@ -1,6 +1,7 @@
 // Labels of the pipeline: stages (spec "Fasi dell'opportunità"), outcomes,
 // loss reasons (CRM-17), call outcomes (CRM-18). Pure: unit tested.
-import type { BadgeTone } from "../../components/ui/badge";
+// Same tones as the UI Kit badge (components/ui/badge).
+type BadgeTone = "info" | "attention" | "success" | "critical" | "neutral";
 
 export const STAGES = [
   "individuata",
