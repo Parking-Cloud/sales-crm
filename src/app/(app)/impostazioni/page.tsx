@@ -33,7 +33,7 @@ export default async function SettingsPage() {
           La tua firma
         </h2>
         <p className="mt-2 text-body text-black-80">
-          Va nelle email che prepari, al posto di {"{firma}"}. Senza firma non si può preparare un&apos;email.
+          Facoltativa: va nelle email che prepari, al posto di {"{firma}"}. Se la lasci vuota, {"{firma}"} resta vuota.
         </p>
         <div className="mt-4">
           <SignatureForm signature={signature} />

@@ -94,7 +94,6 @@ export default async function PrepareEmailPage({ searchParams }: { searchParams:
         })
       : "Piede non disponibile: l'amministratore deve impostare ragione sociale e indirizzo per l'opposizione.";
   const permissionMissing = eligibility.controlli.some((check) => check.codice === "permesso" && !check.ok);
-  const signatureMissing = eligibility.controlli.some((check) => check.codice === "firma" && !check.ok);
 
   return (
     <>
@@ -158,16 +157,9 @@ export default async function PrepareEmailPage({ searchParams }: { searchParams:
                 Permesso: {eligibility.permesso.fonte ? `${eligibility.permesso.fonte}, ` : ""}registrato da {eligibility.permesso.operatore ?? "–"}.
               </p>
             )}
-            {(permissionMissing || signatureMissing) && (
+            {permissionMissing && !recipient.nonContattare && (
               <div className="mt-4 flex flex-wrap gap-2">
-                {permissionMissing && !recipient.nonContattare && (
-                  <RegisterPermissionButton partyId={partyId} contactId={recipient.id} name={recipient.nome} hasEmail={Boolean(recipient.email)} />
-                )}
-                {signatureMissing && (
-                  <Link href="/impostazioni" className="rounded-xs font-semibold text-blue-ink underline underline-offset-2">
-                    Compila la tua firma
-                  </Link>
-                )}
+                <RegisterPermissionButton partyId={partyId} contactId={recipient.id} name={recipient.nome} hasEmail={Boolean(recipient.email)} />
               </div>
             )}
           </section>
