@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { EligibilityChecks, EmailComposer } from "@/components/email/email-composer";
+import { CadenceStepActions } from "@/components/cadences/step-actions";
 import { RegisterPermissionButton } from "@/components/email/permission-controls";
 import { Alert } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
@@ -10,6 +11,8 @@ import { getCurrentUser } from "@/lib/auth/current-user";
 import { SIGN_IN_PATH } from "@/lib/auth/routes";
 import { getEligibility, getEmailSettings, getSignature, listEmailOpportunities, listRecipients, listTemplates, templateValues } from "@/lib/email/queries";
 import { TEMPLATE_USE_LABELS, TEMPLATE_VARIABLE_LABELS, buildFooter, renderTemplate } from "@/lib/email/template";
+import { listCadenceEmailSteps, prepareEmailHref } from "@/lib/cadences/queries";
+import { dayBounds } from "@/lib/pipeline/dates";
 
 export const metadata: Metadata = { title: "Prepara email" };
 
@@ -37,11 +40,17 @@ export default async function PrepareEmailPage({ searchParams }: { searchParams:
     getEmailSettings(),
   ]);
 
-  const opportunityParam = one(params.opportunita);
+  // Cadence email step (block 1a-8): template, contact and opportunity
+  // already chosen; "Segna come inviata" closes the step.
+  const stepParam = one(params.passo);
+  const step = UUID.test(stepParam) ? ((await listCadenceEmailSteps({ taskId: stepParam }))[0] ?? null) : null;
+  const cadenceStep = step && step.partyId === partyId ? step : null;
+
+  const opportunityParam = one(params.opportunita) || cadenceStep?.opportunityId || "";
   const opportunity = opportunities.find((opp) => opp.id === opportunityParam) ?? opportunities.find((opp) => opp.aperta) ?? null;
-  const templateParam = one(params.template);
+  const templateParam = one(params.template) || cadenceStep?.templateId || "";
   const template = templates.find((item) => item.id === templateParam) ?? templates[0] ?? null;
-  const contactParam = one(params.contatto);
+  const contactParam = one(params.contatto) || cadenceStep?.contactId || "";
   const recipient =
     contactParam === GENERAL
       ? recipients.find((item) => item.id === null)!
@@ -58,6 +67,9 @@ export default async function PrepareEmailPage({ searchParams }: { searchParams:
         </Link>
       </p>
       <h1 className="mt-2 text-h2 leading-tight font-semibold">Prepara email</h1>
+      {cadenceStep && (
+        <p className="mt-2 inline-flex rounded-pill bg-blue-20 px-3 py-1 text-caption font-semibold text-blue-ink">{cadenceStep.titolo}</p>
+      )}
       <p className="mt-2 max-w-3xl text-body text-black-60">
         Il CRM non invia nulla: apri la bozza in Gmail o copia il testo, poi registra l&apos;invio con &ldquo;Segna come inviata&rdquo;.
       </p>
@@ -93,6 +105,11 @@ export default async function PrepareEmailPage({ searchParams }: { searchParams:
         })
       : "Piede non disponibile: l'amministratore deve impostare ragione sociale e indirizzo per l'opposizione.";
   const permissionMissing = eligibility.controlli.some((check) => check.codice === "permesso" && !check.ok);
+  const failing = eligibility.controlli.filter((check) => !check.ok).map((check) => check.testo);
+  // Next cadence email of the user due today, after this one.
+  const nextStep = cadenceStep
+    ? (await listCadenceEmailSteps({ userId: user.id, until: dayBounds(new Date()).tomorrow })).find((item) => item.taskId !== cadenceStep.taskId) ?? null
+    : null;
 
   return (
     <>
@@ -189,15 +206,18 @@ export default async function PrepareEmailPage({ searchParams }: { searchParams:
                 initialBody={body.text}
                 footer={footer}
                 allowed
+                taskId={cadenceStep?.taskId ?? null}
+                nextHref={nextStep ? prepareEmailHref(nextStep) : null}
               />
             ) : (
-              <Alert tone="critical" title="Non si può inviare">
-                {eligibility.controlli
-                  .filter((check) => !check.ok)
-                  .map((check) => check.testo)
-                  .join(". ")}
-                .
-              </Alert>
+              <>
+                <Alert tone="critical" title="Non si può inviare">
+                  {failing.join(". ")}.
+                </Alert>
+                {cadenceStep && (
+                  <CadenceStepActions taskId={cadenceStep.taskId} enrollmentId={cadenceStep.enrollmentId} reason={failing.join("; ")} doneHref="/oggi" />
+                )}
+              </>
             )}
           </div>
         </section>

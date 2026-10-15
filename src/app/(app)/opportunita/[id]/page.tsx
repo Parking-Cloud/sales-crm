@@ -4,6 +4,7 @@ import { OpportunityDetail } from "@/components/pipeline/opportunity-detail";
 import { getCurrentUser } from "@/lib/auth/current-user";
 import { SIGN_IN_PATH } from "@/lib/auth/routes";
 import { listTimeline } from "@/lib/pipeline/history";
+import { activeEnrollments, listCadences } from "@/lib/cadences/queries";
 import { getOpportunity, listActiveUsers, listContactOptions, listParkingProducts } from "@/lib/pipeline/queries";
 
 const UUID = /^[0-9a-f-]{36}$/i;
@@ -21,13 +22,24 @@ export default async function OpportunityPage({ params }: { params: Promise<{ id
   if (!UUID.test(id)) notFound();
   const opportunity = await getOpportunity(id);
   if (!opportunity) notFound();
-  const [timeline, users, contacts, products] = await Promise.all([
+  const [timeline, users, contacts, products, enrollments, cadences] = await Promise.all([
     listTimeline({ partyId: opportunity.partyId, opportunityId: id }),
     listActiveUsers(),
     listContactOptions(opportunity.partyId),
     listParkingProducts(opportunity.parkingId),
+    activeEnrollments([id]),
+    listCadences(),
   ]);
   return (
-    <OpportunityDetail opportunity={opportunity} timeline={timeline} users={users} contacts={contacts} products={products} now={Date.now()} />
+    <OpportunityDetail
+      opportunity={opportunity}
+      timeline={timeline}
+      users={users}
+      contacts={contacts}
+      products={products}
+      now={Date.now()}
+      enrollment={enrollments.get(id) ?? null}
+      cadences={cadences.filter((cadence) => cadence.steps.length > 0).map((cadence) => ({ id: cadence.id, nome: cadence.nome, passi: cadence.steps.length }))}
+    />
   );
 }

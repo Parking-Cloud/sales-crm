@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
 import { recordSentEmail } from "@/app/(app)/email/actions";
 import { Alert } from "@/components/ui/alert";
-import { Button } from "@/components/ui/button";
+import { Button, ButtonLink } from "@/components/ui/button";
 import { Field, Input, Textarea } from "@/components/ui/field";
 import { gmailComposeUrl, withFooter } from "@/lib/email/template";
 import type { Eligibility } from "@/lib/email/queries";
@@ -55,6 +55,8 @@ export function EmailComposer({
   initialBody,
   footer,
   allowed,
+  taskId = null,
+  nextHref = null,
   action = recordSentEmail,
 }: {
   partyId: string;
@@ -66,6 +68,10 @@ export function EmailComposer({
   initialBody: string;
   footer: string;
   allowed: boolean;
+  // Cadence email step: "Segna come inviata" also closes it; then the next
+  // email of the cadence, if any (block 1a-8, B5).
+  taskId?: string | null;
+  nextHref?: string | null;
   // For previews and end-to-end tests only.
   action?: typeof recordSentEmail;
 }) {
@@ -101,10 +107,15 @@ export function EmailComposer({
   function markSent() {
     setNotice(null);
     startTransition(async () => {
-      const result = await safeCall(() => action({ partyId, contactId, opportunityId, templateId, oggetto: subject, corpo: fullBody }));
+      const result = await safeCall(() => action({ partyId, contactId, opportunityId, templateId, oggetto: subject, corpo: fullBody, taskId }));
       if (!result.ok) return setNotice({ tone: "critical", text: result.message });
       setSent(true);
-      setNotice({ tone: "success", text: "Email registrata come inviata: è nello storico, con il controllo di ammissibilità." });
+      setNotice({
+        tone: "success",
+        text: taskId
+          ? "Email registrata come inviata e passo della cadenza chiuso: il prossimo passo è in Oggi."
+          : "Email registrata come inviata: è nello storico, con il controllo di ammissibilità.",
+      });
       router.refresh();
     });
   }
@@ -141,6 +152,13 @@ export function EmailComposer({
               {pending ? "Registrazione..." : "Segna come inviata"}
             </Button>
           </div>
+        </div>
+      )}
+      {sent && nextHref && (
+        <div>
+          <ButtonLink href={nextHref} variant="primary" size="md">
+            Email successiva della cadenza
+          </ButtonLink>
         </div>
       )}
       {sent && (

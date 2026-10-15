@@ -289,6 +289,8 @@ export type TodayTask = {
   party: string;
   parking: string | null;
   fase: Stage | null;
+  // Step of a cadence (block 1a-8): the title says which ("Cadenza · passo 2/4").
+  cadenceEnrollmentId: string | null;
 };
 
 export async function listMyOpenTasks(userId: string, until: Date): Promise<TodayTask[]> {
@@ -296,7 +298,7 @@ export async function listMyOpenTasks(userId: string, until: Date): Promise<Toda
   const { data, error } = await supabase
     .from("tasks")
     .select(
-      "id, tipo, titolo, nota, scadenza, opportunity_id, party_id, " +
+      "id, tipo, titolo, nota, scadenza, opportunity_id, party_id, cadence_enrollment_id, " +
         "party:parties!tasks_party_id_fkey(denominazione, nome, cognome), " +
         "opportunity:opportunities!tasks_opportunity_id_fkey(fase, party:parties!opportunities_party_id_fkey(denominazione, nome, cognome), parking:parking_facilities!opportunities_parking_id_fkey(nome, nome_breve))",
     )
@@ -315,6 +317,7 @@ export async function listMyOpenTasks(userId: string, until: Date): Promise<Toda
     scadenza: string | null;
     opportunity_id: string | null;
     party_id: string | null;
+    cadence_enrollment_id: string | null;
     party: Named;
     opportunity: { fase: Stage; party: Named; parking: { nome: string; nome_breve: string | null } | null } | null;
   }[]).map((row) => {
@@ -330,6 +333,7 @@ export async function listMyOpenTasks(userId: string, until: Date): Promise<Toda
       party: named ? partyName(named) : "Soggetto",
       parking: row.opportunity ? parkingName(row.opportunity.parking) : null,
       fase: row.opportunity?.fase ?? null,
+      cadenceEnrollmentId: row.cadence_enrollment_id,
     };
   });
 }

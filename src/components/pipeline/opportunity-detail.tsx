@@ -12,6 +12,9 @@ import { NextActivity } from "./next-activity";
 import { OpportunityForm } from "./opportunity-form";
 import { CloseLostButton, ReopenButton, StageSelect } from "./stage-controls";
 import { Timeline } from "./timeline";
+import { EnrollmentCard } from "@/components/cadences/enrollment-card";
+import type { CadenceOption } from "@/components/cadences/enroll-dialog";
+import type { EnrollmentInfo } from "@/lib/cadences/queries";
 
 function Card({ id, title, children }: { id: string; title: string; children: React.ReactNode }) {
   return (
@@ -33,6 +36,8 @@ export function OpportunityDetail({
   contacts,
   products,
   now,
+  enrollment = null,
+  cadences = [],
 }: {
   opportunity: Detail;
   timeline: TimelineEntry[];
@@ -40,6 +45,9 @@ export function OpportunityDetail({
   contacts: ContactOption[];
   products: ProductOption[];
   now: number;
+  // Active or paused cadence, and the cadences it can be enrolled in.
+  enrollment?: EnrollmentInfo | null;
+  cadences?: CadenceOption[];
 }) {
   const badge = opportunityBadge(opportunity.fase, opportunity.esito);
   const open = opportunity.esito === "aperta";
@@ -100,6 +108,12 @@ export function OpportunityDetail({
             <p className="text-body text-black-60">Opportunità chiusa.</p>
           )}
           <p className="mt-3 text-caption text-black-60">Creata il {formatDate(opportunity.createdAt)}{opportunity.importBatchId ? " da un import Excel" : ""}.</p>
+        </Card>
+      </div>
+
+      <div className="mt-6">
+        <Card id="cadenza" title="Cadenza">
+          <EnrollmentCard opportunityId={opportunity.id} label={subject} open={open} enrollment={enrollment} cadences={cadences} />
         </Card>
       </div>
 
