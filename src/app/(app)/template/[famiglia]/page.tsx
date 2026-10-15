@@ -14,7 +14,6 @@ import {
   getEmailSettings,
   getSignature,
   listEmailOpportunities,
-  listPartyPermissions,
   listRecipients,
   listTemplateVersions,
   templateUsage,
@@ -70,19 +69,13 @@ export default async function TemplatePage({ params, searchParams }: { params: P
       const opportunities = await listEmailOpportunities(previewId);
       const parkingParam = one(search.parcheggio);
       const parkingId = UUID.test(parkingParam) ? parkingParam : (opportunities.find((opp) => opp.aperta) ?? opportunities[0])?.parkingId ?? null;
-      const [signature, settings, permissions] = await Promise.all([
-        getSignature(user.id),
-        getEmailSettings(),
-        listPartyPermissions(previewId, contact?.id ? [contact.id] : []),
-      ]);
+      const [signature, settings] = await Promise.all([getSignature(user.id), getEmailSettings()]);
       const values = await templateValues({ partyName: party.nome, contactName: contact?.id ? contact.nome : null, parkingId, signature });
       const subject = renderTemplate(shown.oggetto, values);
       const body = renderTemplate(shown.corpo, values);
-      const permission = permissions.find((row) => row.contactId === (contact?.id ?? null)) ?? null;
       const footer = buildFooter({
         ragioneSociale: settings.ragioneSociale ?? "[ragione sociale da impostare]",
         emailOpposizione: settings.emailOpposizione ?? "[indirizzo per l'opposizione da impostare]",
-        permesso: permission ? { base: permission.base, data: permission.data } : { base: "richiesta_in_chiamata", data: new Date().toISOString() },
       });
       preview = {
         subject: subject.text,

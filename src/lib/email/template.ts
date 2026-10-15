@@ -2,7 +2,6 @@
 // mandatory footer and the Gmail compose link (CRM-22, no Gmail API in 1a).
 // Pure: unit tested. Relative imports only (the unit tests run without the
 // "@/" alias).
-import { formatDate } from "../format";
 
 export const TEMPLATE_VARIABLES = ["azienda", "referente", "parcheggio", "indirizzo_parcheggio", "prodotti_prezzi", "firma"] as const;
 export type TemplateVariable = (typeof TEMPLATE_VARIABLES)[number];
@@ -102,28 +101,15 @@ export const PERMISSION_BASIS_LABELS: Record<PermissionBasis, string> = {
   consenso: "Consenso registrato",
 };
 
-export type FooterInput = {
-  ragioneSociale: string;
-  emailOpposizione: string;
-  // The permission the email relies on; null only with cold email on.
-  permesso: { base: PermissionBasis; data: string } | null;
-};
+export type FooterInput = { ragioneSociale: string; emailOpposizione: string };
 
-// Mandatory footer (B3), added to every email and not editable: who we are,
-// how we got the contact, how to opt out.
+// Mandatory footer (B3), added to every email and not editable: who we are
+// and how to opt out. Since block 1a-8 it no longer says how we got the
+// contact.
 export function buildFooter(input: FooterInput): string {
-  const day = input.permesso ? formatDate(input.permesso.data) : null;
-  const how = !input.permesso
-    ? "abbiamo trovato questo recapito tra i contatti aziendali pubblici."
-    : input.permesso.base === "richiesta_in_chiamata"
-      ? `ci ha chiesto queste informazioni al telefono il ${day}.`
-      : input.permesso.base === "contatto_in_entrata"
-        ? `ci ha scritto per primo il ${day}.`
-        : `ci ha dato il consenso a ricevere nostre comunicazioni il ${day}.`;
   return [
     "--",
     `Questa email Le arriva da ${input.ragioneSociale.trim()} (Parking Cloud).`,
-    `Abbiamo il Suo contatto perché ${how}`,
     `Se non desidera ricevere altre comunicazioni, risponda "NO" a questa email oppure scriva a ${input.emailOpposizione.trim()}.`,
   ].join("\n");
 }

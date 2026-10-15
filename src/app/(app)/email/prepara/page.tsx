@@ -90,7 +90,6 @@ export default async function PrepareEmailPage({ searchParams }: { searchParams:
       ? buildFooter({
           ragioneSociale: settings.ragioneSociale,
           emailOpposizione: settings.emailOpposizione,
-          permesso: eligibility.permesso ? { base: eligibility.permesso.base, data: eligibility.permesso.data } : null,
         })
       : "Piede non disponibile: l'amministratore deve impostare ragione sociale e indirizzo per l'opposizione.";
   const permissionMissing = eligibility.controlli.some((check) => check.codice === "permesso" && !check.ok);
