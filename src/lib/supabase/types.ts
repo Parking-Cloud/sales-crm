@@ -265,6 +265,185 @@ export type Database = {
           },
         ]
       }
+      cadence_enrollments: {
+        Row: {
+          avvio: string
+          cadence_id: string
+          contact_id: string | null
+          created_at: string
+          created_by: string | null
+          esito: string | null
+          id: string
+          motivo_stop: string | null
+          opportunity_id: string
+          responsabile_id: string | null
+          stato: string
+          step_id: string | null
+          terminata_il: string | null
+          updated_at: string
+        }
+        Insert: {
+          avvio: string
+          cadence_id: string
+          contact_id?: string | null
+          created_at?: string
+          created_by?: string | null
+          esito?: string | null
+          id?: string
+          motivo_stop?: string | null
+          opportunity_id: string
+          responsabile_id?: string | null
+          stato?: string
+          step_id?: string | null
+          terminata_il?: string | null
+          updated_at?: string
+        }
+        Update: {
+          avvio?: string
+          cadence_id?: string
+          contact_id?: string | null
+          created_at?: string
+          created_by?: string | null
+          esito?: string | null
+          id?: string
+          motivo_stop?: string | null
+          opportunity_id?: string
+          responsabile_id?: string | null
+          stato?: string
+          step_id?: string | null
+          terminata_il?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "cadence_enrollments_cadence_id_fkey"
+            columns: ["cadence_id"]
+            isOneToOne: false
+            referencedRelation: "cadences"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "cadence_enrollments_contact_id_fkey"
+            columns: ["contact_id"]
+            isOneToOne: false
+            referencedRelation: "contacts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "cadence_enrollments_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "cadence_enrollments_opportunity_id_fkey"
+            columns: ["opportunity_id"]
+            isOneToOne: false
+            referencedRelation: "opportunities"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "cadence_enrollments_responsabile_id_fkey"
+            columns: ["responsabile_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "cadence_enrollments_step_id_fkey"
+            columns: ["step_id"]
+            isOneToOne: false
+            referencedRelation: "cadence_steps"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      cadence_steps: {
+        Row: {
+          attesa_giorni: number
+          cadence_id: string
+          created_at: string
+          id: string
+          istruzioni: string | null
+          orario: string | null
+          posizione: number
+          template_famiglia_id: string | null
+          tipo: string
+          updated_at: string
+        }
+        Insert: {
+          attesa_giorni?: number
+          cadence_id: string
+          created_at?: string
+          id?: string
+          istruzioni?: string | null
+          orario?: string | null
+          posizione: number
+          template_famiglia_id?: string | null
+          tipo: string
+          updated_at?: string
+        }
+        Update: {
+          attesa_giorni?: number
+          cadence_id?: string
+          created_at?: string
+          id?: string
+          istruzioni?: string | null
+          orario?: string | null
+          posizione?: number
+          template_famiglia_id?: string | null
+          tipo?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "cadence_steps_cadence_id_fkey"
+            columns: ["cadence_id"]
+            isOneToOne: false
+            referencedRelation: "cadences"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      cadences: {
+        Row: {
+          archiviata_il: string | null
+          created_at: string
+          created_by: string | null
+          descrizione: string | null
+          id: string
+          nome: string
+          updated_at: string
+        }
+        Insert: {
+          archiviata_il?: string | null
+          created_at?: string
+          created_by?: string | null
+          descrizione?: string | null
+          id?: string
+          nome: string
+          updated_at?: string
+        }
+        Update: {
+          archiviata_il?: string | null
+          created_at?: string
+          created_by?: string | null
+          descrizione?: string | null
+          id?: string
+          nome?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "cadences_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       campaign_recipients: {
         Row: {
           campaign_id: string
@@ -1564,6 +1743,8 @@ export type Database = {
       tasks: {
         Row: {
           assegnatario_id: string | null
+          cadence_enrollment_id: string | null
+          cadence_step_id: string | null
           completata_il: string | null
           created_at: string
           created_by: string | null
@@ -1578,6 +1759,8 @@ export type Database = {
         }
         Insert: {
           assegnatario_id?: string | null
+          cadence_enrollment_id?: string | null
+          cadence_step_id?: string | null
           completata_il?: string | null
           created_at?: string
           created_by?: string | null
@@ -1592,6 +1775,8 @@ export type Database = {
         }
         Update: {
           assegnatario_id?: string | null
+          cadence_enrollment_id?: string | null
+          cadence_step_id?: string | null
           completata_il?: string | null
           created_at?: string
           created_by?: string | null
@@ -1610,6 +1795,20 @@ export type Database = {
             columns: ["assegnatario_id"]
             isOneToOne: false
             referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "tasks_cadence_enrollment_id_fkey"
+            columns: ["cadence_enrollment_id"]
+            isOneToOne: false
+            referencedRelation: "cadence_enrollments"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "tasks_cadence_step_id_fkey"
+            columns: ["cadence_step_id"]
+            isOneToOne: false
+            referencedRelation: "cadence_steps"
             referencedColumns: ["id"]
           },
           {
@@ -1685,6 +1884,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      add_business_days: {
+        Args: { p_day: string; p_days: number }
+        Returns: string
+      }
       add_suppression: {
         Args: {
           p_canale?: string
@@ -1709,6 +1912,27 @@ export type Database = {
         }[]
       }
       apply_google_coordinates: { Args: { p_rows: Json }; Returns: Json }
+      cadence_clear_open_tasks: {
+        Args: { p_enrollment: string }
+        Returns: undefined
+      }
+      cadence_create_task: {
+        Args: { p_day: string; p_enrollment: string; p_step: string }
+        Returns: string
+      }
+      cadence_log: {
+        Args: { p_enrollment: string; p_text: string }
+        Returns: undefined
+      }
+      cadence_step_due: {
+        Args: { p_attesa: number; p_day: string; p_orario: string }
+        Returns: string
+      }
+      cadence_step_used: { Args: { p_step: string }; Returns: boolean }
+      cadence_stop_internal: {
+        Args: { p_enrollment: string; p_esito: string; p_motivo: string }
+        Returns: undefined
+      }
       check_import_rows: {
         Args: { p_rows: Json }
         Returns: {
@@ -1765,6 +1989,27 @@ export type Database = {
         }
         Returns: Json
       }
+      crono_export_rows: {
+        Args: { p_parking?: string; p_parties: string[] }
+        Returns: {
+          city: string
+          company: string
+          contact_id: string
+          email: string
+          email_permission: string
+          escluso: boolean
+          first_name: string
+          job_title: string
+          last_name: string
+          motivo: string
+          parking: string
+          party_id: string
+          phone: string
+          stage: string
+          website: string
+        }[]
+      }
+      delete_cadence_step: { Args: { p_step: string }; Returns: undefined }
       delete_party: { Args: { p_party: string }; Returns: Json }
       do_not_contact_values: {
         Args: { p_entita: string; p_id: string }
@@ -1773,9 +2018,36 @@ export type Database = {
           valore: string
         }[]
       }
+      duplicate_cadence: { Args: { p_cadence: string }; Returns: string }
       email_eligibility: {
         Args: { p_contact?: string; p_party: string }
         Returns: Json
+      }
+      enroll_in_cadence: {
+        Args: { p_avvio: string; p_cadence: string; p_items: Json }
+        Returns: {
+          contact_id: string
+          enrollment_id: string
+          esito: string
+          motivo: string
+          opportunity_id: string
+        }[]
+      }
+      enroll_parties_in_cadence: {
+        Args: {
+          p_avvio: string
+          p_cadence: string
+          p_parking: string
+          p_parties: string[]
+        }
+        Returns: {
+          contact_id: string
+          enrollment_id: string
+          esito: string
+          motivo: string
+          opportunity_id: string
+          party_id: string
+        }[]
       }
       gdpr_erase: { Args: { p_entita: string; p_id: string }; Returns: Json }
       generic_email_domains: { Args: never; Returns: string[] }
@@ -1819,6 +2091,10 @@ export type Database = {
         }
         Returns: Json
       }
+      log_crono_export: {
+        Args: { p_escluse: number; p_righe: number }
+        Returns: undefined
+      }
       loss_reason_label: {
         Args: { p_reason: Database["public"]["Enums"]["loss_reason"] }
         Returns: string
@@ -1834,6 +2110,10 @@ export type Database = {
       }
       merge_parties: {
         Args: { p_drop: string; p_keep: string; p_values?: Json }
+        Returns: undefined
+      }
+      move_cadence_step: {
+        Args: { p_direction: number; p_step: string }
         Returns: undefined
       }
       normalize_domain: { Args: { raw: string }; Returns: string }
@@ -1864,6 +2144,7 @@ export type Database = {
         Returns: string
       }
       party_tracked_fields: { Args: never; Returns: string[] }
+      pause_cadence: { Args: { p_enrollment: string }; Returns: undefined }
       record_sent_email: {
         Args: {
           p_contact: string
@@ -1871,6 +2152,7 @@ export type Database = {
           p_oggetto: string
           p_opportunity: string
           p_party: string
+          p_task?: string
           p_template: string
         }
         Returns: string
@@ -1891,6 +2173,7 @@ export type Database = {
         Args: { p_id: string; p_motivo: string }
         Returns: undefined
       }
+      resume_cadence: { Args: { p_enrollment: string }; Returns: undefined }
       save_email_template: {
         Args: {
           p_corpo: string
@@ -1944,9 +2227,17 @@ export type Database = {
           totale: number
         }[]
       }
+      skip_cadence_step: {
+        Args: { p_motivo?: string; p_task: string }
+        Returns: undefined
+      }
       stage_label: {
         Args: { p_fase: Database["public"]["Enums"]["opportunity_stage"] }
         Returns: string
+      }
+      stop_cadence: {
+        Args: { p_enrollment: string; p_esito: string; p_motivo: string }
+        Returns: undefined
       }
       suppression_hash: { Args: { p_value: string }; Returns: string }
       template_unknown_variables: {
