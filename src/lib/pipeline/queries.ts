@@ -1,3 +1,4 @@
+import { activeEnrollments } from "@/lib/cadences/queries";
 import { partyName } from "@/lib/parties/labels";
 import { createClient } from "@/lib/supabase/server";
 import { nextActivityRange, type PipelineFilters } from "./filters";
@@ -28,6 +29,8 @@ export type PipelineItem = {
   prossimaIl: string | null;
   next: NextTask | null;
   motivoPerdita: LossReasonKey | null;
+  // Active or paused cadence (block 1a-8), on the pipeline only.
+  cadenza?: { nome: string; passo: number | null; passi: number; stato: "attiva" | "in_pausa" | "completata" | "fermata" } | null;
 };
 
 const MAX_ITEMS = 500;
@@ -72,7 +75,7 @@ export async function listPipeline(filters: PipelineFilters, userId: string, now
   }[];
   const truncated = rows.length > MAX_ITEMS;
   const items = rows.slice(0, MAX_ITEMS);
-  const next = await nextTasks(items.map((row) => row.id));
+  const [next, cadences] = await Promise.all([nextTasks(items.map((row) => row.id)), activeEnrollments(items.map((row) => row.id))]);
   return {
     truncated,
     items: items.map((row) => ({
@@ -88,6 +91,10 @@ export async function listPipeline(filters: PipelineFilters, userId: string, now
       prossimaIl: row.prossima_attivita_il,
       next: next.get(row.id) ?? null,
       motivoPerdita: row.motivo_perdita,
+      cadenza: (() => {
+        const enrollment = cadences.get(row.id);
+        return enrollment ? { nome: enrollment.cadenza, passo: enrollment.passo, passi: enrollment.passi, stato: enrollment.stato } : null;
+      })(),
     })),
   };
 }

@@ -149,12 +149,13 @@ export function AddToParkingButton({
   );
 }
 
-// Party list: checkbox of a row, tied to the selection form by its id.
-export function SelectPartyCheckbox({ formId, partyId, label }: { formId: string; partyId: string; label: string }) {
+// Party list (and pipeline table): checkbox of a row, tied to the selection
+// form by its id.
+export function SelectPartyCheckbox({ formId, partyId, label, name = "soggetto" }: { formId: string; partyId: string; label: string; name?: string }) {
   return (
     <input
       type="checkbox"
-      name="soggetto"
+      name={name}
       value={partyId}
       form={formId}
       aria-label={`Seleziona ${label}`}
@@ -164,15 +165,15 @@ export function SelectPartyCheckbox({ formId, partyId, label }: { formId: string
 }
 
 // "Seleziona tutti" of the page, in the table header.
-export function SelectAllCheckbox({ formId }: { formId: string }) {
+export function SelectAllCheckbox({ formId, label = "Seleziona tutti i soggetti della pagina" }: { formId: string; label?: string }) {
   return (
     <input
       type="checkbox"
-      aria-label="Seleziona tutti i soggetti della pagina"
+      aria-label={label}
       className="size-5 cursor-pointer accent-brand-blue"
       onChange={(event) => {
         document
-          .querySelectorAll<HTMLInputElement>(`input[type=checkbox][name=soggetto][form="${formId}"]`)
+          .querySelectorAll<HTMLInputElement>(`input[type=checkbox][form="${formId}"]`)
           .forEach((box) => (box.checked = event.target.checked));
       }}
     />
@@ -185,12 +186,15 @@ export function BulkAddToParking({
   formId,
   parkings,
   names,
+  extra,
   action = addToParking,
 }: {
   formId: string;
   parkings: ParkingOption[];
   // Names of the parties on the page, for the summary.
   names: Record<string, string>;
+  // More actions on the same selection (cadence, export).
+  extra?: React.ReactNode;
   // For previews and end-to-end tests only.
   action?: typeof addToParking;
 }) {
@@ -259,6 +263,7 @@ export function BulkAddToParking({
         <Button type="submit" disabled={pending || selected === 0} aria-busy={pending || undefined}>
           {pending ? "Aggiunta..." : "Aggiungi a parcheggio"}
         </Button>
+        {extra}
       </form>
       {error && <Alert tone="critical">{error}</Alert>}
       <Dialog

@@ -10,9 +10,11 @@ import { PAGE_SIZE, type ParkingFilterOption, type PartyFilters, type PartyListI
 import type { ParkingOption } from "@/lib/pipeline/queries";
 import { BulkAddToParking, SelectAllCheckbox, SelectPartyCheckbox } from "@/components/pipeline/add-to-parking";
 import { StageMenu } from "@/components/pipeline/stage-controls";
+import { EnrollButton, type CadenceOption } from "@/components/cadences/enroll-dialog";
 import { DataStatusBadge, DoNotContactBadge } from "./data-status-badge";
 
 const SELECTION_FORM = "selezione-soggetti";
+
 
 export function listHref(filters: PartyFilters, page: number): string {
   const params = new URLSearchParams();
@@ -40,6 +42,7 @@ export function PartyList({
   filters,
   parkings,
   activeParkings,
+  cadences = [],
 }: {
   items: PartyListItem[];
   total: number;
@@ -47,10 +50,13 @@ export function PartyList({
   parkings: ParkingFilterOption[];
   // Car parks a party can be added to (not archived).
   activeParkings: ParkingOption[];
+  // Active cadences, for "Iscrivi a cadenza".
+  cadences?: CadenceOption[];
 }) {
   const parkingCount = filters.parcheggi.length + (filters.senzaParcheggio ? 1 : 0);
   const filtered = Boolean(filters.q || filters.tipo || filters.categoria || filters.citta || filters.soloDaVerificare || parkingCount > 0);
   const pageCount = Math.max(1, Math.ceil(total / PAGE_SIZE));
+  const names = Object.fromEntries(items.map((item) => [item.id, partyName(item)]));
 
   return (
     <>
@@ -147,7 +153,12 @@ export function PartyList({
             <BulkAddToParking
               formId={SELECTION_FORM}
               parkings={activeParkings}
-              names={Object.fromEntries(items.map((item) => [item.id, partyName(item)]))}
+              names={names}
+              extra={
+                cadences.length > 0 && (
+                  <EnrollButton mode="parties" formId={SELECTION_FORM} cadences={cadences} parkings={activeParkings} names={names} />
+                )
+              }
             />
             <Table caption="Elenco dei soggetti">
               <thead>
