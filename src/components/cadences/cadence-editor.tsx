@@ -20,12 +20,37 @@ import type { Cadence, CadenceStep } from "@/lib/cadences/queries";
 import { safeCall } from "@/lib/import/safe-call";
 
 type TemplateOption = { famigliaId: string; nome: string };
+type EditorActions = {
+  save: typeof saveStep;
+  move: typeof moveStep;
+  remove: typeof deleteStep;
+  update: typeof updateCadence;
+  archive: typeof setCadenceArchived;
+  duplicate: typeof duplicateCadence;
+};
+const DEFAULT_ACTIONS: EditorActions = {
+  save: saveStep,
+  move: moveStep,
+  remove: deleteStep,
+  update: updateCadence,
+  archive: setCadenceArchived,
+  duplicate: duplicateCadence,
+};
 type Outcome = { ok: true; data: unknown } | { ok: false; message: string };
 
 // Editor of a cadence (B2): name and description, steps (add, edit, move,
 // delete), duplicate and archive. Changes to future steps apply to every
 // enrollment; steps already used are read-only.
-export function CadenceEditor({ cadence, templates }: { cadence: Cadence; templates: TemplateOption[] }) {
+export function CadenceEditor({
+  cadence,
+  templates,
+  actions = DEFAULT_ACTIONS,
+}: {
+  cadence: Cadence;
+  templates: TemplateOption[];
+  // For previews and end-to-end tests only.
+  actions?: EditorActions;
+}) {
   const router = useRouter();
   const [nome, setNome] = useState(cadence.nome);
   const [descrizione, setDescrizione] = useState(cadence.descrizione ?? "");
@@ -56,14 +81,14 @@ export function CadenceEditor({ cadence, templates }: { cadence: Cadence; templa
             <Button
               size="sm"
               disabled={pending}
-              onClick={() => run(() => duplicateCadence(cadence.id), undefined, (data) => router.push(`/cadenze/${(data as { id: string }).id}`))}
+              onClick={() => run(() => actions.duplicate(cadence.id), undefined, (data) => router.push(`/cadenze/${(data as { id: string }).id}`))}
             >
               Duplica
             </Button>
             <Button
               size="sm"
               disabled={pending}
-              onClick={() => run(() => setCadenceArchived(cadence.id, !cadence.archiviata), cadence.archiviata ? "Cadenza ripristinata." : "Cadenza archiviata: non si possono iscrivere altri.")}
+              onClick={() => run(() => actions.archive(cadence.id, !cadence.archiviata), cadence.archiviata ? "Cadenza ripristinata." : "Cadenza archiviata: non si possono iscrivere altri.")}
             >
               {cadence.archiviata ? "Ripristina" : "Archivia"}
             </Button>
@@ -78,7 +103,7 @@ export function CadenceEditor({ cadence, templates }: { cadence: Cadence; templa
           </Field>
         </div>
         <div className="mt-4 flex justify-end">
-          <Button size="md" disabled={pending} onClick={() => run(() => updateCadence({ id: cadence.id, nome, descrizione }), "Cadenza salvata.")}>
+          <Button size="md" disabled={pending} onClick={() => run(() => actions.update({ id: cadence.id, nome, descrizione }), "Cadenza salvata.")}>
             Salva nome e descrizione
           </Button>
         </div>
@@ -105,7 +130,7 @@ export function CadenceEditor({ cadence, templates }: { cadence: Cadence; templa
                   templates={templates}
                   pending={pending}
                   onCancel={() => setEditing(null)}
-                  onSave={(input) => run(() => saveStep({ ...input, cadenceId: cadence.id, stepId: step.id }), "Passo salvato.", () => setEditing(null))}
+                  onSave={(input) => run(() => actions.save({ ...input, cadenceId: cadence.id, stepId: step.id }), "Passo salvato.", () => setEditing(null))}
                 />
               ) : (
                 <StepRow
@@ -116,8 +141,8 @@ export function CadenceEditor({ cadence, templates }: { cadence: Cadence; templa
                   template={templates.find((item) => item.famigliaId === step.templateFamigliaId)?.nome ?? null}
                   pending={pending}
                   onEdit={() => setEditing(step.id)}
-                  onMove={(direction) => run(() => moveStep(cadence.id, step.id, direction))}
-                  onDelete={() => run(() => deleteStep(cadence.id, step.id), "Passo eliminato.")}
+                  onMove={(direction) => run(() => actions.move(cadence.id, step.id, direction))}
+                  onDelete={() => run(() => actions.remove(cadence.id, step.id), "Passo eliminato.")}
                 />
               )}
             </li>
@@ -131,7 +156,7 @@ export function CadenceEditor({ cadence, templates }: { cadence: Cadence; templa
                 templates={templates}
                 pending={pending}
                 onCancel={() => setEditing(null)}
-                onSave={(input) => run(() => saveStep({ ...input, cadenceId: cadence.id }), "Passo aggiunto.", () => setEditing(null))}
+                onSave={(input) => run(() => actions.save({ ...input, cadenceId: cadence.id }), "Passo aggiunto.", () => setEditing(null))}
               />
             </div>
           ) : (
