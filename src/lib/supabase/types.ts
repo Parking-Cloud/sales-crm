@@ -653,6 +653,7 @@ export type Database = {
         Row: {
           attivo: boolean
           corpo: string
+          corrente: boolean
           created_at: string
           created_by: string | null
           famiglia_id: string
@@ -666,6 +667,7 @@ export type Database = {
         Insert: {
           attivo?: boolean
           corpo: string
+          corrente?: boolean
           created_at?: string
           created_by?: string | null
           famiglia_id?: string
@@ -679,6 +681,7 @@ export type Database = {
         Update: {
           attivo?: boolean
           corpo?: string
+          corrente?: boolean
           created_at?: string
           created_by?: string | null
           famiglia_id?: string
@@ -1953,6 +1956,7 @@ export type Database = {
       template_variables: { Args: never; Returns: string[] }
       undo_import_batch: { Args: { p_batch: string }; Returns: Json }
       use_api_quota: { Args: { p_n?: number; p_sku: string }; Returns: Json }
+      use_template_version: { Args: { p_id: string }; Returns: undefined }
     }
     Enums: {
       activity_type: "chiamata" | "email" | "nota" | "incontro" | "cambio_fase"

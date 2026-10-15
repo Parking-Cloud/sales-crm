@@ -25,8 +25,8 @@ export default async function TemplatesPage() {
         <div>
           <h1 className="text-h2 leading-tight font-semibold">Template email</h1>
           <p className="mt-2 max-w-3xl text-body text-black-60">
-            Testi con variabili per &ldquo;Prepara email&rdquo;. Ogni salvataggio crea una nuova versione; le precedenti restano
-            consultabili.
+            Testi con variabili per &ldquo;Prepara email&rdquo;, condivisi da tutti. Ogni salvataggio crea una nuova versione, che
+            diventa quella attiva; le precedenti restano consultabili.
           </p>
         </div>
         <ButtonLink href="/template/nuovo" variant="primary" size="md">
@@ -43,7 +43,8 @@ export default async function TemplatesPage() {
                 <Th>Nome</Th>
                 <Th>Uso</Th>
                 <Th>Oggetto</Th>
-                <Th>Versione</Th>
+                <Th>Versione attiva</Th>
+                <Th>Ultima modifica</Th>
                 <Th>Stato</Th>
               </tr>
             </thead>
@@ -58,11 +59,11 @@ export default async function TemplatesPage() {
                   <Td>{TEMPLATE_USE_LABELS[template.uso]}</Td>
                   <Td wrap>{template.oggetto}</Td>
                   <Td>
-                    {template.versione}
-                    <span className="block text-caption text-black-60">
-                      {formatDate(template.creataIl)}
-                      {template.autore ? `, ${template.autore}` : ""}
-                    </span>
+                    {template.versione} di {template.versioni}
+                  </Td>
+                  <Td wrap>
+                    {formatDate(template.ultimaModificaIl)}
+                    <span className="block text-caption text-black-60">{template.ultimaModificaDa ?? "–"}</span>
                   </Td>
                   <Td>{template.attivo ? <Badge tone="success">In uso</Badge> : <Badge tone="neutral">Disattivato</Badge>}</Td>
                 </Tr>
