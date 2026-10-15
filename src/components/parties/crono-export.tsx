@@ -35,6 +35,7 @@ export function CronoExportButton({
   const [summary, setSummary] = useState<CronoSummary | null>(null);
   const [done, setDone] = useState<number | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [phase, setPhase] = useState<"controllo" | "scarico" | null>(null);
   const [pending, startTransition] = useTransition();
 
   const input = (): CronoExportInput => (scope === "selezionati" ? { partyIds: selected } : { filtri });
@@ -51,6 +52,7 @@ export function CronoExportButton({
 
   function check() {
     setError(null);
+    setPhase("controllo");
     startTransition(async () => {
       const result = await safeCall(() => actions.preview(input()));
       if (!result.ok) return setError(result.message);
@@ -60,6 +62,7 @@ export function CronoExportButton({
 
   function download() {
     setError(null);
+    setPhase("scarico");
     startTransition(async () => {
       const result = await safeCall(() => actions.download(input()));
       if (!result.ok) return setError(result.message);
@@ -93,7 +96,7 @@ export function CronoExportButton({
             {done === null &&
               (summary ? (
                 <Button variant="primary" size="md" disabled={pending || summary.esportate === 0} aria-busy={pending || undefined} onClick={download}>
-                  {pending ? "Preparazione..." : `Scarica ${summary.esportate} righe`}
+                  {pending && phase === "scarico" ? "Preparazione..." : `Scarica ${summary.esportate} righe`}
                 </Button>
               ) : (
                 <Button variant="primary" size="md" disabled={pending} aria-busy={pending || undefined} onClick={check}>
