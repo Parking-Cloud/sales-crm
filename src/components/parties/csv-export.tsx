@@ -1,24 +1,24 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import { downloadCronoExport, previewCronoExport, type CronoExportInput, type CronoSummary } from "@/app/(app)/soggetti/export-actions";
+import { downloadCsvExport, previewCsvExport, type CsvExportInput, type CsvExportSummary } from "@/app/(app)/soggetti/export-actions";
 import { Alert } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Dialog } from "@/components/ui/dialog";
-import { cronoFileName } from "@/lib/export/csv";
+import { exportFileName } from "@/lib/export/csv";
 import { safeCall } from "@/lib/import/safe-call";
 import { romeDay } from "@/lib/pipeline/dates";
 
-// "Esporta CSV per Crono" (block 1a-8, C1-C2): the selected parties, or all
+// "Esporta CSV" (block 1a-8, C1-C2): the selected parties, or all
 // the filtered ones. First the summary (exported rows, excluded ones with
 // the reason), then the download: the file is built here, in the browser,
 // and never stored on the server.
-export function CronoExportButton({
+export function CsvExportButton({
   formId,
   filtri,
   total,
   initiallyOpen = false,
-  actions = { preview: previewCronoExport, download: downloadCronoExport },
+  actions = { preview: previewCsvExport, download: downloadCsvExport },
 }: {
   formId: string;
   // Search parameters of the list, for "Tutti i filtrati".
@@ -27,18 +27,18 @@ export function CronoExportButton({
   total: number;
   // For previews and end-to-end tests only.
   initiallyOpen?: boolean;
-  actions?: { preview: typeof previewCronoExport; download: typeof downloadCronoExport };
+  actions?: { preview: typeof previewCsvExport; download: typeof downloadCsvExport };
 }) {
   const [open, setOpen] = useState(initiallyOpen);
   const [selected, setSelected] = useState<string[]>([]);
   const [scope, setScope] = useState<"selezionati" | "filtrati">("filtrati");
-  const [summary, setSummary] = useState<CronoSummary | null>(null);
+  const [summary, setSummary] = useState<CsvExportSummary | null>(null);
   const [done, setDone] = useState<number | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [phase, setPhase] = useState<"controllo" | "scarico" | null>(null);
   const [pending, startTransition] = useTransition();
 
-  const input = (): CronoExportInput => (scope === "selezionati" ? { partyIds: selected } : { filtri });
+  const input = (): CsvExportInput => (scope === "selezionati" ? { partyIds: selected } : { filtri });
 
   function openDialog() {
     const ids = [...document.querySelectorAll<HTMLInputElement>(`input[type=checkbox][form="${formId}"]:checked`)].map((box) => box.value);
@@ -69,7 +69,7 @@ export function CronoExportButton({
       const url = URL.createObjectURL(new Blob([result.data.csv], { type: "text/csv;charset=utf-8" }));
       const link = document.createElement("a");
       link.href = url;
-      link.download = cronoFileName(romeDay(new Date()));
+      link.download = exportFileName(romeDay(new Date()));
       document.body.appendChild(link);
       link.click();
       link.remove();
@@ -81,11 +81,11 @@ export function CronoExportButton({
   return (
     <>
       <Button size="sm" onClick={openDialog}>
-        Esporta CSV per Crono
+        Esporta CSV
       </Button>
       <Dialog
         open={open}
-        title="Esporta CSV per Crono"
+        title="Esporta soggetti e contatti"
         busy={pending}
         onClose={() => setOpen(false)}
         footer={
@@ -145,7 +145,7 @@ export function CronoExportButton({
               )}
             </div>
           )}
-          {done !== null && <Alert tone="success">File scaricato: {done === 1 ? "1 riga" : `${done} righe`}. Importalo in Crono.</Alert>}
+          {done !== null && <Alert tone="success">File scaricato: {done === 1 ? "1 riga" : `${done} righe`}.</Alert>}
           {error && <Alert tone="critical">{error}</Alert>}
         </div>
       </Dialog>

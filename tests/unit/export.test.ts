@@ -1,7 +1,7 @@
-// Unit tests of the CSV for Crono (block 1a-8).  Run: npm run test:unit
+// Unit tests of the CSV export (block 1a-8).  Run: npm run test:unit
 import assert from "node:assert/strict";
 import { test } from "node:test";
-import { CRONO_COLUMNS, cronoFileName, csvField, toCsv } from "../../src/lib/export/csv";
+import { EXPORT_COLUMNS, exportFileName, csvField, toCsv } from "../../src/lib/export/csv";
 
 test("CSV fields: commas, quotes, accents, line breaks, edge spaces", () => {
   assert.equal(csvField("Mario"), "Mario");
@@ -15,9 +15,9 @@ test("CSV fields: commas, quotes, accents, line breaks, edge spaces", () => {
   assert.equal(csvField("+39 02 0000 0000"), "+39 02 0000 0000");
 });
 
-test("CSV file: English headers in Crono's order, CRLF lines, one row per contact", () => {
-  const empty = Object.fromEntries(CRONO_COLUMNS.map((column) => [column, null])) as Record<(typeof CRONO_COLUMNS)[number], string | null>;
-  const csv = toCsv(CRONO_COLUMNS, [
+test("CSV file: English headers in a fixed order, CRLF lines, one row per contact", () => {
+  const empty = Object.fromEntries(EXPORT_COLUMNS.map((column) => [column, null])) as Record<(typeof EXPORT_COLUMNS)[number], string | null>;
+  const csv = toCsv(EXPORT_COLUMNS, [
     { ...empty, first_name: "Mario", last_name: "Esempio", job_title: 'Resp. "acquisti", sede', email: "mario@example.com", company: "Azienda Esempio Srl", city: "Forlì", stage: "Da contattare", email_permission: "sì - richiesta in chiamata" },
     { ...empty, company: "Studio Prova", email_permission: "no" },
   ]);
@@ -27,5 +27,5 @@ test("CSV file: English headers in Crono's order, CRLF lines, one row per contac
       'Mario,Esempio,"Resp. ""acquisti"", sede",mario@example.com,,Azienda Esempio Srl,,Forlì,,Da contattare,sì - richiesta in chiamata\r\n' +
       ",,,,,Studio Prova,,,,,no\r\n",
   );
-  assert.equal(cronoFileName("2026-10-15"), "crono-contatti-2026-10-15.csv");
+  assert.equal(exportFileName("2026-10-15"), "soggetti-2026-10-15.csv");
 });

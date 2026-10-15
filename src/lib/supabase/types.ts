@@ -1989,26 +1989,6 @@ export type Database = {
         }
         Returns: Json
       }
-      crono_export_rows: {
-        Args: { p_parking?: string; p_parties: string[] }
-        Returns: {
-          city: string
-          company: string
-          contact_id: string
-          email: string
-          email_permission: string
-          escluso: boolean
-          first_name: string
-          job_title: string
-          last_name: string
-          motivo: string
-          parking: string
-          party_id: string
-          phone: string
-          stage: string
-          website: string
-        }[]
-      }
       delete_cadence_step: { Args: { p_step: string }; Returns: undefined }
       delete_party: { Args: { p_party: string }; Returns: Json }
       do_not_contact_values: {
@@ -2047,6 +2027,26 @@ export type Database = {
           motivo: string
           opportunity_id: string
           party_id: string
+        }[]
+      }
+      export_party_rows: {
+        Args: { p_parking?: string; p_parties: string[] }
+        Returns: {
+          city: string
+          company: string
+          contact_id: string
+          email: string
+          email_permission: string
+          escluso: boolean
+          first_name: string
+          job_title: string
+          last_name: string
+          motivo: string
+          parking: string
+          party_id: string
+          phone: string
+          stage: string
+          website: string
         }[]
       }
       gdpr_erase: { Args: { p_entita: string; p_id: string }; Returns: Json }
@@ -2091,7 +2091,7 @@ export type Database = {
         }
         Returns: Json
       }
-      log_crono_export: {
+      log_csv_export: {
         Args: { p_escluse: number; p_righe: number }
         Returns: undefined
       }

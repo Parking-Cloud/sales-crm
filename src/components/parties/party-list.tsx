@@ -11,7 +11,7 @@ import type { ParkingOption } from "@/lib/pipeline/queries";
 import { BulkAddToParking, SelectAllCheckbox, SelectPartyCheckbox } from "@/components/pipeline/add-to-parking";
 import { StageMenu } from "@/components/pipeline/stage-controls";
 import { EnrollButton, type CadenceOption } from "@/components/cadences/enroll-dialog";
-import { CronoExportButton } from "./crono-export";
+import { CsvExportButton } from "./csv-export";
 import { DataStatusBadge, DoNotContactBadge } from "./data-status-badge";
 
 const SELECTION_FORM = "selezione-soggetti";
@@ -166,7 +166,7 @@ export function PartyList({
                   {cadences.length > 0 && (
                     <EnrollButton mode="parties" formId={SELECTION_FORM} cadences={cadences} parkings={activeParkings} names={names} />
                   )}
-                  <CronoExportButton formId={SELECTION_FORM} filtri={filterParams(filters)} total={total} />
+                  <CsvExportButton formId={SELECTION_FORM} filtri={filterParams(filters)} total={total} />
                 </>
               }
             />

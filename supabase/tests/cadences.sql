@@ -1,5 +1,5 @@
 -- Block 1a-8: template versions, optional signature, light cadences (working
--- days, steps, enrollments, automatic stops), export for Crono.
+-- days, steps, enrollments, automatic stops), CSV export.
 --
 -- Run with all migrations applied, as the database owner:
 --   npm run db:test   (Supabase Management API)
@@ -375,14 +375,14 @@ select pg_temp.record(
 reset role;
 
 -- ---------------------------------------------------------------------------
--- C: export for Crono
+-- C: CSV export
 -- ---------------------------------------------------------------------------
 
 select public.add_suppression('telefono', '02 7777 8888', 'Opposizione', 'telefono');
 update public.parties set gdpr_cancellato_il = now(), non_contattare = true where id = pg_temp.id('g');
 select pg_temp.act_as(pg_temp.id('operatore'));
 create temp table export_rows as
-select * from public.crono_export_rows(array[pg_temp.id('a'), pg_temp.id('b'), pg_temp.id('c'), pg_temp.id('g')], null);
+select * from public.export_party_rows(array[pg_temp.id('a'), pg_temp.id('b'), pg_temp.id('c'), pg_temp.id('g')], null);
 grant all on export_rows to authenticated;
 select pg_temp.record(
   'esportazione: una riga per contatto, con parcheggio, fase, città e permesso',
@@ -397,11 +397,11 @@ select pg_temp.record(
   and (select bool_and(escluso) and bool_and(motivo like 'Soggetto%') from export_rows where party_id = pg_temp.id('c'))
   and (select bool_and(escluso) and bool_and(motivo = 'Cancellato per richiesta GDPR') from export_rows where party_id = pg_temp.id('g'))
 );
-select public.log_crono_export(2, 3);
+select public.log_csv_export(2, 3);
 reset role;
 select pg_temp.record(
   'esportazione: nell''audit chi, quando e quante righe, senza dati',
-  exists (select 1 from public.audit_logs where entita = 'esportazione_crono' and utente_id = pg_temp.id('operatore')
+  exists (select 1 from public.audit_logs where entita = 'esportazione_csv' and utente_id = pg_temp.id('operatore')
           and dopo = '{"righe_esportate": 2, "righe_escluse": 3}'::jsonb and prima is null)
 );
 
