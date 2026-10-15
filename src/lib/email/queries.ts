@@ -26,12 +26,14 @@ export type TemplateVersion = {
   oggetto: string;
   corpo: string;
   attivo: boolean;
+  // The version "Prepara email" uses (block 1a-8).
+  corrente: boolean;
   creataIl: string;
   autore: string | null;
 };
 
 const TEMPLATE_COLUMNS =
-  "id, famiglia_id, versione, nome, uso, oggetto, corpo, attivo, created_at, autore:users!email_templates_created_by_fkey(nome, email)";
+  "id, famiglia_id, versione, nome, uso, oggetto, corpo, attivo, corrente, created_at, autore:users!email_templates_created_by_fkey(nome, email)";
 
 type TemplateRow = {
   id: string;
@@ -42,6 +44,7 @@ type TemplateRow = {
   oggetto: string;
   corpo: string;
   attivo: boolean;
+  corrente: boolean;
   created_at: string;
   autore: UserRef;
 };
@@ -56,23 +59,43 @@ function toVersion(row: TemplateRow): TemplateVersion {
     oggetto: row.oggetto,
     corpo: row.corpo,
     attivo: row.attivo,
+    corrente: row.corrente,
     creataIl: row.created_at,
     autore: userName(row.autore),
   };
 }
 
-// The latest version of every template, by name.
-export async function listTemplates(options: { onlyActive?: boolean } = {}): Promise<TemplateVersion[]> {
+// The active version of every template, by name, with who changed it last
+// and when (the newest version): templates are shared by everyone.
+export type TemplateSummary = TemplateVersion & { versioni: number; ultimaModificaIl: string; ultimaModificaDa: string | null };
+
+export async function listTemplates(options: { onlyActive?: boolean } = {}): Promise<TemplateSummary[]> {
   const supabase = await createClient();
   const { data, error } = await supabase.from("email_templates").select(TEMPLATE_COLUMNS).order("versione", { ascending: false });
   if (error) fail("email_templates", error);
-  const latest = new Map<string, TemplateVersion>();
+  const families = new Map<string, TemplateVersion[]>();
   for (const row of (data ?? []) as unknown as TemplateRow[]) {
-    if (!latest.has(row.famiglia_id)) latest.set(row.famiglia_id, toVersion(row));
+    families.set(row.famiglia_id, [...(families.get(row.famiglia_id) ?? []), toVersion(row)]);
   }
-  return [...latest.values()]
+  return [...families.values()]
+    .map((versions) => {
+      const latest = versions[0];
+      const current = versions.find((version) => version.corrente) ?? latest;
+      return { ...current, versioni: versions.length, ultimaModificaIl: latest.creataIl, ultimaModificaDa: latest.autore };
+    })
     .filter((template) => !options.onlyActive || template.attivo)
     .sort((a, b) => a.nome.localeCompare(b.nome, "it"));
+}
+
+// Emails sent with each version, to tell which versions can be deleted.
+export async function templateUsage(versionIds: string[]): Promise<Map<string, number>> {
+  const out = new Map<string, number>();
+  if (versionIds.length === 0) return out;
+  const supabase = await createClient();
+  const { data, error } = await supabase.from("communications").select("template_id").in("template_id", versionIds);
+  if (error) fail("communications", error);
+  for (const row of data ?? []) if (row.template_id) out.set(row.template_id, (out.get(row.template_id) ?? 0) + 1);
+  return out;
 }
 
 // All the versions of a template, newest first.

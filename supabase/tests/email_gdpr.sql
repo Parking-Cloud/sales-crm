@@ -195,8 +195,11 @@ select pg_temp.expect_error(
   format($$update public.email_templates set corpo = 'Cambiato' where id = %L$$, pg_temp.id('t1')),
   '42501'
 );
-with gone as (delete from public.email_templates where id = pg_temp.id('t1') returning 1)
-select pg_temp.record('template: le versioni non si cancellano (nessuna riga)', (select count(*) from gone) = 0);
+select pg_temp.expect_error(
+  'template: la versione attiva non si cancella (1a-8)',
+  format($$delete from public.email_templates where id = %L$$, pg_temp.id('t2')),
+  '42501'
+);
 reset role;
 select pg_temp.act_as(pg_temp.id('operatore'));
 select pg_temp.expect_error(
@@ -217,10 +220,10 @@ $$;
 select pg_temp.act_as(pg_temp.id('operatore'));
 insert into test_json select 'e0', public.email_eligibility(pg_temp.id('a'), pg_temp.id('ca'));
 select pg_temp.record(
-  'ammissibilità: senza permesso, firma e piede l''email non è ammessa, con i motivi',
+  'ammissibilità: senza permesso e piede l''email non è ammessa, con i motivi; la firma vuota non blocca (1a-8)',
   not (pg_temp.j('e0') ->> 'ammessa')::boolean
   and not pg_temp.check_ok(pg_temp.j('e0'), 'permesso')
-  and not pg_temp.check_ok(pg_temp.j('e0'), 'firma')
+  and pg_temp.check_ok(pg_temp.j('e0'), 'firma')
   and not pg_temp.check_ok(pg_temp.j('e0'), 'piede')
   and pg_temp.check_ok(pg_temp.j('e0'), 'esclusione')
 );
@@ -439,7 +442,8 @@ select pg_temp.record(
   exists (select 1 from public.audit_logs where entita = 'parties' and entita_id = pg_temp.id('b') and azione = 'delete'
           and utente_id = pg_temp.id('admin') and dopo ->> 'gdpr' is not null and (dopo ->> 'contatti')::int = 1)
   and not exists (select 1 from public.audit_logs
-                  where (prima::text || coalesce(dopo::text, '')) ~* '(giovanni|finto|3334445555|chiamare dopo)')
+                  where entita <> 'email_templates'
+                    and (prima::text || coalesce(dopo::text, '')) ~* '(giovanni|finto|3334445555|chiamare dopo)')
 );
 select pg_temp.act_as(pg_temp.id('operatore'));
 select pg_temp.record(

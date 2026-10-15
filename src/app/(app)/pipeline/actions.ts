@@ -180,6 +180,9 @@ export type ActivityResult = {
   // Party of the activity, for the "Prepara email" link.
   partyId: string | null;
   permesso: { registrato: true; contactId: string | null } | { registrato: false; messaggio: string } | null;
+  // Active cadence of the opportunity after an answered call: the dialog
+  // asks whether to stop it (block 1a-8, B6).
+  cadenza: { enrollmentId: string; nome: string } | null;
 };
 
 function nextInstant(day: string, time: string): Date | null | "invalid" {
@@ -240,10 +243,20 @@ export async function logActivity(input: ActivityInput): Promise<Result<Activity
         }
       : { registrato: true, contactId: asked.contactId };
   }
+  let cadenza: ActivityResult["cadenza"] = null;
+  if (esito === "risposto" && opportunityId) {
+    const { data: enrollment } = await supabase
+      .from("cadence_enrollments")
+      .select("id, cadence:cadences!cadence_enrollments_cadence_id_fkey(nome)")
+      .eq("opportunity_id", opportunityId)
+      .eq("stato", "attiva")
+      .maybeSingle();
+    if (enrollment) cadenza = { enrollmentId: enrollment.id, nome: (enrollment.cadence as { nome: string } | null)?.nome ?? "Cadenza" };
+  }
   refresh(opportunityId, party);
   return {
     ok: true,
-    data: { proponiContattata: Boolean((data as { proponi_contattata?: boolean } | null)?.proponi_contattata), partyId: party, permesso },
+    data: { proponiContattata: Boolean((data as { proponi_contattata?: boolean } | null)?.proponi_contattata), partyId: party, permesso, cadenza },
   };
 }
 

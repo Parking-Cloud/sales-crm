@@ -10,6 +10,7 @@ import { safeCall } from "@/lib/import/safe-call";
 import { HANDOFF_STAGE_NOTE, MANUAL_STAGES, STAGES, STAGE_LABELS, opportunityBadge, type Stage } from "@/lib/pipeline/labels";
 import type { PipelineItem } from "@/lib/pipeline/queries";
 import { ActivityButton } from "./activity-dialog";
+import { CadenceLine } from "./cadence-line";
 import { NextActivity } from "./next-activity";
 import { MoveToMenu } from "./stage-controls";
 
@@ -153,6 +154,7 @@ function PipelineCard({
       <p className="text-caption text-black-80">
         {item.parking}
         <span className="block">{item.responsabile ? `Responsabile: ${item.responsabile}` : "Senza responsabile"}</span>
+        <CadenceLine cadenza={item.cadenza} />
       </p>
       {open && <NextActivity item={item} now={now} />}
       {open && (

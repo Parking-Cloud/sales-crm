@@ -72,3 +72,36 @@ export function BanIcon({ className, size = 14 }: IconProps) {
     </svg>
   );
 }
+
+// Cadence steps (block 1a-8).
+export function PhoneIcon({ className, size = 16 }: IconProps) {
+  return (
+    <svg aria-hidden="true" width={size} height={size} viewBox="0 0 20 20" className={className}>
+      <path
+        d="M6.6 2.75 8.4 6.6 6.9 8.1c.9 2 2.6 3.7 4.6 4.6l1.5-1.5 3.85 1.8-.6 3c-.1.5-.55.85-1.05.8C8.6 16.4 3.6 11.4 3 4.85c-.05-.5.3-.95.8-1.05l2.8-1.05Z"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.6"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
+}
+
+export function MailIcon({ className, size = 16 }: IconProps) {
+  return (
+    <svg aria-hidden="true" width={size} height={size} viewBox="0 0 20 20" className={className}>
+      <rect x="2.75" y="4.5" width="14.5" height="11" rx="1.5" fill="none" stroke="currentColor" strokeWidth="1.6" />
+      <path d="m3.5 5.5 6.5 5 6.5-5" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinejoin="round" />
+    </svg>
+  );
+}
+
+export function TaskIcon({ className, size = 16 }: IconProps) {
+  return (
+    <svg aria-hidden="true" width={size} height={size} viewBox="0 0 20 20" className={className}>
+      <rect x="3.25" y="3.25" width="13.5" height="13.5" rx="2" fill="none" stroke="currentColor" strokeWidth="1.6" />
+      <path d="m6.75 10.25 2.25 2.25 4.25-4.75" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
+}

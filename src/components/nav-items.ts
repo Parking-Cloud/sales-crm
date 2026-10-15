@@ -12,6 +12,7 @@ export const NAV_ITEMS: NavItem[] = [
   { href: "/ricerca-mappa", label: "Ricerca su mappa" },
   { href: "/soggetti", label: "Soggetti" },
   { href: "/pipeline", label: "Pipeline" },
+  { href: "/cadenze", label: "Cadenze" },
   { href: "/import", label: "Import" },
   { href: "/template", label: "Template email", adminOnly: true },
   { href: "/esclusioni", label: "Esclusioni" },

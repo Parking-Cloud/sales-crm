@@ -4,6 +4,7 @@ import { PartyList } from "@/components/parties/party-list";
 import { getCurrentUser } from "@/lib/auth/current-user";
 import { SIGN_IN_PATH } from "@/lib/auth/routes";
 import { listParkingFilterOptions, readPartyFilters, searchParties } from "@/lib/parties/queries";
+import { listCadences } from "@/lib/cadences/queries";
 import { listParkingOptions } from "@/lib/pipeline/queries";
 
 export const metadata: Metadata = { title: "Soggetti" };
@@ -17,10 +18,20 @@ export default async function PartiesPage({
   if (!user) redirect(SIGN_IN_PATH);
 
   const filters = readPartyFilters(await searchParams);
-  const [{ items, total }, parkings, activeParkings] = await Promise.all([
+  const [{ items, total }, parkings, activeParkings, cadences] = await Promise.all([
     searchParties(filters),
     listParkingFilterOptions(),
     listParkingOptions(),
+    listCadences(),
   ]);
-  return <PartyList items={items} total={total} filters={filters} parkings={parkings} activeParkings={activeParkings} />;
+  return (
+    <PartyList
+      items={items}
+      total={total}
+      filters={filters}
+      parkings={parkings}
+      activeParkings={activeParkings}
+      cadences={cadences.filter((cadence) => cadence.steps.length > 0).map((cadence) => ({ id: cadence.id, nome: cadence.nome, passi: cadence.steps.length }))}
+    />
+  );
 }

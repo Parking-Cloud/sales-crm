@@ -3,6 +3,7 @@ import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { TemplateForm } from "@/components/email/template-form";
 import { TemplateToggle } from "@/components/email/template-toggle";
+import { TemplateVersionControls } from "@/components/email/template-version-controls";
 import { Alert } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -13,9 +14,9 @@ import {
   getEmailSettings,
   getSignature,
   listEmailOpportunities,
-  listPartyPermissions,
   listRecipients,
   listTemplateVersions,
+  templateUsage,
   templateValues,
 } from "@/lib/email/queries";
 import { TEMPLATE_USE_LABELS, TEMPLATE_VARIABLE_LABELS, buildFooter, renderTemplate, withFooter } from "@/lib/email/template";
@@ -46,10 +47,13 @@ export default async function TemplatePage({ params, searchParams }: { params: P
   const versions = await listTemplateVersions(famiglia);
   if (versions.length === 0) notFound();
   const latest = versions[0];
+  // The active version: the one "Prepara email" uses and new versions start from.
+  const active = versions.find((version) => version.corrente) ?? latest;
+  const usage = await templateUsage(versions.map((version) => version.id));
   const search = await searchParams;
   const savedVersion = one(search.salvata);
   const shownNumber = Number.parseInt(one(search.versione), 10);
-  const shown = versions.find((version) => version.versione === shownNumber) ?? latest;
+  const shown = versions.find((version) => version.versione === shownNumber) ?? active;
   const base = `/template/${famiglia}`;
 
   // Preview with a real party chosen by the administrator.
@@ -65,19 +69,13 @@ export default async function TemplatePage({ params, searchParams }: { params: P
       const opportunities = await listEmailOpportunities(previewId);
       const parkingParam = one(search.parcheggio);
       const parkingId = UUID.test(parkingParam) ? parkingParam : (opportunities.find((opp) => opp.aperta) ?? opportunities[0])?.parkingId ?? null;
-      const [signature, settings, permissions] = await Promise.all([
-        getSignature(user.id),
-        getEmailSettings(),
-        listPartyPermissions(previewId, contact?.id ? [contact.id] : []),
-      ]);
+      const [signature, settings] = await Promise.all([getSignature(user.id), getEmailSettings()]);
       const values = await templateValues({ partyName: party.nome, contactName: contact?.id ? contact.nome : null, parkingId, signature });
       const subject = renderTemplate(shown.oggetto, values);
       const body = renderTemplate(shown.corpo, values);
-      const permission = permissions.find((row) => row.contactId === (contact?.id ?? null)) ?? null;
       const footer = buildFooter({
         ragioneSociale: settings.ragioneSociale ?? "[ragione sociale da impostare]",
         emailOpposizione: settings.emailOpposizione ?? "[indirizzo per l'opposizione da impostare]",
-        permesso: permission ? { base: permission.base, data: permission.data } : { base: "richiesta_in_chiamata", data: new Date().toISOString() },
       });
       preview = {
         subject: subject.text,
@@ -102,7 +100,11 @@ export default async function TemplatePage({ params, searchParams }: { params: P
           <div className="mt-2 flex flex-wrap items-center gap-2">
             <Badge tone="info">{TEMPLATE_USE_LABELS[latest.uso]}</Badge>
             {latest.attivo ? <Badge tone="success">In uso</Badge> : <Badge tone="neutral">Disattivato</Badge>}
-            <span className="text-caption text-black-60">Versione {latest.versione}</span>
+            <Badge tone="info">Versione attiva: {active.versione}</Badge>
+            <span className="text-caption text-black-60">
+              {versions.length === 1 ? "1 versione" : `${versions.length} versioni`}, ultima del {formatDate(latest.creataIl)}
+              {latest.autore ? ` (${latest.autore})` : ""}
+            </span>
           </div>
         </div>
         <div className="flex flex-wrap gap-2">
@@ -112,7 +114,7 @@ export default async function TemplatePage({ params, searchParams }: { params: P
 
       {savedVersion && (
         <Alert tone="success" className="mt-6">
-          Salvata la versione {savedVersion}.
+          Salvata la versione {savedVersion}: ora è quella attiva.
         </Alert>
       )}
 
@@ -186,7 +188,11 @@ export default async function TemplatePage({ params, searchParams }: { params: P
           <h2 id="modifica-titolo" className="mb-3 text-h3 font-semibold">
             Nuova versione
           </h2>
-          <TemplateForm template={latest} />
+          <p className="mb-3 text-caption text-black-60">
+            Parte dalla versione attiva ({active.versione}); salvando diventa la nuova versione attiva. I template sono condivisi da
+            tutti.
+          </p>
+          <TemplateForm template={{ ...active, versione: latest.versione }} />
         </section>
 
         <section aria-labelledby="versioni-titolo" className="rounded-md border border-grey-60 bg-white p-5 shadow-sm sm:p-6">
@@ -202,14 +208,18 @@ export default async function TemplatePage({ params, searchParams }: { params: P
                     {formatDate(version.creataIl)}
                     {version.autore ? `, ${version.autore}` : ""}
                   </span>
+                  {version.corrente && <Badge tone="success">Attiva: usata da Prepara email</Badge>}
                   {version.versione === shown.versione ? (
-                    <Badge tone="info">Mostrata nell&apos;anteprima</Badge>
+                    <Badge tone="neutral">Mostrata nell&apos;anteprima</Badge>
                   ) : (
                     <Link href={`${base}?versione=${version.versione}`} className="rounded-xs text-caption font-semibold text-blue-ink underline underline-offset-2">
                       Vedi questa versione
                     </Link>
                   )}
                 </p>
+                <div className="mt-2">
+                  <TemplateVersionControls id={version.id} versione={version.versione} corrente={version.corrente} usata={usage.get(version.id) ?? 0} />
+                </div>
                 {version.versione === shown.versione && (
                   <div className="mt-2 rounded-sm bg-grey-20 p-3 text-caption">
                     <p>

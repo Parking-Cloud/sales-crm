@@ -105,6 +105,8 @@ export async function recordSentEmail(input: {
   templateId: string | null;
   oggetto: string;
   corpo: string;
+  // Cadence email step this email completes (block 1a-8).
+  taskId?: string | null;
 }): Promise<Result<{ communicationId: string }>> {
   if (!(await getCurrentUser())) return { ok: false, message: NOT_ALLOWED };
   const id = (value: string | null) => (value && UUID.test(value) ? value : null);
@@ -119,6 +121,7 @@ export async function recordSentEmail(input: {
     p_template: id(input.templateId) as string,
     p_oggetto: input.oggetto.trim().slice(0, 300),
     p_corpo: input.corpo.slice(0, 30000),
+    p_task: id(input.taskId ?? null) ?? undefined,
   });
   if (error) {
     if (error.code === "42501" && error.message?.startsWith("email not allowed")) {
@@ -128,5 +131,6 @@ export async function recordSentEmail(input: {
   }
   refresh(input.partyId, input.opportunityId);
   revalidatePath("/pipeline");
+  revalidatePath("/oggi");
   return { ok: true, data: { communicationId: data as string } };
 }

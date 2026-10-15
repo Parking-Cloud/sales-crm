@@ -53,23 +53,13 @@ test("signature: needs the name, empty lines dropped", () => {
   );
 });
 
-test("footer: who we are, how we got the contact (by basis, with the date), how to opt out", () => {
-  const footer = buildFooter({
-    ragioneSociale: "Societa Esempio Srl",
-    emailOpposizione: "opposizione@example.com",
-    permesso: { base: "richiesta_in_chiamata", data: "2026-10-14T10:00:00Z" },
-  });
-  assert.match(footer, /Societa Esempio Srl \(Parking Cloud\)/);
-  assert.match(footer, /ci ha chiesto queste informazioni al telefono il 14\/10\/2026\./);
-  assert.match(footer, /risponda "NO" a questa email oppure scriva a opposizione@example\.com/);
-  assert.match(
-    buildFooter({ ragioneSociale: "S", emailOpposizione: "o@example.com", permesso: { base: "contatto_in_entrata", data: "2026-10-01T10:00:00Z" } }),
-    /ci ha scritto per primo il 01\/10\/2026/,
+test("footer: who we are and how to opt out, never how we got the contact (1a-8)", () => {
+  const footer = buildFooter({ ragioneSociale: "Societa Esempio Srl", emailOpposizione: "opposizione@example.com" });
+  assert.equal(
+    footer,
+    '--\nQuesta email Le arriva da Societa Esempio Srl (Parking Cloud).\nSe non desidera ricevere altre comunicazioni, risponda "NO" a questa email oppure scriva a opposizione@example.com.',
   );
-  assert.match(
-    buildFooter({ ragioneSociale: "S", emailOpposizione: "o@example.com", permesso: { base: "consenso", data: "2026-10-01T10:00:00Z" } }),
-    /consenso a ricevere nostre comunicazioni il 01\/10\/2026/,
-  );
+  assert.doesNotMatch(footer, /Abbiamo il Suo contatto|ci ha chiesto|ci ha scritto|consenso/);
   assert.equal(withFooter("Testo\n\n\n", "--\nPiede"), "Testo\n\n--\nPiede");
 });
 

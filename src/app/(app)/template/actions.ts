@@ -90,3 +90,35 @@ export async function setTemplateActive(famigliaId: string, attivo: boolean): Pr
   revalidatePath(`/template/${famigliaId}`);
   return { ok: true, data: null };
 }
+
+// "Usa questa versione": the version "Prepara email" uses (block 1a-8).
+export async function activateTemplateVersion(id: string): Promise<{ ok: true; data: null } | { ok: false; message: string }> {
+  const user = await getCurrentUser();
+  if (!user?.isAdmin) return { ok: false, message: NOT_ADMIN };
+  if (!UUID.test(id ?? "")) return { ok: false, message: "Versione non trovata." };
+  const supabase = await createClient();
+  const { data: version } = await supabase.from("email_templates").select("famiglia_id").eq("id", id).maybeSingle();
+  const { error } = await supabase.rpc("use_template_version", { p_id: id });
+  if (error) return { ok: false, message: error.code === "42501" ? NOT_ADMIN : "Operazione non riuscita. Riprova." };
+  revalidatePath("/template");
+  if (version) revalidatePath(`/template/${version.famiglia_id}`);
+  return { ok: true, data: null };
+}
+
+// Deletes a version never used by an email and not active.
+export async function deleteTemplateVersion(id: string): Promise<{ ok: true; data: null } | { ok: false; message: string }> {
+  const user = await getCurrentUser();
+  if (!user?.isAdmin) return { ok: false, message: NOT_ADMIN };
+  if (!UUID.test(id ?? "")) return { ok: false, message: "Versione non trovata." };
+  const supabase = await createClient();
+  const { data, error } = await supabase.from("email_templates").delete().eq("id", id).select("famiglia_id");
+  if (error) {
+    if (error.message?.includes("active")) return { ok: false, message: "La versione attiva non si elimina: prima scegline un'altra." };
+    if (error.message?.includes("used by an email")) return { ok: false, message: "Questa versione è stata usata in un'email: resta in sola lettura." };
+    return { ok: false, message: error.code === "42501" ? NOT_ADMIN : "Eliminazione non riuscita. Riprova." };
+  }
+  if (!data || data.length === 0) return { ok: false, message: "Versione non trovata." };
+  revalidatePath("/template");
+  revalidatePath(`/template/${data[0].famiglia_id}`);
+  return { ok: true, data: null };
+}

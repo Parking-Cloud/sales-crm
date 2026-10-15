@@ -10,8 +10,8 @@ import { formatSignature, type Signature } from "@/lib/email/template";
 
 const INITIAL: EmailFormState = { version: 0, status: "idle" };
 
-// "La tua firma" (B2): each user fills their own; {firma} uses it and an
-// email cannot be prepared without it.
+// "La tua firma" (B2): each user fills their own; {firma} uses it. Optional
+// since block 1a-8: when empty {firma} stays empty (Gmail can add its own).
 export function SignatureForm({ signature, initialState = INITIAL }: { signature: Signature; initialState?: EmailFormState }) {
   const [state, formAction, pending] = useActionState(saveMySignature, initialState);
   const values = state.values ?? {
@@ -24,10 +24,10 @@ export function SignatureForm({ signature, initialState = INITIAL }: { signature
   const preview = formatSignature({ nome: values.firma_nome, ruolo: values.firma_ruolo, telefono: values.firma_telefono, testo: values.firma_testo });
   return (
     <form key={state.version} action={formAction} noValidate className="flex flex-col gap-4">
-      {state.status === "saved" && <Alert tone="success">Firma salvata.</Alert>}
+      {state.status === "saved" && <Alert tone="success">{values.firma_nome ? "Firma salvata." : "Firma del CRM vuota: {firma} resterà vuota."}</Alert>}
       {state.status === "error" && state.message && <Alert tone="critical">{state.message}</Alert>}
       <div className="grid gap-4 sm:grid-cols-3">
-        <Field id="firma_nome" label="Nome" error={errors.firma_nome} required>
+        <Field id="firma_nome" label="Nome" error={errors.firma_nome}>
           <Input id="firma_nome" name="firma_nome" defaultValue={values.firma_nome} maxLength={120} autoComplete="name" invalid={Boolean(errors.firma_nome)} />
         </Field>
         <Field id="firma_ruolo" label="Ruolo" error={errors.firma_ruolo}>
@@ -46,6 +46,10 @@ export function SignatureForm({ signature, initialState = INITIAL }: { signature
           <pre className="mt-1 rounded-sm bg-grey-20 p-3 font-sans text-body whitespace-pre-wrap">{preview}</pre>
         </div>
       )}
+      <p className="text-caption text-black-80">
+        Per la firma con logo impostala in Gmail (Impostazioni → Firma, inserita nelle nuove email): Gmail la aggiunge quando
+        apri la bozza.
+      </p>
       <div className="flex justify-end">
         <Button type="submit" size="md" disabled={pending} aria-busy={pending || undefined}>
           {pending ? "Salvataggio..." : "Salva la firma"}

@@ -9,8 +9,13 @@ import { pipelineHref, type PipelineFilters } from "@/lib/pipeline/filters";
 import { STAGES, STAGE_LABELS, opportunityBadge } from "@/lib/pipeline/labels";
 import type { ParkingOption, PipelineItem, UserOption } from "@/lib/pipeline/queries";
 import { ActivityButton } from "./activity-dialog";
+import { EnrollButton, type CadenceOption } from "@/components/cadences/enroll-dialog";
+import { CadenceLine } from "./cadence-line";
+import { SelectAllCheckbox, SelectPartyCheckbox } from "./add-to-parking";
 import { NextActivity } from "./next-activity";
 import { PipelineBoard } from "./pipeline-board";
+
+const SELECTION_FORM = "selezione-opportunita";
 
 // /pipeline (CRM-16): same query and filters for the kanban and the table.
 export function PipelineView({
@@ -21,6 +26,7 @@ export function PipelineView({
   users,
   now,
   board,
+  cadences = [],
 }: {
   items: PipelineItem[];
   truncated: boolean;
@@ -30,6 +36,8 @@ export function PipelineView({
   now: number;
   // For previews: a board with fake actions.
   board?: React.ReactNode;
+  // Active cadences, for "Iscrivi a cadenza" from the table.
+  cadences?: CadenceOption[];
 }) {
   return (
     <>
@@ -54,7 +62,12 @@ export function PipelineView({
         </nav>
       </div>
 
-      <form method="get" action="/pipeline" aria-label="Filtra le opportunità" className="mt-6 grid gap-4 rounded-md border border-grey-60 bg-white p-4 sm:grid-cols-2 lg:grid-cols-6">
+      <form
+        method="get"
+        action="/pipeline"
+        aria-label="Filtra le opportunità"
+        className="mt-6 grid gap-4 rounded-md border border-grey-60 bg-white p-4 sm:grid-cols-2 lg:grid-cols-6"
+      >
         {filters.vista !== "kanban" && <input type="hidden" name="vista" value={filters.vista} />}
         <Field id="f-parcheggio" label="Parcheggio">
           <Select id="f-parcheggio" name="parcheggio" defaultValue={filters.parcheggio ?? ""}>
@@ -121,43 +134,70 @@ export function PipelineView({
         ) : filters.vista === "kanban" ? (
           (board ?? <PipelineBoard items={items} now={now} />)
         ) : (
-          <Table caption="Opportunità">
-            <thead>
-              <tr>
-                <Th>Soggetto</Th>
-                <Th>Parcheggio</Th>
-                <Th>Fase</Th>
-                <Th>Responsabile</Th>
-                <Th>Prossima attività</Th>
-                <Th>Azioni</Th>
-              </tr>
-            </thead>
-            <tbody>
-              {items.map((item) => {
-                const badge = opportunityBadge(item.fase, item.esito);
-                return (
-                  <Tr key={item.id}>
-                    <Td wrap>
-                      <Link href={`/opportunita/${item.id}`} className="rounded-xs font-semibold text-blue-ink underline-offset-2 hover:underline">
-                        {item.party}
-                      </Link>
-                    </Td>
-                    <Td>{item.parking}</Td>
-                    <Td>
-                      <Badge tone={badge.tone}>{badge.label}</Badge>
-                    </Td>
-                    <Td>{item.responsabile ?? "–"}</Td>
-                    <Td wrap>{item.esito === "aperta" ? <NextActivity item={item} now={now} /> : "–"}</Td>
-                    <Td>
-                      {item.esito === "aperta" && (
-                        <ActivityButton opportunityId={item.id} partyId={item.partyId} subject={`${item.party} · ${item.parking}`} />
-                      )}
-                    </Td>
-                  </Tr>
-                );
-              })}
-            </tbody>
-          </Table>
+          <>
+            {cadences.length > 0 && (
+              <div className="flex flex-col gap-2 rounded-md border border-grey-60 bg-white p-4 sm:flex-row sm:items-center sm:justify-between">
+                <p className="text-caption text-black-80">Spunta le opportunità aperte, poi iscrivile a una cadenza.</p>
+                <EnrollButton
+                  mode="opportunities"
+                  formId={SELECTION_FORM}
+                  cadences={cadences}
+                  names={Object.fromEntries(items.map((item) => [item.id, `${item.party} · ${item.parking}`]))}
+                />
+              </div>
+            )}
+            <Table caption="Opportunità">
+              <thead>
+                <tr>
+                  <Th>
+                    <SelectAllCheckbox formId={SELECTION_FORM} label="Seleziona tutte le opportunità mostrate" />
+                  </Th>
+                  <Th>Soggetto</Th>
+                  <Th>Parcheggio</Th>
+                  <Th>Fase</Th>
+                  <Th>Responsabile</Th>
+                  <Th>Prossima attività</Th>
+                  <Th>Azioni</Th>
+                </tr>
+              </thead>
+              <tbody>
+                {items.map((item) => {
+                  const badge = opportunityBadge(item.fase, item.esito);
+                  return (
+                    <Tr key={item.id}>
+                      <Td>
+                        {item.esito === "aperta" && (
+                          <SelectPartyCheckbox
+                            formId={SELECTION_FORM}
+                            partyId={item.id}
+                            label={`${item.party} · ${item.parking}`}
+                            name="opportunita"
+                          />
+                        )}
+                      </Td>
+                      <Td wrap>
+                        <Link href={`/opportunita/${item.id}`} className="rounded-xs font-semibold text-blue-ink underline-offset-2 hover:underline">
+                          {item.party}
+                        </Link>
+                        <CadenceLine cadenza={item.cadenza} />
+                      </Td>
+                      <Td>{item.parking}</Td>
+                      <Td>
+                        <Badge tone={badge.tone}>{badge.label}</Badge>
+                      </Td>
+                      <Td>{item.responsabile ?? "–"}</Td>
+                      <Td wrap>{item.esito === "aperta" ? <NextActivity item={item} now={now} /> : "–"}</Td>
+                      <Td>
+                        {item.esito === "aperta" && (
+                          <ActivityButton opportunityId={item.id} partyId={item.partyId} subject={`${item.party} · ${item.parking}`} />
+                        )}
+                      </Td>
+                    </Tr>
+                  );
+                })}
+              </tbody>
+            </Table>
+          </>
         )}
       </div>
     </>

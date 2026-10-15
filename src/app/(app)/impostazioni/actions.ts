@@ -132,7 +132,6 @@ export async function saveMySignature(previous: EmailFormState, form: FormData):
   };
   if (!(await getCurrentUser())) return { version, status: "error", message: "Accesso scaduto: entra di nuovo.", values };
   const errors: Record<string, string> = {};
-  if (!values.firma_nome) errors.firma_nome = "Scrivi il nome da mostrare nella firma.";
   if (values.firma_nome.length > 120) errors.firma_nome = "Al massimo 120 caratteri.";
   if (values.firma_ruolo.length > 120) errors.firma_ruolo = "Al massimo 120 caratteri.";
   if (values.firma_telefono.length > 40) errors.firma_telefono = "Al massimo 40 caratteri.";
@@ -147,6 +146,7 @@ export async function saveMySignature(previous: EmailFormState, form: FormData):
   });
   if (error) return { version, status: "error", message: "Salvataggio non riuscito. Riprova.", values };
   revalidatePath("/impostazioni");
+  revalidatePath("/email/prepara");
   return { version, status: "saved" };
 }
 

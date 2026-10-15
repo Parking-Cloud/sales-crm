@@ -40,6 +40,8 @@
     "src/lib/pipeline/today.ts",
     "src/lib/pipeline/entry.ts",
     "src/lib/email/template.ts",
+    "src/lib/cadences/schedule.ts",
+    "src/lib/export/csv.ts",
     "src/lib/format.ts",
     "tests/unit/**/*.ts",
     "tests/fixtures/**/*.ts"

@@ -1,3 +1,4 @@
+import { activeEnrollments } from "@/lib/cadences/queries";
 import { partyName } from "@/lib/parties/labels";
 import { createClient } from "@/lib/supabase/server";
 import { nextActivityRange, type PipelineFilters } from "./filters";
@@ -28,6 +29,8 @@ export type PipelineItem = {
   prossimaIl: string | null;
   next: NextTask | null;
   motivoPerdita: LossReasonKey | null;
+  // Active or paused cadence (block 1a-8), on the pipeline only.
+  cadenza?: { nome: string; passo: number | null; passi: number; stato: "attiva" | "in_pausa" | "completata" | "fermata" } | null;
 };
 
 const MAX_ITEMS = 500;
@@ -72,7 +75,7 @@ export async function listPipeline(filters: PipelineFilters, userId: string, now
   }[];
   const truncated = rows.length > MAX_ITEMS;
   const items = rows.slice(0, MAX_ITEMS);
-  const next = await nextTasks(items.map((row) => row.id));
+  const [next, cadences] = await Promise.all([nextTasks(items.map((row) => row.id)), activeEnrollments(items.map((row) => row.id))]);
   return {
     truncated,
     items: items.map((row) => ({
@@ -88,6 +91,10 @@ export async function listPipeline(filters: PipelineFilters, userId: string, now
       prossimaIl: row.prossima_attivita_il,
       next: next.get(row.id) ?? null,
       motivoPerdita: row.motivo_perdita,
+      cadenza: (() => {
+        const enrollment = cadences.get(row.id);
+        return enrollment ? { nome: enrollment.cadenza, passo: enrollment.passo, passi: enrollment.passi, stato: enrollment.stato } : null;
+      })(),
     })),
   };
 }
@@ -282,6 +289,8 @@ export type TodayTask = {
   party: string;
   parking: string | null;
   fase: Stage | null;
+  // Step of a cadence (block 1a-8): the title says which ("Cadenza · passo 2/4").
+  cadenceEnrollmentId: string | null;
 };
 
 export async function listMyOpenTasks(userId: string, until: Date): Promise<TodayTask[]> {
@@ -289,7 +298,7 @@ export async function listMyOpenTasks(userId: string, until: Date): Promise<Toda
   const { data, error } = await supabase
     .from("tasks")
     .select(
-      "id, tipo, titolo, nota, scadenza, opportunity_id, party_id, " +
+      "id, tipo, titolo, nota, scadenza, opportunity_id, party_id, cadence_enrollment_id, " +
         "party:parties!tasks_party_id_fkey(denominazione, nome, cognome), " +
         "opportunity:opportunities!tasks_opportunity_id_fkey(fase, party:parties!opportunities_party_id_fkey(denominazione, nome, cognome), parking:parking_facilities!opportunities_parking_id_fkey(nome, nome_breve))",
     )
@@ -308,6 +317,7 @@ export async function listMyOpenTasks(userId: string, until: Date): Promise<Toda
     scadenza: string | null;
     opportunity_id: string | null;
     party_id: string | null;
+    cadence_enrollment_id: string | null;
     party: Named;
     opportunity: { fase: Stage; party: Named; parking: { nome: string; nome_breve: string | null } | null } | null;
   }[]).map((row) => {
@@ -323,6 +333,7 @@ export async function listMyOpenTasks(userId: string, until: Date): Promise<Toda
       party: named ? partyName(named) : "Soggetto",
       parking: row.opportunity ? parkingName(row.opportunity.parking) : null,
       fase: row.opportunity?.fase ?? null,
+      cadenceEnrollmentId: row.cadence_enrollment_id,
     };
   });
 }

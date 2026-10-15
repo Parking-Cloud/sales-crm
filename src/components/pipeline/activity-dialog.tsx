@@ -3,6 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
 import { listCallRecipients, type CallRecipient } from "@/app/(app)/email/actions";
+import { stopCadence } from "@/app/(app)/cadenze/actions";
 import { logActivity, moveStage, type ActivityResult } from "@/app/(app)/pipeline/actions";
 import { Alert } from "@/components/ui/alert";
 import { Button, type ButtonSize } from "@/components/ui/button";
@@ -12,7 +13,7 @@ import { safeCall } from "@/lib/import/safe-call";
 import { addDays, romeDay } from "@/lib/pipeline/dates";
 import { ACTIVITY_LABELS, ACTIVITY_TYPES, CALL_OUTCOMES, CALL_OUTCOME_LABELS, type ActivityKind, type CallOutcome } from "@/lib/pipeline/labels";
 
-type Actions = { log: typeof logActivity; move: typeof moveStage; recipients?: typeof listCallRecipients };
+type Actions = { log: typeof logActivity; move: typeof moveStage; recipients?: typeof listCallRecipients; stopCadence?: typeof stopCadence };
 
 const GENERAL = "generale";
 
@@ -123,7 +124,7 @@ export function ActivityButton({
       );
       if (!result.ok) return setError(result.message);
       router.refresh();
-      if ((result.data.proponiContattata && opportunityId) || result.data.permesso) {
+      if ((result.data.proponiContattata && opportunityId) || result.data.permesso || result.data.cadenza) {
         setAfter(result.data);
         return;
       }
@@ -242,6 +243,9 @@ export function ActivityButton({
                   È la prima chiamata con risposta su questa opportunità, che è ancora tra le prime fasi. Vuoi passarla a &ldquo;Contattata&rdquo;?
                 </p>
               ))}
+            {after.cadenza && (
+              <CadenceStopQuestion enrollmentId={after.cadenza.enrollmentId} nome={after.cadenza.nome} stop={actions.stopCadence ?? stopCadence} />
+            )}
             {error && <Alert tone="critical">{error}</Alert>}
           </div>
         ) : (
@@ -347,5 +351,42 @@ export function ActivityButton({
         )}
       </Dialog>
     </>
+  );
+}
+
+// After an answered call on an opportunity in a cadence: "Fermare la
+// cadenza?" (counts as "risposto"). Answering no leaves it running.
+function CadenceStopQuestion({ enrollmentId, nome, stop }: { enrollmentId: string; nome: string; stop: typeof stopCadence }) {
+  const router = useRouter();
+  const [state, setState] = useState<"ask" | "stopped" | "kept">("ask");
+  const [error, setError] = useState<string | null>(null);
+  const [pending, startTransition] = useTransition();
+  if (state === "stopped") return <Alert tone="success">Cadenza &ldquo;{nome}&rdquo; fermata: conta come &ldquo;risposto&rdquo;.</Alert>;
+  if (state === "kept") return <p className="text-caption text-black-80">La cadenza &ldquo;{nome}&rdquo; continua.</p>;
+  return (
+    <div className="rounded-sm border border-grey-60 p-3">
+      <p className="text-body font-semibold">Fermare la cadenza &ldquo;{nome}&rdquo;?</p>
+      <p className="text-caption text-black-80">Ha risposto: se la fermi conta come &ldquo;risposto&rdquo;.</p>
+      <div className="mt-2 flex flex-wrap gap-2">
+        <Button
+          size="sm"
+          disabled={pending}
+          onClick={() =>
+            startTransition(async () => {
+              const result = await safeCall(() => stop(enrollmentId, "risposto", "Ha risposto alla chiamata"));
+              if (!result.ok) return setError(result.message);
+              setState("stopped");
+              router.refresh();
+            })
+          }
+        >
+          Sì, ferma la cadenza
+        </Button>
+        <Button size="sm" variant="ghost" disabled={pending} onClick={() => setState("kept")}>
+          No, continua
+        </Button>
+      </div>
+      {error && <Alert tone="critical">{error}</Alert>}
+    </div>
   );
 }
