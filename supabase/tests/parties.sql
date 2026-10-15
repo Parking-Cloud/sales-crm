@@ -268,11 +268,11 @@ select pg_temp.record(
 
 create temp table dnc_result (added integer);
 grant all on dnc_result to authenticated;
-insert into dnc_result select public.mark_do_not_contact('parties', pg_temp.id('a'), 'Ha chiesto di non essere contattato');
+insert into dnc_result select (public.mark_do_not_contact('parties', pg_temp.id('a'), 'Ha chiesto di non essere contattato') ->> 'valori')::integer;
 
 select pg_temp.record(
-  'non contattare: l''operatore lo imposta e scrive in suppression_list con motivo e autore',
-  (select added from dnc_result) = 6
+  'non contattare: l''operatore lo imposta e scrive in suppression_list con motivo e autore (anche P.IVA e place_id)',
+  (select added from dnc_result) = 8
   and (select non_contattare from public.parties where id = pg_temp.id('a'))
   and (select count(*) from public.suppression_list
        where valore_normalizzato in ('+390212345678', 'info@esempio-uno.it', 'esempio-uno.it', '+393471234567')
@@ -305,9 +305,9 @@ delete from dnc_result;
 insert into dnc_result select public.clear_do_not_contact('parties', pg_temp.id('a'));
 select pg_temp.record(
   'non contattare: l''admin lo toglie e libera la lista di esclusione',
-  (select added from dnc_result) = 6
+  (select added from dnc_result) = 8
   and not (select non_contattare from public.parties where id = pg_temp.id('a'))
-  and not exists (select 1 from public.suppression_list where valore_normalizzato = '+390212345678')
+  and not exists (select 1 from public.suppression_list where valore_normalizzato = '+390212345678' and rimossa_il is null)
 );
 reset role;
 

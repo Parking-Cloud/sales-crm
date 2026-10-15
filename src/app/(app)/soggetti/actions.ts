@@ -27,8 +27,11 @@ import {
   type ProvenanceInput,
   type TrackedField,
 } from "@/lib/parties/validation";
+import { readPipelineEntry } from "@/lib/pipeline/entry";
+import { isOppositionChannel } from "@/lib/suppression/labels";
 import { createClient } from "@/lib/supabase/server";
 
+const UUID_PATTERN = /^[0-9a-f-]{36}$/i;
 const SAVE_FAILED = "Salvataggio non riuscito. Riprova; se il problema continua, avvisa l'amministratore.";
 const NOT_ALLOWED = "Non hai i permessi per questa operazione.";
 
@@ -84,8 +87,10 @@ export async function saveParty(previous: PartyFormState, form: FormData): Promi
   }
 
   const { values, location, errors } = validateParty(form);
-  if (!values) {
-    return { version, status: "error", message: "Controlla i campi evidenziati.", fieldErrors: errors, values: raw };
+  // Car park of interest: new parties only.
+  const pipeline = existing ? { entry: null, errors: {} } : readPipelineEntry(raw);
+  if (!values || Object.keys(pipeline.errors).length > 0) {
+    return { version, status: "error", message: "Controlla i campi evidenziati.", fieldErrors: { ...errors, ...pipeline.errors }, values: raw };
   }
 
   // Duplicate check, always in the database (public.check_party_duplicates).
@@ -123,6 +128,15 @@ export async function saveParty(previous: PartyFormState, form: FormData): Promi
         .from("party_locations")
         .insert({ party_id: partyId, ...location, principale: true });
       if (locationError) return { version, status: "error", message: SAVE_FAILED, values: raw };
+    }
+    if (pipeline.entry) {
+      const { error: entryError } = await supabase.rpc("add_to_parking", {
+        p_parties: [partyId],
+        p_parking: pipeline.entry.parkingId,
+        p_fase: pipeline.entry.fase,
+        p_origine: pipeline.entry.origine ?? undefined,
+      });
+      if (entryError) return { version, status: "error", message: SAVE_FAILED, values: raw };
     }
   }
 
@@ -302,15 +316,25 @@ export async function markDoNotContact(
   id: string,
   partyId: string,
   motivo: string,
-): Promise<{ ok: boolean; message?: string }> {
+  canale: string,
+): Promise<{ ok: boolean; message?: string; closed?: number }> {
   if (!(await getCurrentUser())) return { ok: false, message: NOT_ALLOWED };
   if (motivo.trim() === "") return { ok: false, message: "Scrivi il motivo." };
+  if (!isOppositionChannel(canale)) return { ok: false, message: "Indica da dove arriva la richiesta." };
   const supabase = await createClient();
-  const { error } = await supabase.rpc("mark_do_not_contact", { p_entita: entita, p_id: id, p_motivo: motivo.trim() });
+  const { data, error } = await supabase.rpc("mark_do_not_contact", {
+    p_entita: entita,
+    p_id: id,
+    p_motivo: motivo.trim().slice(0, 1000),
+    p_canale: canale,
+  });
   if (error) return { ok: false, message: error.code === "42501" ? NOT_ALLOWED : SAVE_FAILED };
   revalidatePath(`/soggetti/${partyId}`);
   revalidatePath("/soggetti");
-  return { ok: true };
+  revalidatePath("/pipeline");
+  revalidatePath("/oggi");
+  revalidatePath("/esclusioni");
+  return { ok: true, closed: Number((data as { opportunita_chiuse?: number } | null)?.opportunita_chiuse ?? 0) };
 }
 
 export async function clearDoNotContact(
@@ -397,4 +421,29 @@ export async function deleteParty(partyId: string): Promise<{ ok: true; data: De
   revalidatePath("/soggetti");
   revalidatePath("/pipeline");
   return { ok: true, data: readSummary(data) };
+}
+
+// ---------------------------------------------------------------------------
+// GDPR erasure (CRM-31, administrators)
+// ---------------------------------------------------------------------------
+
+export type GdprResult = { soggetti: number; contatti: number; sedi: number; opportunita: number; email: number; valori_in_esclusione: number };
+
+export async function gdprErase(
+  entita: "parties" | "contacts",
+  id: string,
+  partyId: string,
+): Promise<{ ok: true; data: GdprResult } | { ok: false; message: string }> {
+  const user = await getCurrentUser();
+  if (!user?.isAdmin) return { ok: false, message: "Solo l'amministratore può cancellare per richiesta GDPR." };
+  if ((entita !== "parties" && entita !== "contacts") || !UUID_PATTERN.test(id)) return { ok: false, message: "Record non trovato." };
+  const supabase = await createClient();
+  const { data, error } = await supabase.rpc("gdpr_erase", { p_entita: entita, p_id: id });
+  if (error) return { ok: false, message: error.code === "42501" ? NOT_ALLOWED : error.code === "P0002" ? "Record non trovato." : SAVE_FAILED };
+  revalidatePath(`/soggetti/${partyId}`);
+  revalidatePath("/soggetti");
+  revalidatePath("/pipeline");
+  revalidatePath("/oggi");
+  revalidatePath("/esclusioni");
+  return { ok: true, data: data as GdprResult };
 }

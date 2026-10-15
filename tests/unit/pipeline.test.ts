@@ -6,6 +6,7 @@ import { addDays, dayBounds, romeDay, romeInstant } from "../../src/lib/pipeline
 import { nextActivityRange, pipelineHref, readPipelineFilters } from "../../src/lib/pipeline/filters";
 import { MANUAL_STAGES, isManualStage, opportunityBadge } from "../../src/lib/pipeline/labels";
 import { groupToday, overdueCount } from "../../src/lib/pipeline/today";
+import { defaultStageFor, readPipelineEntry } from "../../src/lib/pipeline/entry";
 
 const PARK = "00000000-0000-4000-8000-0000000000d1";
 
@@ -75,4 +76,22 @@ test("stages: only Individuata…Vinta by hand; badges carry text", () => {
   assert.equal(isManualStage("attivata"), false);
   assert.deepEqual(opportunityBadge("contattata", "persa"), { label: "Persa", tone: "neutral" });
   assert.deepEqual(opportunityBadge("interessata", "aperta"), { label: "Interessata", tone: "info" });
+});
+
+test("pipeline entry (1a-7): no car park, origin proposes the stage, invalid values refused", () => {
+  assert.deepEqual(readPipelineEntry({}), { entry: null, errors: {} });
+  assert.deepEqual(readPipelineEntry({ parcheggio_interesse: PARK }).entry, { parkingId: PARK, origine: null, fase: "individuata" });
+  assert.deepEqual(readPipelineEntry({ parcheggio_interesse: PARK, origine: "contatto_in_entrata" }).entry, {
+    parkingId: PARK,
+    origine: "contatto_in_entrata",
+    fase: "interessata",
+  });
+  // The proposal can be changed.
+  assert.equal(readPipelineEntry({ parcheggio_interesse: PARK, origine: "contatto_in_entrata", fase_iniziale: "contattata" }).entry?.fase, "contattata");
+  assert.equal(defaultStageFor("segnalazione"), "individuata");
+  const bad = readPipelineEntry({ parcheggio_interesse: "x", origine: "web", fase_iniziale: "vinta" });
+  assert.equal(bad.entry, null);
+  assert.deepEqual(Object.keys(bad.errors).sort(), ["fase_iniziale", "origine", "parcheggio_interesse"]);
+  // Handoff stages and later ones are never a starting stage.
+  assert.equal(readPipelineEntry({ parcheggio_interesse: PARK, fase_iniziale: "passata_bo" }).entry, null);
 });

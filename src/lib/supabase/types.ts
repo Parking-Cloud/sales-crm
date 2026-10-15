@@ -377,7 +377,9 @@ export type Database = {
           inviata_il: string | null
           oggetto: string | null
           opportunity_id: string | null
+          party_id: string | null
           stato: Database["public"]["Enums"]["communication_status"]
+          template_id: string | null
           updated_at: string
         }
         Insert: {
@@ -394,7 +396,9 @@ export type Database = {
           inviata_il?: string | null
           oggetto?: string | null
           opportunity_id?: string | null
+          party_id?: string | null
           stato?: Database["public"]["Enums"]["communication_status"]
+          template_id?: string | null
           updated_at?: string
         }
         Update: {
@@ -411,7 +415,9 @@ export type Database = {
           inviata_il?: string | null
           oggetto?: string | null
           opportunity_id?: string | null
+          party_id?: string | null
           stato?: Database["public"]["Enums"]["communication_status"]
+          template_id?: string | null
           updated_at?: string
         }
         Relationships: [
@@ -443,6 +449,20 @@ export type Database = {
             referencedRelation: "opportunities"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "communications_party_id_fkey"
+            columns: ["party_id"]
+            isOneToOne: false
+            referencedRelation: "parties"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "communications_template_id_fkey"
+            columns: ["template_id"]
+            isOneToOne: false
+            referencedRelation: "email_templates"
+            referencedColumns: ["id"]
+          },
         ]
       }
       contact_permissions: {
@@ -455,6 +475,7 @@ export type Database = {
           data: string
           fonte: string | null
           id: string
+          nota: string | null
           party_id: string | null
           stato: Database["public"]["Enums"]["permission_status"]
           updated_at: string
@@ -468,6 +489,7 @@ export type Database = {
           data?: string
           fonte?: string | null
           id?: string
+          nota?: string | null
           party_id?: string | null
           stato?: Database["public"]["Enums"]["permission_status"]
           updated_at?: string
@@ -481,6 +503,7 @@ export type Database = {
           data?: string
           fonte?: string | null
           id?: string
+          nota?: string | null
           party_id?: string | null
           stato?: Database["public"]["Enums"]["permission_status"]
           updated_at?: string
@@ -518,6 +541,7 @@ export type Database = {
           created_at: string
           created_by: string | null
           email: string | null
+          gdpr_cancellato_il: string | null
           id: string
           import_batch_id: string | null
           nome: string | null
@@ -535,6 +559,7 @@ export type Database = {
           created_at?: string
           created_by?: string | null
           email?: string | null
+          gdpr_cancellato_il?: string | null
           id?: string
           import_batch_id?: string | null
           nome?: string | null
@@ -552,6 +577,7 @@ export type Database = {
           created_at?: string
           created_by?: string | null
           email?: string | null
+          gdpr_cancellato_il?: string | null
           id?: string
           import_batch_id?: string | null
           nome?: string | null
@@ -625,9 +651,11 @@ export type Database = {
       }
       email_templates: {
         Row: {
+          attivo: boolean
           corpo: string
           created_at: string
           created_by: string | null
+          famiglia_id: string
           id: string
           nome: string
           oggetto: string
@@ -636,9 +664,11 @@ export type Database = {
           versione: number
         }
         Insert: {
+          attivo?: boolean
           corpo: string
           created_at?: string
           created_by?: string | null
+          famiglia_id?: string
           id?: string
           nome: string
           oggetto: string
@@ -647,9 +677,11 @@ export type Database = {
           versione?: number
         }
         Update: {
+          attivo?: boolean
           corpo?: string
           created_at?: string
           created_by?: string | null
+          famiglia_id?: string
           id?: string
           nome?: string
           oggetto?: string
@@ -991,6 +1023,7 @@ export type Database = {
           import_batch_id: string | null
           motivo_perdita: Database["public"]["Enums"]["loss_reason"] | null
           nota_perdita: string | null
+          origine: string | null
           parking_id: string
           party_id: string
           posti_richiesti: number | null
@@ -1012,6 +1045,7 @@ export type Database = {
           import_batch_id?: string | null
           motivo_perdita?: Database["public"]["Enums"]["loss_reason"] | null
           nota_perdita?: string | null
+          origine?: string | null
           parking_id: string
           party_id: string
           posti_richiesti?: number | null
@@ -1033,6 +1067,7 @@ export type Database = {
           import_batch_id?: string | null
           motivo_perdita?: Database["public"]["Enums"]["loss_reason"] | null
           nota_perdita?: string | null
+          origine?: string | null
           parking_id?: string
           party_id?: string
           posti_richiesti?: number | null
@@ -1286,6 +1321,7 @@ export type Database = {
           dominio: string | null
           email: string | null
           form_web_url: string | null
+          gdpr_cancellato_il: string | null
           id: string
           import_batch_id: string | null
           merged_into_id: string | null
@@ -1312,6 +1348,7 @@ export type Database = {
           dominio?: string | null
           email?: string | null
           form_web_url?: string | null
+          gdpr_cancellato_il?: string | null
           id?: string
           import_batch_id?: string | null
           merged_into_id?: string | null
@@ -1338,6 +1375,7 @@ export type Database = {
           dominio?: string | null
           email?: string | null
           form_web_url?: string | null
+          gdpr_cancellato_il?: string | null
           id?: string
           import_batch_id?: string | null
           merged_into_id?: string | null
@@ -1459,36 +1497,61 @@ export type Database = {
       }
       suppression_list: {
         Row: {
+          canale: string | null
           created_at: string
           created_by: string | null
+          gdpr: boolean
           id: string
           motivo: string | null
+          motivo_rimozione: string | null
+          rimossa_da: string | null
+          rimossa_il: string | null
           tipo: Database["public"]["Enums"]["suppression_type"]
           updated_at: string
-          valore_normalizzato: string
+          valore_hash: string
+          valore_normalizzato: string | null
         }
         Insert: {
+          canale?: string | null
           created_at?: string
           created_by?: string | null
+          gdpr?: boolean
           id?: string
           motivo?: string | null
+          motivo_rimozione?: string | null
+          rimossa_da?: string | null
+          rimossa_il?: string | null
           tipo: Database["public"]["Enums"]["suppression_type"]
           updated_at?: string
-          valore_normalizzato: string
+          valore_hash: string
+          valore_normalizzato?: string | null
         }
         Update: {
+          canale?: string | null
           created_at?: string
           created_by?: string | null
+          gdpr?: boolean
           id?: string
           motivo?: string | null
+          motivo_rimozione?: string | null
+          rimossa_da?: string | null
+          rimossa_il?: string | null
           tipo?: Database["public"]["Enums"]["suppression_type"]
           updated_at?: string
-          valore_normalizzato?: string
+          valore_hash?: string
+          valore_normalizzato?: string | null
         }
         Relationships: [
           {
             foreignKeyName: "suppression_list_created_by_fkey"
             columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "suppression_list_rimossa_da_fkey"
+            columns: ["rimossa_da"]
             isOneToOne: false
             referencedRelation: "users"
             referencedColumns: ["id"]
@@ -1575,6 +1638,10 @@ export type Database = {
           created_at: string
           email: string
           firma_email: string | null
+          firma_nome: string | null
+          firma_ruolo: string | null
+          firma_telefono: string | null
+          firma_testo: string | null
           id: string
           nome: string | null
           ruolo: Database["public"]["Enums"]["user_role"]
@@ -1585,6 +1652,10 @@ export type Database = {
           created_at?: string
           email: string
           firma_email?: string | null
+          firma_nome?: string | null
+          firma_ruolo?: string | null
+          firma_telefono?: string | null
+          firma_testo?: string | null
           id?: string
           nome?: string | null
           ruolo?: Database["public"]["Enums"]["user_role"]
@@ -1595,6 +1666,10 @@ export type Database = {
           created_at?: string
           email?: string
           firma_email?: string | null
+          firma_nome?: string | null
+          firma_ruolo?: string | null
+          firma_telefono?: string | null
+          firma_testo?: string | null
           id?: string
           nome?: string | null
           ruolo?: Database["public"]["Enums"]["user_role"]
@@ -1607,6 +1682,29 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      add_suppression: {
+        Args: {
+          p_canale?: string
+          p_motivo: string
+          p_tipo: Database["public"]["Enums"]["suppression_type"]
+          p_valore: string
+        }
+        Returns: string
+      }
+      add_to_parking: {
+        Args: {
+          p_fase?: Database["public"]["Enums"]["opportunity_stage"]
+          p_origine?: string
+          p_parking: string
+          p_parties: string[]
+        }
+        Returns: {
+          esito: string
+          motivo: string
+          opportunity_id: string
+          party_id: string
+        }[]
+      }
       apply_google_coordinates: { Args: { p_rows: Json }; Returns: Json }
       check_import_rows: {
         Args: { p_rows: Json }
@@ -1672,6 +1770,11 @@ export type Database = {
           valore: string
         }[]
       }
+      email_eligibility: {
+        Args: { p_contact?: string; p_party: string }
+        Returns: Json
+      }
+      gdpr_erase: { Args: { p_entita: string; p_id: string }; Returns: Json }
       generic_email_domains: { Args: never; Returns: string[] }
       geo_point: { Args: { lat: number; lng: number }; Returns: unknown }
       google_coordinates_valid: {
@@ -1698,6 +1801,7 @@ export type Database = {
       is_active_user: { Args: never; Returns: boolean }
       is_admin: { Args: never; Returns: boolean }
       is_generic_domain: { Args: { domain: string }; Returns: boolean }
+      is_suppressed: { Args: { p_values: string[] }; Returns: boolean }
       is_valid_email: { Args: { value: string }; Returns: boolean }
       log_activity: {
         Args: {
@@ -1717,8 +1821,13 @@ export type Database = {
         Returns: string
       }
       mark_do_not_contact: {
-        Args: { p_entita: string; p_id: string; p_motivo: string }
-        Returns: number
+        Args: {
+          p_canale?: string
+          p_entita: string
+          p_id: string
+          p_motivo: string
+        }
+        Returns: Json
       }
       merge_parties: {
         Args: { p_drop: string; p_keep: string; p_values?: Json }
@@ -1738,11 +1847,66 @@ export type Database = {
           parking_id: string
         }[]
       }
+      party_parking_options: {
+        Args: { p_party: string }
+        Returns: {
+          distanza_m: number
+          nome: string
+          opportunity_id: string
+          parking_id: string
+        }[]
+      }
       party_search_name: {
         Args: { cognome: string; denominazione: string; nome: string }
         Returns: string
       }
       party_tracked_fields: { Args: never; Returns: string[] }
+      record_sent_email: {
+        Args: {
+          p_contact: string
+          p_corpo: string
+          p_oggetto: string
+          p_opportunity: string
+          p_party: string
+          p_template: string
+        }
+        Returns: string
+      }
+      register_email_permission: {
+        Args: {
+          p_base: Database["public"]["Enums"]["permission_basis"]
+          p_contact: string
+          p_data?: string
+          p_email?: string
+          p_fonte?: string
+          p_nota?: string
+          p_party: string
+        }
+        Returns: string
+      }
+      remove_suppression: {
+        Args: { p_id: string; p_motivo: string }
+        Returns: undefined
+      }
+      save_email_template: {
+        Args: {
+          p_corpo: string
+          p_famiglia: string
+          p_nome: string
+          p_oggetto: string
+          p_uso: Database["public"]["Enums"]["template_use"]
+        }
+        Returns: string
+      }
+      save_my_signature: {
+        Args: {
+          p_nome: string
+          p_ruolo: string
+          p_telefono: string
+          p_testo: string
+        }
+        Returns: undefined
+      }
       save_notes: {
         Args: { p_entita: string; p_id: string; p_note: string }
         Returns: undefined
@@ -1781,6 +1945,12 @@ export type Database = {
         Args: { p_fase: Database["public"]["Enums"]["opportunity_stage"] }
         Returns: string
       }
+      suppression_hash: { Args: { p_value: string }; Returns: string }
+      template_unknown_variables: {
+        Args: { p_text: string }
+        Returns: string[]
+      }
+      template_variables: { Args: never; Returns: string[] }
       undo_import_batch: { Args: { p_batch: string }; Returns: Json }
       use_api_quota: { Args: { p_n?: number; p_sku: string }; Returns: Json }
     }
@@ -1805,6 +1975,7 @@ export type Database = {
         | "nessun_bisogno"
         | "non_raggiungibile"
         | "altro"
+        | "non_contattare"
       offer_status: "bozza" | "inviata" | "accettata" | "rifiutata" | "scaduta"
       opportunity_outcome: "aperta" | "vinta" | "persa"
       opportunity_stage:
@@ -1831,7 +2002,7 @@ export type Database = {
         | "carnet"
         | "convenzione"
         | "servizio_aggiuntivo"
-      suppression_type: "email" | "telefono" | "dominio"
+      suppression_type: "email" | "telefono" | "dominio" | "piva" | "place_id"
       template_use: "uffici" | "attivita_commerciali" | "offerta"
       user_role: "admin" | "operatore"
     }
@@ -1982,6 +2153,7 @@ export const Constants = {
         "nessun_bisogno",
         "non_raggiungibile",
         "altro",
+        "non_contattare",
       ],
       offer_status: ["bozza", "inviata", "accettata", "rifiutata", "scaduta"],
       opportunity_outcome: ["aperta", "vinta", "persa"],
@@ -2012,7 +2184,7 @@ export const Constants = {
         "convenzione",
         "servizio_aggiuntivo",
       ],
-      suppression_type: ["email", "telefono", "dominio"],
+      suppression_type: ["email", "telefono", "dominio", "piva", "place_id"],
       template_use: ["uffici", "attivita_commerciali", "offerta"],
       user_role: ["admin", "operatore"],
     },

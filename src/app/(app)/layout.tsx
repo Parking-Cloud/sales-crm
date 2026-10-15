@@ -16,7 +16,7 @@ export default async function AppLayout({
 
   return (
     <AppShell
-      user={{ name: user.name, roleLabel: ROLE_LABELS[user.role] }}
+      user={{ name: user.name, roleLabel: ROLE_LABELS[user.role], isAdmin: user.isAdmin }}
       counts={{ "/oggi": { count: overdue, label: overdue === 1 ? "attività scaduta" : "attività scadute" } }}
     >
       {children}

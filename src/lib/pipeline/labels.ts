@@ -57,7 +57,8 @@ export const LOSS_REASONS = [
   "non_raggiungibile",
   "altro",
 ] as const;
-export type LossReasonKey = (typeof LOSS_REASONS)[number];
+// "non_contattare" is set only by "Non contattare" (block 1a-7), never chosen.
+export type LossReasonKey = (typeof LOSS_REASONS)[number] | "non_contattare";
 export const LOSS_REASON_LABELS: Record<LossReasonKey, string> = {
   mezzi_pubblici: "Usa i mezzi pubblici",
   ha_gia_parcheggio: "Ha già un parcheggio",
@@ -66,6 +67,7 @@ export const LOSS_REASON_LABELS: Record<LossReasonKey, string> = {
   nessun_bisogno: "Nessun bisogno",
   non_raggiungibile: "Non raggiungibile",
   altro: "Altro",
+  non_contattare: "Ha chiesto di non essere contattato",
 };
 
 export const CALL_OUTCOMES = ["risposto", "non_risponde", "numero_errato", "richiamare"] as const;

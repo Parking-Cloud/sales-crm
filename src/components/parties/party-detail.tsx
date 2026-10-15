@@ -17,8 +17,9 @@ import {
 } from "@/lib/parties/labels";
 import type { Contact, Distance, Party, PartyLocation, Provenance } from "@/lib/parties/queries";
 import type { TimelineEntry } from "@/lib/pipeline/history";
-import { opportunityBadge } from "@/lib/pipeline/labels";
-import type { PipelineItem } from "@/lib/pipeline/queries";
+import type { ParkingChoice, PipelineItem } from "@/lib/pipeline/queries";
+import { AddToParkingButton } from "@/components/pipeline/add-to-parking";
+import { StageMenu } from "@/components/pipeline/stage-controls";
 import { ActivityButton } from "@/components/pipeline/activity-dialog";
 import { NextActivity } from "@/components/pipeline/next-activity";
 import { Timeline } from "@/components/pipeline/timeline";
@@ -26,6 +27,9 @@ import { TRACKED_FIELD_LABELS, type TrackedField } from "@/lib/parties/validatio
 import { DoNotContactBadge } from "./data-status-badge";
 import { DeletePartyControl } from "./delete-party-control";
 import { DoNotContactControl } from "./do-not-contact-control";
+import { GdprEraseControl } from "./gdpr-erase-control";
+import { PermissionBadge, RegisterPermissionButton } from "@/components/email/permission-controls";
+import type { EmailPermission } from "@/lib/email/queries";
 import { LocationCoordinates } from "./location-coordinates";
 import { NotesCard } from "@/components/notes-card";
 import { ProvenanceBadge } from "./provenance";
@@ -88,6 +92,8 @@ export function PartyDetail({
   placeId,
   noteAuthor,
   opportunities,
+  parkingChoices,
+  permissions,
   timeline,
   isAdmin,
   dialogOpenFor,
@@ -104,6 +110,9 @@ export function PartyDetail({
   placeId: string | null;
   noteAuthor: string | null;
   opportunities: PipelineItem[];
+  parkingChoices: ParkingChoice[];
+  // Active email permissions of the party and its contacts.
+  permissions: EmailPermission[];
   timeline: TimelineEntry[];
   isAdmin: boolean;
   // For previews only: open the "Non contattare" dialog of this record.
@@ -111,6 +120,9 @@ export function PartyDetail({
 }) {
   const name = partyName(party);
   const company = party.tipo === "azienda";
+  const erased = party.gdpr_cancellato_il !== null;
+  const emailHref = `/email/prepara?soggetto=${party.id}`;
+  const permissionOf = (contactId: string | null) => permissions.find((row) => row.contactId === contactId) ?? null;
   const partyProvenance = (field: TrackedField) =>
     provenance.find((row) => row.entita === "parties" && row.entita_id === party.id && row.campo === field);
   const contactProvenance = (contactId: string) =>
@@ -149,24 +161,37 @@ export function PartyDetail({
             {party.non_contattare && <DoNotContactBadge />}
           </div>
         </div>
-        <div className="flex flex-wrap gap-2">
-          <ActivityButton opportunityId={null} partyId={party.id} subject={name} />
-          <ButtonLink href={`/soggetti/${party.id}/modifica`}>Modifica</ButtonLink>
-          <DoNotContactControl
-            entita="parties"
-            id={party.id}
-            partyId={party.id}
-            name={name}
-            active={party.non_contattare}
-            isAdmin={isAdmin}
-            initiallyOpen={dialogOpenFor === party.id}
-          />
-          {isAdmin && <ButtonLink href={`/soggetti/${party.id}/unisci`}>Unisci con un altro</ButtonLink>}
-          {isAdmin && <DeletePartyControl partyId={party.id} partyName={name} />}
-        </div>
+        {erased ? (
+          <div className="flex flex-wrap gap-2">{isAdmin && <DeletePartyControl partyId={party.id} partyName={name} />}</div>
+        ) : (
+          <div className="flex flex-wrap gap-2">
+            <ActivityButton opportunityId={null} partyId={party.id} subject={name} />
+            {!party.non_contattare && <ButtonLink href={emailHref}>Prepara email</ButtonLink>}
+            <ButtonLink href={`/soggetti/${party.id}/modifica`}>Modifica</ButtonLink>
+            <DoNotContactControl
+              entita="parties"
+              id={party.id}
+              partyId={party.id}
+              name={name}
+              active={party.non_contattare}
+              isAdmin={isAdmin}
+              initiallyOpen={dialogOpenFor === party.id}
+            />
+            {isAdmin && <ButtonLink href={`/soggetti/${party.id}/unisci`}>Unisci con un altro</ButtonLink>}
+            {isAdmin && <GdprEraseControl entita="parties" id={party.id} partyId={party.id} name={name} />}
+            {isAdmin && <DeletePartyControl partyId={party.id} partyName={name} />}
+          </div>
+        )}
       </div>
 
-      {party.non_contattare && (
+      {erased && (
+        <Alert tone="info" title="Dati cancellati per richiesta GDPR" className="mt-6">
+          Cancellati il {formatDate(party.gdpr_cancellato_il)}. Restano solo l&apos;identificativo e lo storico senza dati
+          personali; i recapiti sono in lista di esclusione in forma non leggibile.
+        </Alert>
+      )}
+
+      {party.non_contattare && !erased && (
         <Alert tone="critical" title="Non contattare" className="mt-6">
           Questo soggetto ha chiesto di non essere contattato. I suoi recapiti sono nella lista di esclusione.
         </Alert>
@@ -184,9 +209,15 @@ export function PartyDetail({
             {tracked(
               "email",
               party.email && (
-                <a href={`mailto:${party.email}`} className="rounded-xs text-blue-ink underline underline-offset-2">
-                  {party.email}
-                </a>
+                <span className="flex flex-col items-start gap-1">
+                  <a href={`mailto:${party.email}`} className="rounded-xs text-blue-ink underline underline-offset-2">
+                    {party.email}
+                  </a>
+                  <PermissionBadge permission={permissionOf(null)} />
+                  {!permissionOf(null) && !party.non_contattare && !erased && (
+                    <RegisterPermissionButton partyId={party.id} contactId={null} name={`${name} (indirizzo generale)`} hasEmail />
+                  )}
+                </span>
               ),
               Boolean(party.email),
             )}
@@ -337,6 +368,7 @@ export function PartyDetail({
                   <Th>Email</Th>
                   <Th>Telefono</Th>
                   <Th>Canale preferito</Th>
+                  <Th>Permesso email</Th>
                   <Th>Provenienza</Th>
                   <Th>
                     <span className="sr-only">Azioni</span>
@@ -363,6 +395,14 @@ export function PartyDetail({
                       <Td wrap>{contact.telefono ?? "–"}</Td>
                       <Td>{contact.canale_preferito ? CONTACT_CHANNEL_LABELS[contact.canale_preferito] : "–"}</Td>
                       <Td wrap>
+                        <span className="flex flex-col items-start gap-1">
+                          <PermissionBadge permission={permissionOf(contact.id)} />
+                          {!permissionOf(contact.id) && !contact.non_contattare && !party.non_contattare && (
+                            <RegisterPermissionButton partyId={party.id} contactId={contact.id} name={contactName} hasEmail={Boolean(contact.email)} />
+                          )}
+                        </span>
+                      </Td>
+                      <Td wrap>
                         <ProvenanceBadge provenance={contactProvenance(contact.id)} />
                       </Td>
                       <Td>
@@ -382,6 +422,7 @@ export function PartyDetail({
                             isAdmin={isAdmin}
                             initiallyOpen={dialogOpenFor === contact.id}
                           />
+                          {isAdmin && <GdprEraseControl entita="contacts" id={contact.id} partyId={party.id} name={contactName} />}
                         </span>
                       </Td>
                     </Tr>
@@ -392,21 +433,27 @@ export function PartyDetail({
           )}
         </Section>
 
-        <Section id="opportunita" title="Opportunità">
+        <Section
+          id="opportunita"
+          title="Opportunità"
+          action={!party.non_contattare && <AddToParkingButton partyId={party.id} partyName={name} choices={parkingChoices} />}
+        >
           {opportunities.length === 0 ? (
-            <p className="text-body text-black-60">Nessuna opportunità: nascono dall&apos;import o dal collegamento con un parcheggio.</p>
+            <p className="text-body text-black-60">Nessuna opportunità: aggiungi il soggetto a un parcheggio.</p>
           ) : (
             <ul className="flex flex-col divide-y divide-grey-60">
               {opportunities.map((item) => {
-                const badge = opportunityBadge(item.fase, item.esito);
                 return (
-                  <li key={item.id} className="flex flex-col gap-2 py-3 first:pt-0 last:pb-0 md:flex-row md:items-center md:justify-between">
+                  <li key={item.id} className="flex flex-col gap-2 py-3 first:pt-0 last:pb-0 md:flex-row md:items-start md:justify-between">
                     <div className="min-w-0">
-                      <p className="flex flex-wrap items-center gap-2">
-                        <Link href={`/opportunita/${item.id}`} className="rounded-xs font-semibold text-blue-ink underline-offset-2 hover:underline">
+                      <p className="flex flex-wrap items-start gap-2">
+                        <Link
+                          href={`/opportunita/${item.id}`}
+                          className="mt-1 rounded-xs font-semibold text-blue-ink underline-offset-2 hover:underline"
+                        >
                           {item.parking}
                         </Link>
-                        <Badge tone={badge.tone}>{badge.label}</Badge>
+                        <StageMenu opportunityId={item.id} fase={item.fase} esito={item.esito} subject={`${name} · ${item.parking}`} />
                       </p>
                       <p className="text-caption text-black-80">{item.responsabile ? `Responsabile: ${item.responsabile}` : "Senza responsabile"}</p>
                       {item.esito === "aperta" && <NextActivity item={item} now={now} />}

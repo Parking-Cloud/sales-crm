@@ -132,6 +132,18 @@ export async function listParkingOptions(): Promise<ParkingOption[]> {
   return data.map((row) => ({ id: row.id, nome: row.nome_breve ?? row.nome }));
 }
 
+// "Aggiungi a un parcheggio": active car parks, nearest to the party first
+// (distance null when no location has coordinates), with the open
+// opportunity on the pair, if any.
+export type ParkingChoice = { id: string; nome: string; distanzaM: number | null; openOpportunityId: string | null };
+
+export async function listParkingChoices(partyId: string): Promise<ParkingChoice[]> {
+  const supabase = await createClient();
+  const { data, error } = await supabase.rpc("party_parking_options", { p_party: partyId });
+  if (error) fail("party_parking_options", error);
+  return (data ?? []).map((row) => ({ id: row.parking_id, nome: row.nome, distanzaM: row.distanza_m, openOpportunityId: row.opportunity_id }));
+}
+
 // ---------------------------------------------------------------------------
 // Opportunity page (B6)
 // ---------------------------------------------------------------------------

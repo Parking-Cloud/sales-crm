@@ -104,3 +104,78 @@ export async function saveApiLimits(previous: LimitsFormState, form: FormData): 
   revalidatePath("/impostazioni");
   return { version, status: "saved" };
 }
+
+// ---------------------------------------------------------------------------
+// Email: the user's own signature (B2), footer and cold email (B3, B4)
+// ---------------------------------------------------------------------------
+
+export type EmailFormState = {
+  version: number;
+  status: "idle" | "saved" | "error";
+  message?: string;
+  fieldErrors?: Record<string, string>;
+  values?: Record<string, string>;
+};
+
+function formText(form: FormData, name: string): string {
+  const value = form.get(name);
+  return typeof value === "string" ? value.trim() : "";
+}
+
+export async function saveMySignature(previous: EmailFormState, form: FormData): Promise<EmailFormState> {
+  const version = previous.version + 1;
+  const values = {
+    firma_nome: formText(form, "firma_nome"),
+    firma_ruolo: formText(form, "firma_ruolo"),
+    firma_telefono: formText(form, "firma_telefono"),
+    firma_testo: formText(form, "firma_testo"),
+  };
+  if (!(await getCurrentUser())) return { version, status: "error", message: "Accesso scaduto: entra di nuovo.", values };
+  const errors: Record<string, string> = {};
+  if (!values.firma_nome) errors.firma_nome = "Scrivi il nome da mostrare nella firma.";
+  if (values.firma_nome.length > 120) errors.firma_nome = "Al massimo 120 caratteri.";
+  if (values.firma_ruolo.length > 120) errors.firma_ruolo = "Al massimo 120 caratteri.";
+  if (values.firma_telefono.length > 40) errors.firma_telefono = "Al massimo 40 caratteri.";
+  if (values.firma_testo.length > 1000) errors.firma_testo = "Al massimo 1.000 caratteri.";
+  if (Object.keys(errors).length > 0) return { version, status: "error", message: "Controlla i campi evidenziati.", fieldErrors: errors, values };
+  const supabase = await createClient();
+  const { error } = await supabase.rpc("save_my_signature", {
+    p_nome: values.firma_nome,
+    p_ruolo: values.firma_ruolo,
+    p_telefono: values.firma_telefono,
+    p_testo: values.firma_testo,
+  });
+  if (error) return { version, status: "error", message: "Salvataggio non riuscito. Riprova.", values };
+  revalidatePath("/impostazioni");
+  return { version, status: "saved" };
+}
+
+export async function saveEmailSettings(previous: EmailFormState, form: FormData): Promise<EmailFormState> {
+  const version = previous.version + 1;
+  const values = {
+    ragione_sociale: formText(form, "ragione_sociale"),
+    email_opposizione: formText(form, "email_opposizione"),
+    email_a_freddo: form.get("email_a_freddo") === "1" ? "1" : "",
+  };
+  const user = await getCurrentUser();
+  if (!user?.isAdmin) return { version, status: "error", message: NOT_ADMIN, values };
+  const errors: Record<string, string> = {};
+  if (values.ragione_sociale.length < 2 || values.ragione_sociale.length > 200) errors.ragione_sociale = "Scrivi la ragione sociale (da 2 a 200 caratteri).";
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(values.email_opposizione)) errors.email_opposizione = "Scrivi un indirizzo email valido.";
+  if (Object.keys(errors).length > 0) return { version, status: "error", message: "Controlla i campi evidenziati.", fieldErrors: errors, values };
+  const supabase = await createClient();
+  const { error } = await supabase.from("app_settings").upsert(
+    [
+      { chiave: "ragione_sociale", valore: values.ragione_sociale },
+      { chiave: "email_opposizione", valore: values.email_opposizione.toLowerCase() },
+      { chiave: "email_a_freddo", valore: values.email_a_freddo === "1" },
+    ],
+    { onConflict: "chiave" },
+  );
+  if (error) {
+    if (error.code === "23514") return { version, status: "error", message: "Controlla i campi evidenziati.", fieldErrors: { email_opposizione: "Indirizzo email non valido." }, values };
+    return { version, status: "error", message: error.code === "42501" ? NOT_ADMIN : "Salvataggio non riuscito. Riprova.", values };
+  }
+  revalidatePath("/impostazioni");
+  return { version, status: "saved" };
+}

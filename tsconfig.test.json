@@ -5,6 +5,7 @@
     "moduleResolution": "node",
     "lib": [
       "ES2022",
+      "ES2023.Intl",
       "DOM"
     ],
     "types": [
@@ -37,6 +38,9 @@
     "src/lib/pipeline/filters.ts",
     "src/lib/pipeline/labels.ts",
     "src/lib/pipeline/today.ts",
+    "src/lib/pipeline/entry.ts",
+    "src/lib/email/template.ts",
+    "src/lib/format.ts",
     "tests/unit/**/*.ts",
     "tests/fixtures/**/*.ts"
   ]

@@ -1,6 +1,8 @@
 export type NavItem = {
   href: string;
   label: string;
+  // Shown only to administrators.
+  adminOnly?: boolean;
 };
 
 // Sidebar entries. Every href must point to an existing page.
@@ -11,5 +13,7 @@ export const NAV_ITEMS: NavItem[] = [
   { href: "/soggetti", label: "Soggetti" },
   { href: "/pipeline", label: "Pipeline" },
   { href: "/import", label: "Import" },
+  { href: "/template", label: "Template email", adminOnly: true },
+  { href: "/esclusioni", label: "Esclusioni" },
   { href: "/impostazioni", label: "Impostazioni" },
 ];

@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Alert } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
+import { ButtonLink } from "@/components/ui/button";
 import { DoNotContactBadge } from "@/components/parties/data-status-badge";
 import { formatDate } from "@/lib/format";
 import type { TimelineEntry } from "@/lib/pipeline/history";
@@ -66,6 +67,13 @@ export function OpportunityDetail({
         </div>
         <div className="flex flex-wrap gap-2">
           {open && <ActivityButton opportunityId={opportunity.id} partyId={opportunity.partyId} subject={subject} variant="primary" size="md" />}
+          {!opportunity.partyNonContattare && (
+            <ButtonLink
+              href={`/email/prepara?soggetto=${opportunity.partyId}&opportunita=${opportunity.id}${opportunity.contactId ? `&contatto=${opportunity.contactId}` : ""}`}
+            >
+              Prepara email
+            </ButtonLink>
+          )}
           {open ? <CloseLostButton opportunityId={opportunity.id} subject={subject} /> : <ReopenButton opportunityId={opportunity.id} fase={opportunity.fase} />}
         </div>
       </div>
