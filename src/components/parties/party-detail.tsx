@@ -20,6 +20,7 @@ import type { TimelineEntry } from "@/lib/pipeline/history";
 import type { ParkingChoice, PipelineItem } from "@/lib/pipeline/queries";
 import { AddToParkingButton } from "@/components/pipeline/add-to-parking";
 import { OfferStatusBadge } from "@/components/prospect/cells";
+import { MainContactButton } from "@/components/prospect/main-contact-button";
 import { ProspectStatusFields } from "@/components/prospect/status-fields";
 import { Timeline } from "@/components/pipeline/timeline";
 import { TRACKED_FIELD_LABELS, type TrackedField } from "@/lib/parties/validation";
@@ -391,6 +392,11 @@ export function PartyDetail({
                     <Tr key={contact.id}>
                       <Td wrap>
                         <span className="font-semibold">{contactName}</span>
+                        {contact.principale && (
+                          <span className="mt-1 block">
+                            <Badge tone="info">Principale</Badge>
+                          </span>
+                        )}
                         {contact.ruolo && (contact.nome || contact.cognome) && (
                           <span className="block text-caption text-black-60">{contact.ruolo}</span>
                         )}
@@ -422,6 +428,7 @@ export function PartyDetail({
                           >
                             Modifica<span className="sr-only"> {contactName}</span>
                           </Link>
+                          {!contact.principale && !erased && <MainContactButton contactId={contact.id} partyId={party.id} name={contactName} />}
                           <DoNotContactControl
                             entita="contacts"
                             id={contact.id}

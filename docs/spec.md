@@ -37,7 +37,7 @@ Ogni prospect ha uno stato: Da contattare (predefinito), Interessato, Molto inte
 
 "Non interessato" ha un motivo facoltativo (lista dei motivi di perdita) e toglie tutte le righe del prospect dalla pipeline attiva: le righe con offerta da inviare escono, le offerte inviate diventano "Rifiutata" con lo stesso motivo (o "motivo non indicato"), con il cambio nello storico e nell'audit con l'autore; le altre opportunità aperte si chiudono. Se il prospect ha un'offerta accettata il cambio è bloccato ("Il prospect ha un'offerta accettata su <parcheggio>: gestisci prima l'offerta") e non cambia nulla.
 
-Telefono, email e referente mostrati nelle tabelle sono quelli del contatto principale del prospect (il primo creato), con il telefono e l'email dell'azienda quando il contatto non li ha; modificarli in tabella scrive sul contatto principale e lo crea se manca.
+Un prospect può avere più referenti; uno solo è il principale (all'inizio il primo creato), scelto con "Rendi principale" dalla tabella Prospect (menu "+N" accanto al referente) o dalla scheda. Telefono, email e referente nella tabella Prospect sono quelli del principale, con il telefono e l'email dell'azienda quando il contatto non li ha; modificarli in tabella scrive sul principale e lo crea se manca. In Pipeline il referente è quello della riga (contatto dell'opportunità, di norma il principale), scelto da un menu dei contatti del prospect; telefono ed email della riga sono i suoi. "Prepara email" propone il referente della riga da cui si apre, con la scelta di un altro.
 
 ### Pipeline e stato dell'offerta
 

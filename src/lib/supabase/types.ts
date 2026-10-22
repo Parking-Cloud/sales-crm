@@ -726,6 +726,7 @@ export type Database = {
           nome: string | null
           non_contattare: boolean
           party_id: string
+          principale: boolean
           ruolo: string | null
           telefono: string | null
           updated_at: string
@@ -744,6 +745,7 @@ export type Database = {
           nome?: string | null
           non_contattare?: boolean
           party_id: string
+          principale?: boolean
           ruolo?: string | null
           telefono?: string | null
           updated_at?: string
@@ -762,6 +764,7 @@ export type Database = {
           nome?: string | null
           non_contattare?: boolean
           party_id?: string
+          principale?: boolean
           ruolo?: string | null
           telefono?: string | null
           updated_at?: string
@@ -2204,6 +2207,7 @@ export type Database = {
           p_telefono?: string
         }
         Returns: {
+          contatti: Json
           contatto_id: string
           email: string
           giorni: number
@@ -2243,6 +2247,7 @@ export type Database = {
           p_ultimo_contatto?: string
         }
         Returns: {
+          altri_contatti: number
           cancellato: boolean
           categoria: string
           contatto_id: string
@@ -2301,6 +2306,10 @@ export type Database = {
       resume_cadence: { Args: { p_enrollment: string }; Returns: undefined }
       rome_day: { Args: { p_at: string }; Returns: string }
       rome_today: { Args: never; Returns: string }
+      save_contact_field: {
+        Args: { p_campo: string; p_contact: string; p_valore: string }
+        Returns: undefined
+      }
       save_email_template: {
         Args: {
           p_corpo: string
@@ -2366,6 +2375,7 @@ export type Database = {
         }
         Returns: undefined
       }
+      set_primary_contact: { Args: { p_contact: string }; Returns: undefined }
       set_prospect_status: {
         Args: {
           p_motivo?: Database["public"]["Enums"]["loss_reason"]

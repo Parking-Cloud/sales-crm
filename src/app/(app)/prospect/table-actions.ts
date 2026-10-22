@@ -201,3 +201,84 @@ export async function updatePipelineField(opportunityId: string, field: Pipeline
   refresh();
   return { ok: true, data: null };
 }
+
+// ---------------------------------------------------------------------------
+// Contact persons (more than one per prospect)
+// ---------------------------------------------------------------------------
+
+export type ProspectContact = { id: string; nome: string; ruolo: string | null; telefono: string | null; email: string | null; principale: boolean };
+
+// All the contacts of a prospect, main first (the "+N" menu).
+export async function listProspectContacts(partyId: string): Promise<Result<ProspectContact[]>> {
+  const denied = await guard(partyId);
+  if (denied) return { ok: false, message: denied };
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from("contacts")
+    .select("id, nome, cognome, ruolo, telefono, email, principale")
+    .eq("party_id", partyId)
+    .order("principale", { ascending: false })
+    .order("created_at");
+  if (error) return { ok: false, message: "Contatti non caricati. Riprova." };
+  return {
+    ok: true,
+    data: (data ?? []).map((row) => ({
+      id: row.id,
+      nome: [row.nome, row.cognome].filter(Boolean).join(" ") || row.ruolo || row.email || "Contatto",
+      ruolo: row.ruolo,
+      telefono: row.telefono,
+      email: row.email,
+      principale: row.principale,
+    })),
+  };
+}
+
+// "Rendi principale": the contact shown in the tables.
+export async function setPrimaryContact(contactId: string, partyId?: string): Promise<Result> {
+  const denied = await guard(contactId);
+  if (denied) return { ok: false, message: denied };
+  const supabase = await createClient();
+  const { error } = await supabase.rpc("set_primary_contact", { p_contact: contactId });
+  if (error) return { ok: false, message: error.code === "P0002" ? NOT_FOUND : SAVE_FAILED };
+  refresh(partyId && UUID.test(partyId) ? partyId : undefined);
+  return { ok: true, data: null };
+}
+
+// Contact person of a pipeline row (one of the prospect's contacts).
+export async function setRowContact(opportunityId: string, contactId: string): Promise<Result> {
+  const denied = await guard(opportunityId, contactId);
+  if (denied) return { ok: false, message: denied };
+  const supabase = await createClient();
+  const { data: row } = await supabase.from("opportunities").select("party_id").eq("id", opportunityId).maybeSingle();
+  const { data: contact } = await supabase.from("contacts").select("party_id").eq("id", contactId).maybeSingle();
+  if (!row || !contact || row.party_id !== contact.party_id) return { ok: false, message: "Il contatto non è di questo prospect." };
+  const { error } = await supabase.from("opportunities").update({ contact_id: contactId }).eq("id", opportunityId);
+  if (error) return { ok: false, message: SAVE_FAILED };
+  refresh(row.party_id);
+  return { ok: true, data: null };
+}
+
+// Telephone, email or name of a given contact (the contact of a pipeline row).
+export async function saveContactField(contactId: string, field: ContactField, value: string): Promise<Result> {
+  const denied = await guard(contactId);
+  if (denied) return { ok: false, message: denied };
+  if (field !== "telefono" && field !== "email" && field !== "referente") return { ok: false, message: SAVE_FAILED };
+  const text = typeof value === "string" ? value.trim().slice(0, 200) : "";
+  if (text && field === "email") {
+    const problem = emailError(text);
+    if (problem) return { ok: false, message: problem };
+  }
+  if (text && field === "telefono") {
+    const problem = phoneError(text);
+    if (problem) return { ok: false, message: problem };
+  }
+  const supabase = await createClient();
+  const { error } = await supabase.rpc("save_contact_field", { p_contact: contactId, p_campo: field, p_valore: text });
+  if (error) {
+    if (error.code === "P0002") return { ok: false, message: NOT_FOUND };
+    if (error.code === "23514") return { ok: false, message: field === "email" ? "Indirizzo email non valido." : "Numero di telefono non valido." };
+    return { ok: false, message: SAVE_FAILED };
+  }
+  refresh();
+  return { ok: true, data: null };
+}

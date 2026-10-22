@@ -77,7 +77,11 @@ export function PipelineTable({
   // For previews and end-to-end tests only.
   actions?: TableActions;
 }) {
-  const { savePrimaryContact, setOfferStatus, updatePipelineField } = actions;
+  const { savePrimaryContact, saveContactField, setOfferStatus, setRowContact, updatePipelineField } = actions;
+  // Telephone and email of the row's contact person; the main contact is
+  // created when the prospect has none.
+  const saveRowContact = (row: PipelineRow, field: "telefono" | "email", value: string) =>
+    row.contattoId ? saveContactField(row.contattoId, field, value) : savePrimaryContact(row.partyId, field, value);
   const userOptions = users.map((user) => ({ value: user.id, label: user.nome }));
   const columns: Column<PipelineRow>[] = [
     {
@@ -120,7 +124,7 @@ export function PipelineTable({
       sort: "telefono",
       width: "min-w-40",
       filter: { param: "telefono", type: "text" },
-      cell: (row) => <EditableText value={row.telefono} type="tel" label={`Telefono di ${row.nome}`} onSave={(value) => savePrimaryContact(row.partyId, "telefono", value)} />,
+      cell: (row) => <EditableText value={row.telefono} type="tel" label={`Telefono di ${row.nome}, ${row.parcheggio}`} onSave={(value) => saveRowContact(row, "telefono", value)} />,
     },
     {
       key: "email",
@@ -128,7 +132,7 @@ export function PipelineTable({
       sort: "email",
       width: "min-w-52",
       filter: { param: "email", type: "text" },
-      cell: (row) => <EditableText value={row.email} type="email" label={`Email di ${row.nome}`} onSave={(value) => savePrimaryContact(row.partyId, "email", value)} />,
+      cell: (row) => <EditableText value={row.email} type="email" label={`Email di ${row.nome}, ${row.parcheggio}`} onSave={(value) => saveRowContact(row, "email", value)} />,
     },
     {
       key: "referente",
@@ -136,7 +140,18 @@ export function PipelineTable({
       sort: "referente",
       width: "min-w-44",
       filter: { param: "referente", type: "text" },
-      cell: (row) => <EditableText value={row.referente} label={`Referente di ${row.nome}`} onSave={(value) => savePrimaryContact(row.partyId, "referente", value)} />,
+      cell: (row) =>
+        row.contatti.length > 0 ? (
+          <EditableSelect
+            value={row.contattoId}
+            label={`Referente di ${row.nome}, ${row.parcheggio}`}
+            options={row.contatti.map((contact) => ({ value: contact.id, label: contact.principale ? `${contact.nome} (principale)` : contact.nome }))}
+            onSave={(value) => setRowContact(row.id, value)}
+            display={() => (row.referente ? <span>{row.referente}</span> : <span className="text-black-40">–</span>)}
+          />
+        ) : (
+          <EditableText value={row.referente} label={`Referente di ${row.nome}`} onSave={(value) => savePrimaryContact(row.partyId, "referente", value)} />
+        ),
     },
     {
       key: "stato",

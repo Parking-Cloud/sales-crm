@@ -169,7 +169,12 @@ export async function getLocation(partyId: string, locationId: string): Promise<
 
 export async function listContacts(partyId: string): Promise<Contact[]> {
   const supabase = await createClient();
-  const { data, error } = await supabase.from("contacts").select("*").eq("party_id", partyId).order("created_at");
+  const { data, error } = await supabase
+    .from("contacts")
+    .select("*")
+    .eq("party_id", partyId)
+    .order("principale", { ascending: false })
+    .order("created_at");
   if (error) fail("contacts", error);
   return data;
 }

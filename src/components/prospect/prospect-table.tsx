@@ -9,7 +9,7 @@ import { PROSPECT_STATUSES, PROSPECT_STATUS_LABELS, type ProspectStatus } from "
 import { LAST_CONTACT_FILTERS } from "@/lib/prospect/filters";
 import type { ProspectRow } from "@/lib/prospect/queries";
 import type { TableQuery } from "@/lib/tables/query";
-import { EmailButton, formatDay, ParkingCell, ProspectStatusBadge, REASON_OPTIONS, TABLE_ACTIONS, type TableActions } from "./cells";
+import { ContactsMenu, EmailButton, formatDay, ParkingCell, ProspectStatusBadge, REASON_OPTIONS, TABLE_ACTIONS, type TableActions } from "./cells";
 
 const STATUS_OPTIONS = PROSPECT_STATUSES.map((value) => ({ value, label: PROSPECT_STATUS_LABELS[value] }));
 const CATEGORY_OPTIONS = PARTY_CATEGORIES.map((value) => ({ value, label: value }));
@@ -147,7 +147,14 @@ export function ProspectTable({
       width: "min-w-44",
       filter: { param: "referente", type: "text" },
       cell: (row) => (
-        <EditableText value={row.referente} label={`Referente di ${row.nome}`} disabled={locked(row)} onSave={(value) => savePrimaryContact(row.id, "referente", value)} />
+        <span className="flex items-start gap-2">
+          <span className="min-w-0 flex-1">
+            <EditableText value={row.referente} label={`Referente di ${row.nome}`} disabled={locked(row)} onSave={(value) => savePrimaryContact(row.id, "referente", value)} />
+          </span>
+          <span className="mt-1.5">
+            <ContactsMenu partyId={row.id} partyName={row.nome} others={row.altriContatti} actions={actions} />
+          </span>
+        </span>
       ),
     },
     {
@@ -156,6 +163,7 @@ export function ProspectTable({
       cell: (row) => (
         <EmailButton
           partyId={row.id}
+          contactId={row.contattoId}
           blocked={row.cancellato ? "Dati cancellati" : row.nonContattare ? "Non contattare" : null}
         />
       ),

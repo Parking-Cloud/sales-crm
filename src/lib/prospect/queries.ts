@@ -43,6 +43,8 @@ export type ProspectRow = {
   nonContattare: boolean;
   cancellato: boolean;
   parcheggi: ProspectParking[];
+  // Contacts besides the main one.
+  altriContatti: number;
 };
 
 // Arguments of prospect_rows() from the URL query.
@@ -97,6 +99,7 @@ export function toProspectRows(rows: ProspectRpcRow[]): { rows: ProspectRow[]; t
       nonContattare: row.non_contattare,
       cancellato: row.cancellato,
       parcheggi: Array.isArray(row.parcheggi) ? (row.parcheggi as unknown as ProspectParking[]) : [],
+      altriContatti: row.altri_contatti ?? 0,
     })),
   };
 }
@@ -132,7 +135,11 @@ export type PipelineRow = {
   promemoria: string | null;
   giorni: number | null;
   nonContattare: boolean;
+  // The prospect's contacts, main first (menu of the row's contact person).
+  contatti: RowContact[];
 };
+
+export type RowContact = { id: string; nome: string; principale: boolean };
 
 // "pipeline": every row; "promemoria": rows with a reminder date, soonest
 // (and overdue) first unless another order is chosen.
@@ -191,6 +198,7 @@ export function toPipelineRows(rows: PipelineRpcRow[]): { rows: PipelineRow[]; t
       promemoria: row.promemoria_il,
       giorni: row.giorni,
       nonContattare: row.non_contattare,
+      contatti: Array.isArray(row.contatti) ? (row.contatti as unknown as RowContact[]) : [],
     })),
   };
 }

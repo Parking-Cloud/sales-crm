@@ -214,7 +214,12 @@ export async function listRecipients(partyId: string): Promise<{ party: { id: st
   const supabase = await createClient();
   const [{ data: party, error: partyError }, { data: contacts, error: contactsError }] = await Promise.all([
     supabase.from("parties").select("id, tipo, denominazione, nome, cognome, email, non_contattare, gdpr_cancellato_il, merged_into_id").eq("id", partyId).maybeSingle(),
-    supabase.from("contacts").select("id, nome, cognome, ruolo, email, non_contattare").eq("party_id", partyId).order("created_at"),
+    supabase
+      .from("contacts")
+      .select("id, nome, cognome, ruolo, email, non_contattare")
+      .eq("party_id", partyId)
+      .order("principale", { ascending: false })
+      .order("created_at"),
   ]);
   if (partyError) fail("parties", partyError);
   if (contactsError) fail("contacts", contactsError);

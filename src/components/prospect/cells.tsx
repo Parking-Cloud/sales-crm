@@ -2,11 +2,15 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useState, useTransition } from "react";
+import { useEffect, useId, useRef, useState, useTransition } from "react";
 import { addToParking } from "@/app/(app)/pipeline/actions";
 import {
+  listProspectContacts,
   removeParking,
+  saveContactField,
   savePrimaryContact,
+  setPrimaryContact,
+  setRowContact,
   saveProspectNote,
   setOfferStatus,
   setProspectStatus,
@@ -29,6 +33,7 @@ import {
   type ProspectStatus,
 } from "@/lib/prospect/labels";
 import type { ProspectParking } from "@/lib/prospect/queries";
+import type { ProspectContact } from "@/app/(app)/prospect/table-actions";
 import { reminderDue } from "@/lib/tables/reminders";
 
 // Cells shared by the Prospect, Pipeline and Promemoria tables (block 1a-9).
@@ -36,6 +41,10 @@ import { reminderDue } from "@/lib/tables/reminders";
 // The server actions of the tables; replaced only in previews and end-to-end
 // tests.
 export const TABLE_ACTIONS = {
+  listProspectContacts,
+  setPrimaryContact,
+  setRowContact,
+  saveContactField,
   setProspectStatus,
   updateProspectField,
   saveProspectNote,
@@ -219,13 +228,173 @@ export function ParkingCell({
 }
 
 // "Invio email": opens "Prepara email" as a pop-up over the table.
-export function EmailButton({ partyId, opportunityId, blocked }: { partyId: string; opportunityId?: string; blocked: string | null }) {
+// The contact person of the row is proposed; another can be chosen there.
+export function EmailButton({
+  partyId,
+  opportunityId,
+  contactId,
+  blocked,
+}: {
+  partyId: string;
+  opportunityId?: string;
+  contactId?: string | null;
+  blocked: string | null;
+}) {
   if (blocked) return <span className="text-caption text-black-60">{blocked}</span>;
   const params = new URLSearchParams({ soggetto: partyId });
   if (opportunityId) params.set("opportunita", opportunityId);
+  if (contactId) params.set("contatto", contactId);
   return (
     <Link href={`/email/prepara?${params.toString()}`} scroll={false} className={buttonClasses("secondary", "sm")}>
       Prepara email
     </Link>
+  );
+}
+
+// "+N" next to the contact person: a small menu with all the prospect's
+// contacts (name, role, telephone, email) and "Rendi principale", without
+// leaving the table.
+export function ContactsMenu({
+  partyId,
+  partyName,
+  others,
+  actions = TABLE_ACTIONS,
+}: {
+  partyId: string;
+  partyName: string;
+  // Contacts besides the main one.
+  others: number;
+  actions?: TableActions;
+}) {
+  const router = useRouter();
+  const [open, setOpen] = useState(false);
+  // Fixed position under the button: the table scrolls and would cut it.
+  const [place, setPlace] = useState<{ top: number; left: number }>({ top: 0, left: 0 });
+  const [contacts, setContacts] = useState<ProspectContact[] | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [pending, startTransition] = useTransition();
+  const panelId = useId();
+  const buttonRef = useRef<HTMLButtonElement>(null);
+  const panelRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!open) return;
+    const onKey = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        setOpen(false);
+        buttonRef.current?.focus();
+      }
+    };
+    const onClick = (event: MouseEvent) => {
+      const target = event.target as Node;
+      if (!panelRef.current?.contains(target) && !buttonRef.current?.contains(target)) setOpen(false);
+    };
+    // The menu follows its button when the page or the table scrolls.
+    const onScroll = (event: Event) => {
+      if (panelRef.current?.contains(event.target as Node) || !buttonRef.current) return;
+      const box = buttonRef.current.getBoundingClientRect();
+      setPlace({ top: box.bottom + 4, left: Math.max(8, Math.min(box.left, window.innerWidth - 328)) });
+    };
+    document.addEventListener("keydown", onKey);
+    document.addEventListener("mousedown", onClick);
+    window.addEventListener("scroll", onScroll, true);
+    return () => {
+      document.removeEventListener("keydown", onKey);
+      document.removeEventListener("mousedown", onClick);
+      window.removeEventListener("scroll", onScroll, true);
+    };
+  }, [open]);
+
+  function load() {
+    setError(null);
+    startTransition(async () => {
+      const result = await safeCall(() => actions.listProspectContacts(partyId));
+      if (!result.ok) return setError(result.message);
+      setContacts(result.data);
+    });
+  }
+
+  function toggle() {
+    const next = !open;
+    if (next && buttonRef.current) {
+      const box = buttonRef.current.getBoundingClientRect();
+      setPlace({ top: box.bottom + 4, left: Math.max(8, Math.min(box.left, window.innerWidth - 328)) });
+    }
+    setOpen(next);
+    if (next) load();
+  }
+
+  function makeMain(contactId: string) {
+    setError(null);
+    startTransition(async () => {
+      const result = await safeCall(() => actions.setPrimaryContact(contactId, partyId));
+      if (!result.ok) return setError(result.message);
+      const list = await safeCall(() => actions.listProspectContacts(partyId));
+      if (list.ok) setContacts(list.data);
+      router.refresh();
+    });
+  }
+
+  if (others <= 0) return null;
+  return (
+    <div>
+      <button
+        ref={buttonRef}
+        type="button"
+        onClick={toggle}
+        aria-expanded={open}
+        aria-controls={panelId}
+        aria-label={`Altri ${others} ${others === 1 ? "contatto" : "contatti"} di ${partyName}`}
+        className="inline-flex min-h-6 items-center rounded-pill border border-grey-80 bg-grey-20 px-2 text-caption font-semibold text-blue-ink hover:bg-blue-20"
+      >
+        +{others}
+      </button>
+      {open && (
+        <div
+          ref={panelRef}
+          id={panelId}
+          role="group"
+          aria-label={`Contatti di ${partyName}`}
+          aria-busy={pending || undefined}
+          style={{ top: place.top, left: place.left }}
+          className="fixed z-30 max-h-80 w-80 max-w-[calc(100vw-16px)] overflow-y-auto rounded-sm border border-grey-60 bg-white p-2 shadow-lg"
+        >
+          {contacts === null ? (
+            <p className="p-2 text-caption text-black-60">{error ? "" : "Caricamento..."}</p>
+          ) : (
+            <ul className="flex flex-col divide-y divide-grey-60">
+              {contacts.map((contact) => (
+                <li key={contact.id} className="flex flex-col gap-1 p-2 text-[13px]">
+                  <span className="flex flex-wrap items-center gap-2">
+                    <span className="font-semibold">{contact.nome}</span>
+                    {contact.principale && <Badge tone="info">Principale</Badge>}
+                  </span>
+                  {contact.ruolo && <span className="text-black-60">{contact.ruolo}</span>}
+                  <span className="text-black-80">{contact.telefono ?? "Telefono –"}</span>
+                  <span className="break-all text-black-80">{contact.email ?? "Email –"}</span>
+                  {!contact.principale && (
+                    <button
+                      type="button"
+                      disabled={pending}
+                      onClick={() => makeMain(contact.id)}
+                      aria-label={`Rendi principale: ${contact.nome}`}
+                      className="self-start rounded-xs font-semibold text-blue-ink underline underline-offset-2 disabled:opacity-60"
+                    >
+                      Rendi principale
+                    </button>
+                  )}
+                </li>
+              ))}
+            </ul>
+          )}
+          {error && (
+            <p role="alert" className="flex items-start gap-1 p-2 text-caption text-error-ink">
+              <AlertCircleIcon size={14} className="mt-0.5 shrink-0" />
+              {error}
+            </p>
+          )}
+        </div>
+      )}
+    </div>
   );
 }

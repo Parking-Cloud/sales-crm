@@ -553,6 +553,63 @@ select pg_temp.record(
 reset role;
 
 -- ---------------------------------------------------------------------------
+-- More contact persons: one main contact, row contact in the pipeline
+-- ---------------------------------------------------------------------------
+
+insert into test_ids select 'c2', id from public.contacts where party_id = pg_temp.id('p1') and nome = 'Secondo';
+select pg_temp.record(
+  'principale: uno solo per prospect (il primo creato), il nuovo contatto non lo diventa',
+  (select count(*) from public.contacts where party_id = pg_temp.id('p1') and principale) = 1
+  and (select principale from public.contacts where id = pg_temp.id('c1'))
+  and not (select principale from public.contacts where id = pg_temp.id('c2'))
+);
+insert into public.contacts (party_id, nome, principale) values (pg_temp.id('p1'), 'Terzo', true);
+select pg_temp.record(
+  'principale: un contatto aggiunto come principale non toglie il posto a quello esistente',
+  (select count(*) from public.contacts where party_id = pg_temp.id('p1') and principale) = 1
+  and (select principale from public.contacts where id = pg_temp.id('c1'))
+);
+select pg_temp.expect_error(
+  'principale: due principali rifiutati anche con un update diretto',
+  format('update public.contacts set principale = true where id = %L', pg_temp.id('c2')),
+  '23505'
+);
+select public.set_primary_contact(pg_temp.id('c2'));
+select pg_temp.record(
+  'Rendi principale: cambia il principale, tabella Prospect con email e referente del nuovo, in audit con autore',
+  (select count(*) from public.contacts where party_id = pg_temp.id('p1') and principale) = 1
+  and (select principale from public.contacts where id = pg_temp.id('c2'))
+  and (select referente = 'Secondo' and email = 'secondo@prospect-esempio.example' and contatto_id = pg_temp.id('c2') and altri_contatti = 2
+       from public.prospect_rows(p_nome => 'Azienda Esempio Prospect'))
+  and exists (select 1 from public.audit_logs where entita = 'contacts' and entita_id = pg_temp.id('c2') and utente_id = pg_temp.id('operatore')
+              and prima ->> 'principale' = 'false' and dopo ->> 'principale' = 'true')
+);
+update public.opportunities set contact_id = pg_temp.id('c1')
+where party_id = pg_temp.id('p1') and parking_id = '00000000-0000-4000-8000-0000000000e1';
+select pg_temp.record(
+  'Pipeline: referente per riga (contatto dell''opportunità), altrimenti il principale; menu con i contatti del prospect',
+  (select referente = 'Maria Luisa Esempi' and contatto_id = pg_temp.id('c1') and telefono = '+390299990000'
+   from public.pipeline_rows(p_nome => 'Azienda Esempio Prospect', p_parcheggio => '00000000-0000-4000-8000-0000000000e1'))
+  and (select referente = 'Secondo' and contatto_id = pg_temp.id('c2')
+       from public.pipeline_rows(p_nome => 'Azienda Esempio Prospect', p_parcheggio => '00000000-0000-4000-8000-0000000000e3'))
+  and (select jsonb_array_length(contatti) = 3 and (contatti -> 0 ->> 'id')::uuid = pg_temp.id('c2')
+       from public.pipeline_rows(p_nome => 'Azienda Esempio Prospect', p_parcheggio => '00000000-0000-4000-8000-0000000000e3'))
+);
+select public.save_contact_field(pg_temp.id('c1'), 'email', 'riga@prospect-esempio.example');
+select pg_temp.record(
+  'Pipeline: email modificata sul contatto della riga, non sul principale',
+  (select email = 'riga@prospect-esempio.example' from public.contacts where id = pg_temp.id('c1'))
+  and (select email = 'secondo@prospect-esempio.example' from public.contacts where id = pg_temp.id('c2'))
+);
+reset role;
+delete from public.contacts where id = pg_temp.id('c2');
+select pg_temp.record(
+  'principale eliminato: il contatto più vecchio rimasto diventa principale',
+  (select principale from public.contacts where id = pg_temp.id('c1'))
+  and (select count(*) from public.contacts where party_id = pg_temp.id('p1') and principale) = 1
+);
+
+-- ---------------------------------------------------------------------------
 -- Report
 -- ---------------------------------------------------------------------------
 
