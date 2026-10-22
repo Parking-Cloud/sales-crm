@@ -62,6 +62,9 @@ $$;
 -- ---------------------------------------------------------------------------
 
 alter table public.users drop constraint users_email_domain;
+-- The tests start from the default maximum distance (5 km): an
+-- administrator may have changed it on this database (rolled back at the end).
+update public.app_settings set valore = '5000'::jsonb where chiave = 'distanza_massima_parcheggi_m';
 
 insert into public.users (email, nome, ruolo, attivo) values
   ('test-admin@example.com', 'Admin Di Prova', 'admin', true),
