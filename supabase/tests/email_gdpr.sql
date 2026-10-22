@@ -441,8 +441,10 @@ select pg_temp.record(
   'GDPR: l''audit registra la cancellazione con l''autore, senza i dati cancellati',
   exists (select 1 from public.audit_logs where entita = 'parties' and entita_id = pg_temp.id('b') and azione = 'delete'
           and utente_id = pg_temp.id('admin') and dopo ->> 'gdpr' is not null and (dopo ->> 'contatti')::int = 1)
+  -- Only the audit rows of this test run (same transaction time): the audit
+  -- of the database is append-only and may hold other, unrelated texts.
   and not exists (select 1 from public.audit_logs
-                  where entita <> 'email_templates'
+                  where entita <> 'email_templates' and quando >= now()
                     and (prima::text || coalesce(dopo::text, '')) ~* '(giovanni|finto|3334445555|chiamare dopo)')
 );
 select pg_temp.act_as(pg_temp.id('operatore'));
