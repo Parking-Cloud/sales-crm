@@ -12,7 +12,7 @@ import { ALL_OFFERS, PIPELINE_REMINDER_FILTERS, REMINDER_DUE_FILTERS } from "@/l
 import type { PipelineRow } from "@/lib/prospect/queries";
 import { safeCall } from "@/lib/import/safe-call";
 import type { TableQuery } from "@/lib/tables/query";
-import { formatDay, OfferStatusBadge, REASON_OPTIONS, ReminderBadge, TABLE_ACTIONS, type TableActions } from "./cells";
+import { EmailButton, formatDay, OfferStatusBadge, REASON_OPTIONS, ReminderBadge, TABLE_ACTIONS, type TableActions } from "./cells";
 
 const OFFER_OPTIONS = OFFER_STATUSES.map((value) => ({ value, label: OFFER_STATUS_LABELS[value] }));
 
@@ -152,6 +152,14 @@ export function PipelineTable({
         ) : (
           <EditableText value={row.referente} label={`Referente di ${row.nome}`} onSave={(value) => savePrimaryContact(row.partyId, "referente", value)} />
         ),
+    },
+    {
+      key: "invio",
+      label: "Invio email",
+      // "Prepara email" as a pop-up, with the row's car park and contact person.
+      cell: (row) => (
+        <EmailButton partyId={row.partyId} opportunityId={row.id} contactId={row.contattoId} blocked={row.nonContattare ? "Non contattare" : null} />
+      ),
     },
     {
       key: "stato",
