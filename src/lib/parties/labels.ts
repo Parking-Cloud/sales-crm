@@ -1,4 +1,4 @@
-import type { Database } from "@/lib/supabase/types";
+import type { Database } from "../supabase/types";
 
 type Enums = Database["public"]["Enums"];
 export type PartyType = Enums["party_type"];
@@ -13,16 +13,27 @@ export const PARTY_TYPE_LABELS: Record<PartyType, string> = {
 
 // Party categories: the only list, used by forms, filters and validation.
 // The column is free text in the schema, so the list is enforced here.
+// The map search categories (lib/places/categories) are all here, plus
+// "Aziende" (older data) and "Altro".
 export const PARTY_CATEGORIES = [
   "Uffici",
+  "Sedi aziendali",
+  "Aziende",
   "Studi professionali",
+  "Banche e assicurazioni",
+  "Uffici pubblici",
+  "Ospedali e cliniche",
+  "Centri medici",
+  "Università e scuole",
+  "Musei e cultura",
+  "Centri congressi ed eventi",
   "Hotel",
+  "Strutture ricettive",
   "Ristoranti",
   "Negozi",
-  "Aziende",
-  "Centri medici",
+  "Centri commerciali e supermercati",
+  "Concessionarie",
   "Palestre",
-  "Strutture ricettive",
   "Altro",
 ] as const;
 export type PartyCategory = (typeof PARTY_CATEGORIES)[number];

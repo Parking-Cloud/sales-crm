@@ -4,6 +4,7 @@
 // Field masks decide the SKU billed:
 // - Nearby Search: id, name, address, location, types -> Nearby Search Pro
 //   (never Enterprise fields in the search);
+// - Text Search (keyword): the same fields -> Text Search Pro;
 // - Place Details at import: phone, site, address components -> Enterprise;
 // - Place Details for the 30-day refresh: location only -> Essentials;
 // - Route Matrix, walking: distance and duration only -> Essentials.
@@ -59,6 +60,57 @@ type RawPlace = {
   primaryType?: string;
 };
 
+function readPlaces(body: { places?: RawPlace[] } | null): NearbyPlace[] {
+  return (body?.places ?? []).flatMap((place) =>
+    place.id && typeof place.location?.latitude === "number" && typeof place.location?.longitude === "number"
+      ? [
+          {
+            id: place.id,
+            name: place.displayName?.text?.trim() || "Senza nome",
+            address: place.formattedAddress ?? null,
+            location: { lat: place.location.latitude, lng: place.location.longitude },
+            types: Array.isArray(place.types) ? place.types.filter((type) => typeof type === "string") : [],
+            primaryType: typeof place.primaryType === "string" ? place.primaryType : null,
+          },
+        ]
+      : [],
+  );
+}
+
+// Rectangle around a circle: Text Search restricts to rectangles only; the
+// places outside the circle are dropped afterwards (searchArea).
+export function boundingBox(circle: Circle): { low: LatLng; high: LatLng } {
+  const latDelta = (circle.radius / 6_371_008.8) * (180 / Math.PI);
+  const lngDelta = latDelta / Math.cos((circle.center.lat * Math.PI) / 180);
+  return {
+    low: { lat: circle.center.lat - latDelta, lng: circle.center.lng - lngDelta },
+    high: { lat: circle.center.lat + latDelta, lng: circle.center.lng + lngDelta },
+  };
+}
+
+// Text Search (New) for a keyword, within the rectangle around the circle;
+// at most 20 results (one page), like Nearby Search.
+export async function textSearch(circle: Circle, keyword: string): Promise<NearbyPlace[]> {
+  const box = boundingBox(circle);
+  const body = (await googleFetch(`${PLACES_URL}/places:searchText`, {
+    method: "POST",
+    fieldMask: NEARBY_FIELD_MASK,
+    body: JSON.stringify({
+      textQuery: keyword,
+      pageSize: 20,
+      languageCode: "it",
+      regionCode: "it",
+      locationRestriction: {
+        rectangle: {
+          low: { latitude: box.low.lat, longitude: box.low.lng },
+          high: { latitude: box.high.lat, longitude: box.high.lng },
+        },
+      },
+    }),
+  })) as { places?: RawPlace[] } | null;
+  return readPlaces(body);
+}
+
 export async function nearbySearch(circle: Circle, types: readonly string[]): Promise<NearbyPlace[]> {
   const body = (await googleFetch(`${PLACES_URL}/places:searchNearby`, {
     method: "POST",
@@ -74,20 +126,7 @@ export async function nearbySearch(circle: Circle, types: readonly string[]): Pr
       },
     }),
   })) as { places?: RawPlace[] } | null;
-  return (body?.places ?? []).flatMap((place) =>
-    place.id && typeof place.location?.latitude === "number" && typeof place.location?.longitude === "number"
-      ? [
-          {
-            id: place.id,
-            name: place.displayName?.text?.trim() || "Senza nome",
-            address: place.formattedAddress ?? null,
-            location: { lat: place.location.latitude, lng: place.location.longitude },
-            types: Array.isArray(place.types) ? place.types.filter((type) => typeof type === "string") : [],
-            primaryType: typeof place.primaryType === "string" ? place.primaryType : null,
-          },
-        ]
-      : [],
-  );
+  return readPlaces(body);
 }
 
 export type ImportDetails = {

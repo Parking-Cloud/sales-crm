@@ -9,27 +9,43 @@
 
 export const SEARCH_CATEGORIES = [
   "Uffici",
+  "Sedi aziendali",
   "Studi professionali",
+  "Banche e assicurazioni",
+  "Uffici pubblici",
+  "Ospedali e cliniche",
+  "Centri medici",
+  "Università e scuole",
+  "Musei e cultura",
+  "Centri congressi ed eventi",
   "Hotel",
+  "Strutture ricettive",
   "Ristoranti",
   "Negozi",
-  "Aziende",
-  "Centri medici",
+  "Centri commerciali e supermercati",
+  "Concessionarie",
   "Palestre",
-  "Strutture ricettive",
 ] as const;
 export type SearchCategory = (typeof SEARCH_CATEGORIES)[number];
 
 export const CATEGORY_TYPES: Record<SearchCategory, readonly string[]> = {
   Uffici: ["corporate_office", "coworking_space"],
-  "Studi professionali": ["accounting", "lawyer", "insurance_agency", "real_estate_agency", "consultant"],
+  "Sedi aziendali": ["corporate_office"],
+  "Studi professionali": ["accounting", "lawyer", "consultant", "real_estate_agency", "insurance_agency"],
+  "Banche e assicurazioni": ["bank", "insurance_agency"],
+  "Uffici pubblici": ["city_hall", "local_government_office", "courthouse", "post_office", "embassy"],
+  "Ospedali e cliniche": ["hospital", "general_hospital", "medical_clinic", "medical_center"],
+  "Centri medici": ["doctor", "dental_clinic", "medical_lab", "physiotherapist"],
+  "Università e scuole": ["university", "school", "primary_school", "secondary_school"],
+  "Musei e cultura": ["museum", "art_gallery", "cultural_center", "performing_arts_theater", "library"],
+  "Centri congressi ed eventi": ["convention_center", "event_venue", "banquet_hall"],
   Hotel: ["hotel", "bed_and_breakfast"],
+  "Strutture ricettive": ["lodging"],
   Ristoranti: ["restaurant", "cafe", "bar"],
   Negozi: ["store"],
-  Aziende: ["corporate_office"],
-  "Centri medici": ["doctor", "dental_clinic", "medical_lab", "physiotherapist", "hospital"],
+  "Centri commerciali e supermercati": ["shopping_mall", "supermarket", "department_store", "grocery_store", "hypermarket"],
+  Concessionarie: ["car_dealer"],
   Palestre: ["gym", "fitness_center"],
-  "Strutture ricettive": ["lodging"],
 };
 
 export function isSearchCategory(value: unknown): value is SearchCategory {

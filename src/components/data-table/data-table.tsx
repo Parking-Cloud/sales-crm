@@ -17,6 +17,29 @@ import { hasFilters, nextSort, tableSearch, withFilter, type TableQuery } from "
 
 export type FilterOption = { value: string; label: string };
 
+// Selection: form checkboxes read by a form (Prospect), or a set held by the
+// page and kept across pages (map search), with "full" when no more rows can
+// be added.
+export type TableSelection<Row> =
+  | { formId: string; label: (row: Row) => string }
+  | { selected: ReadonlySet<string>; onChange: (ids: string[], on: boolean) => void; label: (row: Row) => string; full?: boolean };
+
+function ControlledCheckbox({ checked, indeterminate, disabled, label, onChange }: { checked: boolean; indeterminate?: boolean; disabled?: boolean; label: string; onChange: (on: boolean) => void }) {
+  return (
+    <input
+      type="checkbox"
+      aria-label={label}
+      checked={checked}
+      disabled={disabled}
+      ref={(node) => {
+        if (node) node.indeterminate = Boolean(indeterminate);
+      }}
+      onChange={(event) => onChange(event.target.checked)}
+      className="size-5 cursor-pointer accent-brand-blue disabled:cursor-not-allowed disabled:opacity-50"
+    />
+  );
+}
+
 export type ColumnFilter =
   | { param: string; type: "text"; placeholder?: string }
   | { param: string; type: "select"; options: FilterOption[]; allLabel?: string };
@@ -110,6 +133,9 @@ export function DataTable<Row extends { id: string }>({
   query,
   empty,
   selection,
+  onQueryChange,
+  rowId,
+  rowClassName,
 }: {
   caption: string;
   columns: Column<Row>[];
@@ -118,15 +144,25 @@ export function DataTable<Row extends { id: string }>({
   query: TableQuery;
   // Message when no row matches.
   empty: string;
-  selection?: { formId: string; label: (row: Row) => string };
+  selection?: TableSelection<Row>;
+  // Rows held by the page (map search): filters, sorting and pages change
+  // through this instead of the URL.
+  onQueryChange?: (next: TableQuery) => void;
+  // Id of the row element (to scroll to it) and extra classes of its cells.
+  rowId?: (row: Row) => string;
+  rowClassName?: (row: Row) => string;
 }) {
   const router = useRouter();
   const pathname = usePathname();
   const [pending, startTransition] = useTransition();
   const pages = pageCount(total);
   const filtered = hasFilters(query);
+  const controlled = selection && "selected" in selection ? selection : null;
+  const pageIds = rows.map((row) => row.id);
+  const pageChecked = controlled ? pageIds.filter((id) => controlled.selected.has(id)).length : 0;
 
   function go(next: TableQuery) {
+    if (onQueryChange) return onQueryChange(next);
     startTransition(() => router.push(`${pathname}${tableSearch(next)}`, { scroll: false }));
   }
 
@@ -140,11 +176,20 @@ export function DataTable<Row extends { id: string }>({
           {total === 0 ? "Nessuna riga" : `Righe ${pageRange(query.page, total)}`}
           {pending && " · aggiornamento..."}
         </p>
-        {filtered && (
-          <Link href={pathname} scroll={false} className="rounded-xs text-caption font-semibold text-blue-ink underline underline-offset-2">
-            Togli i filtri
-          </Link>
-        )}
+        {filtered &&
+          (onQueryChange ? (
+            <button
+              type="button"
+              onClick={() => go({ ...query, filters: {}, page: 1 })}
+              className="rounded-xs text-caption font-semibold text-blue-ink underline underline-offset-2"
+            >
+              Togli i filtri
+            </button>
+          ) : (
+            <Link href={pathname} scroll={false} className="rounded-xs text-caption font-semibold text-blue-ink underline underline-offset-2">
+              Togli i filtri
+            </Link>
+          ))}
       </div>
 
       <div className={`relative max-w-full overflow-x-auto rounded-md border border-grey-60 bg-white ${pending ? "opacity-70" : ""}`} aria-busy={pending || undefined}>
@@ -154,7 +199,17 @@ export function DataTable<Row extends { id: string }>({
             <tr>
               {selection && (
                 <th scope="col" className="w-10 border-b border-grey-60 bg-grey-20 px-3 py-2 text-left">
-                  <SelectAllCheckbox key={tableSearch(query)} formId={selection.formId} label="Seleziona tutte le righe di questa pagina" />
+                  {controlled ? (
+                    <ControlledCheckbox
+                      label="Seleziona tutte le righe di questa pagina"
+                      checked={rows.length > 0 && pageChecked === rows.length}
+                      indeterminate={pageChecked > 0 && pageChecked < rows.length}
+                      disabled={rows.length === 0 || (Boolean(controlled.full) && pageChecked === 0)}
+                      onChange={(on) => controlled.onChange(pageIds, on)}
+                    />
+                  ) : (
+                    "formId" in selection && <SelectAllCheckbox key={tableSearch(query)} formId={selection.formId} label="Seleziona tutte le righe di questa pagina" />
+                  )}
                 </th>
               )}
               {columns.map((column) => {
@@ -200,16 +255,25 @@ export function DataTable<Row extends { id: string }>({
               </tr>
             ) : (
               rows.map((row) => (
-                <tr key={row.id} className="group/row">
+                <tr key={row.id} id={rowId?.(row)} className="group/row scroll-mt-24">
                   {selection && (
-                    <td className="border-b border-grey-60 bg-white px-3 py-2 align-top group-last/row:border-b-0">
-                      <SelectPartyCheckbox formId={selection.formId} partyId={row.id} label={selection.label(row)} />
+                    <td className={`border-b border-grey-60 bg-white px-3 py-2 align-top group-last/row:border-b-0 ${rowClassName?.(row) ?? ""}`}>
+                      {controlled ? (
+                        <ControlledCheckbox
+                          label={`Seleziona ${selection.label(row)}`}
+                          checked={controlled.selected.has(row.id)}
+                          disabled={Boolean(controlled.full) && !controlled.selected.has(row.id)}
+                          onChange={(on) => controlled.onChange([row.id], on)}
+                        />
+                      ) : (
+                        "formId" in selection && <SelectPartyCheckbox formId={selection.formId} partyId={row.id} label={selection.label(row)} />
+                      )}
                     </td>
                   )}
                   {columns.map((column) => (
                     <td
                       key={column.key}
-                      className={`border-b border-grey-60 bg-white px-3 py-2 align-top group-last/row:border-b-0 ${column.width ?? ""} ${column.sticky ? STICKY : ""}`}
+                      className={`border-b border-grey-60 bg-white px-3 py-2 align-top group-last/row:border-b-0 ${column.width ?? ""} ${column.sticky ? STICKY : ""} ${rowClassName?.(row) ?? ""}`}
                     >
                       {column.cell(row)}
                     </td>
@@ -224,9 +288,15 @@ export function DataTable<Row extends { id: string }>({
       {pages > 1 && (
         <nav aria-label="Pagine della tabella" className="flex items-center justify-end gap-2">
           {query.page > 1 ? (
-            <Link href={pageHref(query.page - 1)} scroll={false} rel="prev" aria-label="Pagina precedente" className={`${arrow} border-brand-blue bg-white text-brand-blue hover:bg-blue-20`}>
-              <span aria-hidden="true">‹</span>
-            </Link>
+            onQueryChange ? (
+              <button type="button" onClick={() => go({ ...query, page: query.page - 1 })} aria-label="Pagina precedente" className={`${arrow} border-brand-blue bg-white text-brand-blue hover:bg-blue-20`}>
+                <span aria-hidden="true">‹</span>
+              </button>
+            ) : (
+              <Link href={pageHref(query.page - 1)} scroll={false} rel="prev" aria-label="Pagina precedente" className={`${arrow} border-brand-blue bg-white text-brand-blue hover:bg-blue-20`}>
+                <span aria-hidden="true">‹</span>
+              </Link>
+            )
           ) : (
             <span aria-hidden="true" className={`${arrow} border-brand-grey bg-grey-40 text-black-40`}>
               ‹
@@ -236,9 +306,15 @@ export function DataTable<Row extends { id: string }>({
             Pagina {query.page} di {pages}
           </span>
           {query.page < pages ? (
-            <Link href={pageHref(query.page + 1)} scroll={false} rel="next" aria-label="Pagina successiva" className={`${arrow} border-brand-blue bg-white text-brand-blue hover:bg-blue-20`}>
-              <span aria-hidden="true">›</span>
-            </Link>
+            onQueryChange ? (
+              <button type="button" onClick={() => go({ ...query, page: query.page + 1 })} aria-label="Pagina successiva" className={`${arrow} border-brand-blue bg-white text-brand-blue hover:bg-blue-20`}>
+                <span aria-hidden="true">›</span>
+              </button>
+            ) : (
+              <Link href={pageHref(query.page + 1)} scroll={false} rel="next" aria-label="Pagina successiva" className={`${arrow} border-brand-blue bg-white text-brand-blue hover:bg-blue-20`}>
+                <span aria-hidden="true">›</span>
+              </Link>
+            )
           ) : (
             <span aria-hidden="true" className={`${arrow} border-brand-grey bg-grey-40 text-black-40`}>
               ›
