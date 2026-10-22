@@ -43,6 +43,8 @@
     "src/lib/cadences/schedule.ts",
     "src/lib/export/csv.ts",
     "src/lib/format.ts",
+    "src/lib/analytics/period.ts",
+    "src/lib/analytics/aggregate.ts",
     "tests/unit/**/*.ts",
     "tests/fixtures/**/*.ts"
   ]
