@@ -423,7 +423,7 @@ insert into test_json select 'gdpr', public.gdpr_erase('parties', pg_temp.id('b'
 reset role;
 select pg_temp.record(
   'GDPR: del soggetto resta solo l''identificativo minimo',
-  (select cognome = 'Soggetto cancellato (GDPR)' and nome is null and telefono is null and email is null and note is null
+  (select cognome = 'Prospect cancellato (GDPR)' and nome is null and telefono is null and email is null and note is null
           and non_contattare and gdpr_cancellato_il is not null
    from public.parties where id = pg_temp.id('b'))
   and not exists (select 1 from public.contacts where party_id = pg_temp.id('b'))
