@@ -5,7 +5,7 @@ import { getCurrentUser } from "@/lib/auth/current-user";
 import { GoogleApiError, importDetails, nearbySearch, textSearch, walkingMatrix } from "@/lib/google/places-api";
 import { CATEGORY_TYPES, SEARCH_CATEGORIES, categoryForPlace, isSearchCategory, type SearchCategory } from "@/lib/places/categories";
 import { MAX_IMPORT, MAX_RADIUS, MAX_WALKING, MIN_RADIUS } from "@/lib/places/limits";
-import { capAndCity, searchArea } from "@/lib/places/search";
+import { capAndCity, cleanKeyword, searchArea } from "@/lib/places/search";
 import type {
   DuplicateCandidate,
   ImportCandidate,
@@ -77,8 +77,6 @@ function typeGroups(categories: readonly SearchCategory[]): string[][] {
 // Search
 // ---------------------------------------------------------------------------
 
-const MAX_KEYWORD = 100;
-
 // Categories, or a keyword (Text Search, block 1a-10): with a keyword the
 // categories are not needed; they only decide the category shown.
 export async function searchPlaces(input: { parkingId: string; radius: number; categories: string[]; keyword?: string }): Promise<Result<SearchResponse>> {
@@ -90,7 +88,7 @@ export async function searchPlaces(input: { parkingId: string; radius: number; c
   }
   const chosen = Array.isArray(input?.categories) ? input.categories.filter(isSearchCategory) : [];
   const categories = chosen.length > 0 ? SEARCH_CATEGORIES.filter((category) => chosen.includes(category)) : [];
-  const keyword = typeof input?.keyword === "string" ? input.keyword.replace(/\s+/g, " ").trim().slice(0, MAX_KEYWORD) : "";
+  const keyword = cleanKeyword(input?.keyword);
   if (categories.length === 0 && !keyword) return { ok: false, message: "Scegli almeno una categoria o scrivi una parola chiave." };
   if (typeof input?.parkingId !== "string" || !UUID.test(input.parkingId)) return { ok: false, message: "Scegli un parcheggio." };
 

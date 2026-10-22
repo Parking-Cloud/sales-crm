@@ -59,7 +59,7 @@ export function typesFor(categories: readonly SearchCategory[]): string[] {
 
 // Our category for a Google place: its primary type first, then its other
 // types; among the categories searched first (corporate_office is both
-// "Uffici" and "Aziende": the one the user asked for wins). "Altro" when
+// "Uffici" and "Sedi aziendali": the one the user asked for wins). "Altro" when
 // nothing matches.
 export function categoryForPlace(
   primaryType: string | null | undefined,

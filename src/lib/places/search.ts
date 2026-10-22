@@ -14,6 +14,14 @@ export const MAX_LEVELS = 3;
 export const MAX_CALLS = 60;
 const PARALLEL = 8;
 
+export const MAX_KEYWORD = 100;
+
+// Keyword of a Text Search: spaces collapsed, at most 100 characters; empty
+// when missing.
+export function cleanKeyword(value: unknown): string {
+  return typeof value === "string" ? value.replace(/\s+/g, " ").trim().slice(0, MAX_KEYWORD) : "";
+}
+
 export type NearbyPlace = {
   id: string;
   name: string;

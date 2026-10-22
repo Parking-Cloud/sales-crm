@@ -7,7 +7,7 @@ import { isPartyCategory } from "../../src/lib/parties/labels";
 import { refreshGoogleData, type RpcClient } from "../../src/lib/google/refresh";
 import { CATEGORY_TYPES, SEARCH_CATEGORIES, categoryForPlace, typesFor } from "../../src/lib/places/categories";
 import { distanceMeters, offset, splitCircle, type Circle } from "../../src/lib/places/geo";
-import { MAX_CALLS, capAndCity, searchArea, type NearbyPlace } from "../../src/lib/places/search";
+import { MAX_CALLS, MAX_KEYWORD, capAndCity, cleanKeyword, searchArea, type NearbyPlace } from "../../src/lib/places/search";
 
 const CENTER = { lat: 45.4642, lng: 9.19 };
 
@@ -234,4 +234,11 @@ test("keyword search over an area: 20 results -> the keyword again on 4 smaller 
   assert.equal(result.calls, 5);
   assert.deepEqual([...new Set(queries)], ["sede centrale"]);
   assert.equal(result.places.length, 20);
+});
+
+test("keyword: spaces collapsed, at most 100 characters, empty when missing", () => {
+  assert.equal(cleanKeyword("  sede   centrale \n"), "sede centrale");
+  assert.equal(cleanKeyword("x".repeat(150)).length, MAX_KEYWORD);
+  assert.equal(cleanKeyword(undefined), "");
+  assert.equal(cleanKeyword(42), "");
 });

@@ -16,6 +16,7 @@ import type { TableQuery } from "@/lib/tables/query";
 import { pageRows, toggleSelection } from "@/lib/tables/selection";
 import { SEARCH_CATEGORIES, type SearchCategory } from "@/lib/places/categories";
 import { MAX_IMPORT, MAX_RADIUS, MAX_WALKING, MIN_RADIUS } from "@/lib/places/limits";
+import { MAX_KEYWORD } from "@/lib/places/search";
 import type { SearchParking } from "@/lib/places/queries";
 import type { ImportCandidate, ImportChoice, ImportSummary, ResultStatus, SearchResponse, SearchResult, WalkingDistance } from "@/lib/places/types";
 import { ImportDialog } from "./import-dialog";
@@ -249,7 +250,7 @@ export function MapSearch({
             label="Parola chiave"
             hint="Facoltativa, per esempio: sede centrale. Se la scrivi si cerca questa parola nel raggio; le categorie servono solo a classificare i risultati."
           >
-            <Input id="parola-chiave" value={keyword} maxLength={100} autoComplete="off" onChange={(event) => setKeyword(event.target.value)} hasDescription />
+            <Input id="parola-chiave" value={keyword} maxLength={MAX_KEYWORD} autoComplete="off" onChange={(event) => setKeyword(event.target.value)} hasDescription />
           </Field>
         </div>
         <div className="flex justify-end">
@@ -275,7 +276,11 @@ export function MapSearch({
               si salvano soltanto quelli importati.
             </p>
           </div>
-          {response.partial && <Alert tone="warning">Risultati parziali: restringi il raggio o le categorie.</Alert>}
+          {response.partial && (
+            <Alert tone="warning">
+              {response.keyword ? "Risultati parziali: restringi il raggio o usa una parola chiave più precisa." : "Risultati parziali: restringi il raggio o le categorie."}
+            </Alert>
+          )}
 
           <ResultsMap
             center={response.center}
