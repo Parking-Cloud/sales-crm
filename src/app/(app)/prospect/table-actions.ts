@@ -46,7 +46,7 @@ function validDay(value: string): boolean {
 // Prospect
 // ---------------------------------------------------------------------------
 
-export type StatusChange = { entrate: number; uscite: number; chiuse: number };
+export type StatusChange = { entrate: number; uscite: number; chiuse: number; rifiutate: number };
 
 export async function setProspectStatus(partyId: string, stato: string, motivo: string): Promise<Result<StatusChange>> {
   const denied = await guard(partyId);
@@ -63,6 +63,9 @@ export async function setProspectStatus(partyId: string, stato: string, motivo: 
     if (error.code === "P0002") return { ok: false, message: NOT_FOUND };
     if (error.code === "22023") return { ok: false, message: "Prospect cancellato per GDPR: lo stato non si cambia." };
     if (error.code === "23505") return { ok: false, message: "Su uno dei parcheggi c'è già un'opportunità aperta: controlla la scheda del prospect." };
+    if (error.code === "23514" && error.message === "accepted offer") {
+      return { ok: false, message: `Il prospect ha un'offerta accettata su ${error.details || "un parcheggio"}: gestisci prima l'offerta.` };
+    }
     return { ok: false, message: SAVE_FAILED };
   }
   refresh(partyId);

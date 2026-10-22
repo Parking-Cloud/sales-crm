@@ -249,12 +249,24 @@ select pg_temp.record(
 select public.set_prospect_status(pg_temp.id('p1'), 'interessato');
 insert into test_json select 's4', public.set_prospect_status(pg_temp.id('p1'), 'non_interessato', 'prezzo');
 select pg_temp.record(
-  'Non interessato: motivo facoltativo salvato, chiude le opportunità aperte, la riga con offerta inviata resta',
+  'Non interessato: motivo facoltativo salvato, escono le righe da inviare, chiude le opportunità aperte',
   (select stato_prospect = 'non_interessato' and motivo_non_interesse = 'prezzo' from public.parties where id = pg_temp.id('p1'))
   and pg_temp.j('s4') ->> 'uscite' = '2' and pg_temp.j('s4') ->> 'chiuse' = '2'
   and (select esito = 'persa' and motivo_perdita = 'prezzo' from public.opportunities
        where party_id = pg_temp.id('p1') and parking_id = '00000000-0000-4000-8000-0000000000e2')
-  and pg_temp.offer('p1', '00000000-0000-4000-8000-0000000000e1') = 'inviata'
+);
+select pg_temp.record(
+  'Non interessato con offerta inviata: diventa Rifiutata con il motivo scelto, nello storico e nell''audit con autore',
+  pg_temp.j('s4') ->> 'rifiutate' = '1'
+  and pg_temp.offer('p1', '00000000-0000-4000-8000-0000000000e1') = 'rifiutata'
+  and (select esito = 'persa' and motivo_perdita = 'prezzo' from public.opportunities
+       where party_id = pg_temp.id('p1') and parking_id = '00000000-0000-4000-8000-0000000000e1')
+  and exists (select 1 from public.activities a join public.opportunities o on o.id = a.opportunity_id
+              where o.party_id = pg_temp.id('p1') and o.parking_id = '00000000-0000-4000-8000-0000000000e1'
+                and a.tipo = 'cambio_fase' and a.testo = 'Chiusa come persa: prezzo' and a.user_id = pg_temp.id('operatore'))
+  and exists (select 1 from public.audit_logs a join public.opportunities o on o.id = a.entita_id
+              where o.party_id = pg_temp.id('p1') and o.parking_id = '00000000-0000-4000-8000-0000000000e1'
+                and a.prima ->> 'stato_offerta' = 'inviata' and a.dopo ->> 'stato_offerta' = 'rifiutata' and a.utente_id = pg_temp.id('operatore'))
 );
 select public.set_prospect_status(pg_temp.id('p1'), 'non_interessato');
 select pg_temp.record(
@@ -264,13 +276,23 @@ select pg_temp.record(
 
 insert into test_json select 's5', public.set_prospect_status(pg_temp.id('p1'), 'interessato');
 select pg_temp.record(
-  'di nuovo Interessato: le coppie chiuse rientrano (riaperte) senza duplicati',
+  'di nuovo Interessato: le coppie uscite rientrano come "Offerta da inviare", la Rifiutata resta rifiutata, senza duplicati',
   pg_temp.j('s5') ->> 'entrate' = '2'
   and pg_temp.offer('p1', '00000000-0000-4000-8000-0000000000e2') = 'da_inviare'
   and (select esito = 'aperta' and motivo_perdita is null from public.opportunities
        where party_id = pg_temp.id('p1') and parking_id = '00000000-0000-4000-8000-0000000000e2')
+  and pg_temp.offer('p1', '00000000-0000-4000-8000-0000000000e1') = 'rifiutata'
   and (select count(*) from public.opportunities where party_id = pg_temp.id('p1') and stato_offerta is not null) = 3
 );
+select public.set_offer_status(
+  (select id from public.opportunities where party_id = pg_temp.id('p1') and parking_id = '00000000-0000-4000-8000-0000000000e1'), 'da_inviare');
+select pg_temp.record(
+  'la Rifiutata si rimette a mano su "Offerta da inviare" (riaperta)',
+  (select stato_offerta = 'da_inviare' and esito = 'aperta' and motivo_perdita is null from public.opportunities
+   where party_id = pg_temp.id('p1') and parking_id = '00000000-0000-4000-8000-0000000000e1')
+);
+select public.set_offer_status(
+  (select id from public.opportunities where party_id = pg_temp.id('p1') and parking_id = '00000000-0000-4000-8000-0000000000e1'), 'inviata');
 
 -- ---------------------------------------------------------------------------
 -- Offer status
@@ -295,6 +317,29 @@ select pg_temp.record(
   'Accettata: opportunità vinta',
   (select esito = 'vinta' and fase = 'vinta' from public.opportunities where party_id = pg_temp.id('p1') and parking_id = '00000000-0000-4000-8000-0000000000e3')
 );
+select pg_temp.expect_error(
+  'Non interessato con un''offerta accettata: bloccato, con il parcheggio nel messaggio',
+  format($$select public.set_prospect_status(%L, 'non_interessato', 'prezzo')$$, pg_temp.id('p1')),
+  '23514'
+);
+do $$
+declare v_detail text;
+begin
+  begin
+    perform public.set_prospect_status(pg_temp.id('p1'), 'non_interessato');
+  exception when sqlstate '23514' then
+    get stacked diagnostics v_detail = pg_exception_detail;
+  end;
+  perform pg_temp.record(
+    'offerta accettata: nessuna modifica parziale (stato, righe e motivi invariati)',
+    v_detail = 'Prospect Tre'
+    and (select stato_prospect = 'interessato' and motivo_non_interesse is null from public.parties where id = pg_temp.id('p1'))
+    and pg_temp.offer('p1', '00000000-0000-4000-8000-0000000000e1') = 'inviata'
+    and pg_temp.offer('p1', '00000000-0000-4000-8000-0000000000e2') = 'rifiutata'
+    and pg_temp.offer('p1', '00000000-0000-4000-8000-0000000000e3') = 'accettata',
+    v_detail
+  );
+end $$;
 select pg_temp.expect_error(
   'stato offerta solo su righe della pipeline',
   format($$select public.set_offer_status((select id from public.opportunities where party_id = %L), 'inviata')$$, pg_temp.id('m1')),
@@ -341,10 +386,11 @@ select pg_temp.record(
   and (select count(*) from public.pipeline_rows(p_promemoria => 'oltre3', p_nome => 'Azienda Esempio Prospect')) = 1
 );
 select pg_temp.record(
-  'contatore degli scaduti: conta i promemoria prima di oggi',
+  'contatore degli scaduti: conta i promemoria prima di oggi dei lead attivi',
   public.count_overdue_reminders() >= 1
   and public.count_overdue_reminders() = (select count(*) from public.opportunities o join public.parties p on p.id = o.party_id
-                                          where o.promemoria_il < public.rome_today() and o.stato_offerta is not null and p.merged_into_id is null)
+                                          where o.promemoria_il < public.rome_today() and o.stato_offerta in ('da_inviare', 'inviata')
+                                            and p.merged_into_id is null)
 );
 update public.opportunities set promemoria_il = null
 where party_id = pg_temp.id('p1') and parking_id = '00000000-0000-4000-8000-0000000000e1';

@@ -33,13 +33,17 @@ Menu, in quest'ordine: Promemoria (pagina iniziale, sostituisce Oggi), Parcheggi
 
 ### Stato del prospect
 
-Ogni prospect ha uno stato: Da contattare (predefinito), Interessato, Molto interessato, Non interessato. "Non interessato" ha un motivo facoltativo (lista dei motivi di perdita) e chiude le opportunità aperte che non hanno un'offerta già inviata. La data dell'ultimo contatto si compila a mano (vuota di default).
+Ogni prospect ha uno stato: Da contattare (predefinito), Interessato, Molto interessato, Non interessato. La data dell'ultimo contatto si compila a mano (vuota di default).
+
+"Non interessato" ha un motivo facoltativo (lista dei motivi di perdita) e toglie tutte le righe del prospect dalla pipeline attiva: le righe con offerta da inviare escono, le offerte inviate diventano "Rifiutata" con lo stesso motivo (o "motivo non indicato"), con il cambio nello storico e nell'audit con l'autore; le altre opportunità aperte si chiudono. Se il prospect ha un'offerta accettata il cambio è bloccato ("Il prospect ha un'offerta accettata su <parcheggio>: gestisci prima l'offerta") e non cambia nulla.
 
 Telefono, email e referente mostrati nelle tabelle sono quelli del contatto principale del prospect (il primo creato), con il telefono e l'email dell'azienda quando il contatto non li ha; modificarli in tabella scrive sul contatto principale e lo crea se manca.
 
 ### Pipeline e stato dell'offerta
 
-La pipeline contiene le coppie prospect + parcheggio dei lead, una riga per coppia. Quando un prospect diventa Interessato o Molto interessato, ogni sua coppia entra in pipeline con stato offerta "Offerta da inviare" (mai due righe per la stessa coppia; un parcheggio aggiunto dopo entra subito). Tornando a Da contattare o Non interessato, escono le righe con offerta da inviare; restano quelle con offerta inviata, accettata o rifiutata.
+La pipeline contiene le coppie prospect + parcheggio dei lead, una riga per coppia. Quando un prospect diventa Interessato o Molto interessato, ogni sua coppia entra in pipeline con stato offerta "Offerta da inviare" (mai due righe per la stessa coppia; un parcheggio aggiunto dopo entra subito). Tornando a Da contattare escono le righe con offerta da inviare; restano quelle con offerta inviata, accettata o rifiutata. Tornando da Non interessato a Interessato, le righe uscite rientrano come "Offerta da inviare"; le rifiutate restano rifiutate e si possono rimettere a mano su "Offerta da inviare".
+
+La pipeline mostra di norma solo i lead attivi (Offerta da inviare, Offerta inviata); il filtro Stato offerta mostra anche Accettata, Rifiutata o tutti gli stati.
 
 Stato offerta: Offerta da inviare (predefinito), Offerta inviata, Accettata, Rifiutata (con motivo facoltativo). Lo stato dell'offerta aggiorna fase ed esito dell'opportunità (da inviare = Interessata, inviata = Offerta inviata, accettata = Vinta, rifiutata = Persa), così lo storico resta coerente. Kanban, prossima attività, menu di fase, "Registra chiamata" e le fasi Passata al BO e Attivata non sono più nell'interfaccia.
 
@@ -47,7 +51,7 @@ Il motivo di una perdita è facoltativo: senza scelta vale "motivo non indicato"
 
 ### Promemoria manuale
 
-Ogni riga della pipeline ha una data di promemoria scelta a mano e una nota. Accanto alla data: "tra N giorni" (verde oltre 3 giorni), "oggi" o entro 3 giorni (tono di avviso dell'UI Kit), "scaduto da N giorni" (rosso); i giorni si contano sul calendario di Europe/Rome. La pagina Promemoria mostra solo i lead con la data, quelli scaduti in alto; "Fatto" svuota la data. Il menu mostra il numero dei promemoria scaduti.
+Ogni riga della pipeline ha una data di promemoria scelta a mano e una nota. Accanto alla data: "tra N giorni" (verde oltre 3 giorni), "oggi" o entro 3 giorni (tono di avviso dell'UI Kit), "scaduto da N giorni" (rosso); i giorni si contano sul calendario di Europe/Rome. La pagina Promemoria mostra solo i lead attivi con la data, quelli scaduti in alto; "Fatto" svuota la data. Il menu mostra il numero dei promemoria scaduti dei lead attivi.
 
 ### Tabelle
 

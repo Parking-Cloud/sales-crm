@@ -2,7 +2,7 @@ import { createClient } from "@/lib/supabase/server";
 import type { Database } from "@/lib/supabase/types";
 import { pageOffset, TABLE_PAGE_SIZE } from "@/lib/tables/paging";
 import type { TableQuery } from "@/lib/tables/query";
-import { LAST_CONTACT_FILTERS, PIPELINE_REMINDER_FILTERS, REMINDER_DUE_FILTERS } from "./filters";
+import { ACTIVE_OFFER_STATUSES, ALL_OFFERS, LAST_CONTACT_FILTERS, PIPELINE_REMINDER_FILTERS, REMINDER_DUE_FILTERS } from "./filters";
 import { isOfferStatus, isProspectStatus, type OfferStatus, type ProspectStatus } from "./labels";
 
 export { PIPELINE_FILTERS, PIPELINE_SORTS, PROSPECT_FILTERS, PROSPECT_SORTS, REMINDER_FILTERS, REMINDER_SORTS } from "./filters";
@@ -148,7 +148,14 @@ export function pipelineArgs(query: TableQuery, view: "pipeline" | "promemoria")
     p_telefono: text(f.telefono),
     p_email: text(f.email),
     p_referente: text(f.referente),
-    p_stati: isOfferStatus(f.offerta) ? [f.offerta] : undefined,
+    // Pipeline: active leads unless a status (or all) is chosen; Promemoria:
+    // active leads only.
+    p_stati:
+      view === "pipeline" && isOfferStatus(f.offerta)
+        ? [f.offerta]
+        : view === "pipeline" && f.offerta === ALL_OFFERS
+          ? undefined
+          : [...ACTIVE_OFFER_STATUSES],
     p_note: text(f.note),
     p_promemoria: reminder,
     p_ordina: query.sort ?? (view === "promemoria" ? "promemoria" : "nome"),

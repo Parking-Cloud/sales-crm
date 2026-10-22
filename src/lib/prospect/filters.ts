@@ -15,4 +15,9 @@ export const REMINDER_DUE_FILTERS = {
   entro3: "Oggi o entro 3 giorni",
   oltre3: "Oltre 3 giorni",
 } as const;
+// Active leads: the pipeline shows them unless the offer filter says
+// otherwise ("tutti" = every status).
+export const ACTIVE_OFFER_STATUSES = ["da_inviare", "inviata"] as const;
+export const ALL_OFFERS = "tutti";
+
 export const PIPELINE_REMINDER_FILTERS = { con: "Con promemoria", nessuno: "Senza promemoria", ...REMINDER_DUE_FILTERS } as const;

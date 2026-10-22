@@ -8,7 +8,7 @@ import { EditableSelect, EditableText } from "@/components/data-table/editable";
 import { AlertCircleIcon } from "@/components/ui/icons";
 import { DoNotContactBadge } from "@/components/parties/data-status-badge";
 import { OFFER_STATUSES, OFFER_STATUS_LABELS, type OfferStatus } from "@/lib/prospect/labels";
-import { PIPELINE_REMINDER_FILTERS, REMINDER_DUE_FILTERS } from "@/lib/prospect/filters";
+import { ALL_OFFERS, PIPELINE_REMINDER_FILTERS, REMINDER_DUE_FILTERS } from "@/lib/prospect/filters";
 import type { PipelineRow } from "@/lib/prospect/queries";
 import { safeCall } from "@/lib/import/safe-call";
 import type { TableQuery } from "@/lib/tables/query";
@@ -143,7 +143,12 @@ export function PipelineTable({
       label: "Stato offerta",
       sort: "stato",
       width: "min-w-44",
-      filter: { param: "offerta", type: "select", options: OFFER_OPTIONS },
+      filter: {
+        param: "offerta",
+        type: "select",
+        options: [...OFFER_OPTIONS, { value: ALL_OFFERS, label: "Tutti gli stati" }],
+        allLabel: "Attivi (da inviare, inviata)",
+      },
       cell: (row) => (
         <EditableSelect
           value={row.statoOfferta}
@@ -180,7 +185,7 @@ export function PipelineTable({
       rows={rows}
       total={total}
       query={query}
-      empty="Nessun lead: un prospect entra in pipeline quando diventa Interessato o Molto interessato."
+      empty="Nessun lead attivo: un prospect entra in pipeline quando diventa Interessato o Molto interessato. Accettate e rifiutate si vedono con il filtro Stato offerta."
     />
   );
 }
