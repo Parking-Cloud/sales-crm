@@ -1,7 +1,7 @@
 "use client";
 
 import { useActionState, useState } from "react";
-import { saveParty } from "@/app/(app)/soggetti/actions";
+import { saveParty } from "@/app/(app)/prospect/actions";
 import { Alert } from "@/components/ui/alert";
 import { Button, ButtonLink } from "@/components/ui/button";
 import { Field, Input, Select } from "@/components/ui/field";
@@ -84,7 +84,7 @@ export function PartyForm({
       />
       {!party && <PipelineEntryFields values={values} errors={state.fieldErrors ?? {}} parkings={parkings} />}
       <div className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
-        <ButtonLink href={party ? `/soggetti/${party.id}` : "/soggetti"} size="md">
+        <ButtonLink href={party ? `/prospect/${party.id}` : "/prospect"} size="md">
           Annulla
         </ButtonLink>
         <Button type="submit" variant="primary" size="md" disabled={pending} aria-busy={pending || undefined}>

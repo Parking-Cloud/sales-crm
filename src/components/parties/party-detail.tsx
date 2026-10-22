@@ -19,9 +19,8 @@ import type { Contact, Distance, Party, PartyLocation, Provenance } from "@/lib/
 import type { TimelineEntry } from "@/lib/pipeline/history";
 import type { ParkingChoice, PipelineItem } from "@/lib/pipeline/queries";
 import { AddToParkingButton } from "@/components/pipeline/add-to-parking";
-import { StageMenu } from "@/components/pipeline/stage-controls";
-import { ActivityButton } from "@/components/pipeline/activity-dialog";
-import { NextActivity } from "@/components/pipeline/next-activity";
+import { OfferStatusBadge } from "@/components/prospect/cells";
+import { ProspectStatusFields } from "@/components/prospect/status-fields";
 import { Timeline } from "@/components/pipeline/timeline";
 import { TRACKED_FIELD_LABELS, type TrackedField } from "@/lib/parties/validation";
 import { DoNotContactBadge } from "./data-status-badge";
@@ -148,8 +147,8 @@ export function PartyDetail({
   return (
     <>
       <p className="text-caption">
-        <Link href="/soggetti" className="rounded-xs text-blue-ink underline underline-offset-2">
-          Soggetti
+        <Link href="/prospect" className="rounded-xs text-blue-ink underline underline-offset-2">
+          Prospect
         </Link>
       </p>
       <div className="mt-2 flex flex-wrap items-start justify-between gap-4">
@@ -165,9 +164,8 @@ export function PartyDetail({
           <div className="flex flex-wrap gap-2">{isAdmin && <DeletePartyControl partyId={party.id} partyName={name} />}</div>
         ) : (
           <div className="flex flex-wrap gap-2">
-            <ActivityButton opportunityId={null} partyId={party.id} subject={name} />
             {!party.non_contattare && <ButtonLink href={emailHref}>Prepara email</ButtonLink>}
-            <ButtonLink href={`/soggetti/${party.id}/modifica`}>Modifica</ButtonLink>
+            <ButtonLink href={`/prospect/${party.id}/modifica`}>Modifica</ButtonLink>
             <DoNotContactControl
               entita="parties"
               id={party.id}
@@ -177,7 +175,7 @@ export function PartyDetail({
               isAdmin={isAdmin}
               initiallyOpen={dialogOpenFor === party.id}
             />
-            {isAdmin && <ButtonLink href={`/soggetti/${party.id}/unisci`}>Unisci con un altro</ButtonLink>}
+            {isAdmin && <ButtonLink href={`/prospect/${party.id}/unisci`}>Unisci con un altro</ButtonLink>}
             {isAdmin && <GdprEraseControl entita="parties" id={party.id} partyId={party.id} name={name} />}
             {isAdmin && <DeletePartyControl partyId={party.id} partyName={name} />}
           </div>
@@ -193,11 +191,22 @@ export function PartyDetail({
 
       {party.non_contattare && !erased && (
         <Alert tone="critical" title="Non contattare" className="mt-6">
-          Questo soggetto ha chiesto di non essere contattato. I suoi recapiti sono nella lista di esclusione.
+          Questo prospect ha chiesto di non essere contattato. I suoi recapiti sono nella lista di esclusione.
         </Alert>
       )}
 
       <div className="mt-6 flex flex-col gap-6">
+        <Section id="stato" title="Stato">
+          <ProspectStatusFields
+            partyId={party.id}
+            name={name}
+            stato={party.stato_prospect}
+            motivo={party.motivo_non_interesse}
+            ultimoContatto={party.ultimo_contatto_il}
+            disabled={erased}
+          />
+        </Section>
+
         <Section id="dati" title="Dati">
           <dl className="grid gap-x-6 gap-y-5 sm:grid-cols-2 lg:grid-cols-3">
             {company ? (
@@ -260,7 +269,7 @@ export function PartyDetail({
         <Section
           id="sedi"
           title="Sedi"
-          action={<ButtonLink href={`/soggetti/${party.id}/sedi/nuova`}>Aggiungi sede</ButtonLink>}
+          action={<ButtonLink href={`/prospect/${party.id}/sedi/nuova`}>Aggiungi sede</ButtonLink>}
         >
           {locations.length === 0 ? (
             <p className="text-body text-black-60">Nessuna sede inserita.</p>
@@ -330,7 +339,7 @@ export function PartyDetail({
                         </div>
                       )}
                       <Link
-                        href={`/soggetti/${party.id}/sedi/${location.id}/modifica`}
+                        href={`/prospect/${party.id}/sedi/${location.id}/modifica`}
                         className="rounded-xs font-semibold text-blue-ink underline underline-offset-2"
                       >
                         Modifica sede
@@ -353,7 +362,7 @@ export function PartyDetail({
           id="contatti"
           title="Contatti"
           action={
-            <ButtonLink href={`/soggetti/${party.id}/contatti/nuovo`} variant="primary">
+            <ButtonLink href={`/prospect/${party.id}/contatti/nuovo`} variant="primary">
               Aggiungi contatto
             </ButtonLink>
           }
@@ -361,7 +370,7 @@ export function PartyDetail({
           {contacts.length === 0 ? (
             <p className="text-body text-black-60">Nessun contatto inserito.</p>
           ) : (
-            <Table caption="Contatti del soggetto">
+            <Table caption="Contatti del prospect">
               <thead>
                 <tr>
                   <Th>Referente</Th>
@@ -408,7 +417,7 @@ export function PartyDetail({
                       <Td>
                         <span className="flex flex-wrap items-center gap-2">
                           <Link
-                            href={`/soggetti/${party.id}/contatti/${contact.id}/modifica`}
+                            href={`/prospect/${party.id}/contatti/${contact.id}/modifica`}
                             className="rounded-xs font-semibold text-blue-ink underline underline-offset-2"
                           >
                             Modifica<span className="sr-only"> {contactName}</span>
@@ -435,11 +444,11 @@ export function PartyDetail({
 
         <Section
           id="opportunita"
-          title="Opportunità"
+          title="Parcheggi"
           action={!party.non_contattare && <AddToParkingButton partyId={party.id} partyName={name} choices={parkingChoices} />}
         >
           {opportunities.length === 0 ? (
-            <p className="text-body text-black-60">Nessuna opportunità: aggiungi il soggetto a un parcheggio.</p>
+            <p className="text-body text-black-60">Nessun parcheggio: aggiungi il prospect a un parcheggio.</p>
           ) : (
             <ul className="flex flex-col divide-y divide-grey-60">
               {opportunities.map((item) => {
@@ -453,14 +462,14 @@ export function PartyDetail({
                         >
                           {item.parking}
                         </Link>
-                        <StageMenu opportunityId={item.id} fase={item.fase} esito={item.esito} subject={`${name} · ${item.parking}`} />
+                        {item.statoOfferta ? (
+                          <OfferStatusBadge stato={item.statoOfferta} motivo={item.motivoPerdita} />
+                        ) : (
+                          <span className="mt-1 text-caption text-black-60">Non in pipeline</span>
+                        )}
                       </p>
                       <p className="text-caption text-black-80">{item.responsabile ? `Responsabile: ${item.responsabile}` : "Senza responsabile"}</p>
-                      {item.esito === "aperta" && <NextActivity item={item} now={now} />}
                     </div>
-                    {item.esito === "aperta" && (
-                      <ActivityButton opportunityId={item.id} partyId={party.id} subject={`${name} · ${item.parking}`} />
-                    )}
                   </li>
                 );
               })}
@@ -472,7 +481,7 @@ export function PartyDetail({
           {provenance.length === 0 ? (
             <p className="text-body text-black-60">Nessuna provenienza registrata.</p>
           ) : (
-            <Table caption="Provenienza dei dati del soggetto e dei contatti">
+            <Table caption="Provenienza dei dati del prospect e dei contatti">
               <thead>
                 <tr>
                   <Th>Dato</Th>

@@ -2,7 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useId, useState, useTransition } from "react";
-import { clearDoNotContact, markDoNotContact } from "@/app/(app)/soggetti/actions";
+import { clearDoNotContact, markDoNotContact } from "@/app/(app)/prospect/actions";
 import { Alert } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
@@ -107,7 +107,7 @@ export function DoNotContactControl({
         </p>
         <ul className="mt-2 list-disc pl-5">
           <li>
-            le opportunità aperte {entita === "parties" ? "del soggetto" : "collegate al contatto"} si chiudono come perse
+            le opportunità aperte {entita === "parties" ? "del prospect" : "collegate al contatto"} si chiudono come perse
             (&ldquo;ha chiesto di non essere contattato&rdquo;) e i loro promemoria si chiudono;
           </li>
           <li>non si possono più preparare email;</li>

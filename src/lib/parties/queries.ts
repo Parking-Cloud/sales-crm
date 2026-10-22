@@ -97,30 +97,6 @@ export async function searchParties(filters: PartyFilters): Promise<{ items: Par
   };
 }
 
-// Ids of every party matching the filters, for exports (block 1a-8): up to
-// `max`, in pages of 200 (the most search_parties returns at once).
-export async function listFilteredPartyIds(filters: PartyFilters, max = 5000): Promise<string[]> {
-  const supabase = await createClient();
-  const ids: string[] = [];
-  for (let offset = 0; offset < max; offset += 200) {
-    const { data, error } = await supabase.rpc("search_parties", {
-      p_query: filters.q || undefined,
-      p_tipo: filters.tipo ?? undefined,
-      p_categoria: filters.categoria ?? undefined,
-      p_citta: filters.citta || undefined,
-      p_solo_da_verificare: filters.soloDaVerificare,
-      p_limit: 200,
-      p_offset: offset,
-      p_parcheggi: filters.parcheggi.length > 0 ? filters.parcheggi : undefined,
-      p_senza_parcheggio: filters.senzaParcheggio,
-    });
-    if (error) throw new Error(`search_parties: ${error.code ?? error.message}`);
-    (data ?? []).forEach((row) => ids.push(row.id));
-    if (!data || data.length < 200) break;
-  }
-  return ids.slice(0, max);
-}
-
 // ---------------------------------------------------------------------------
 // Party detail
 // ---------------------------------------------------------------------------

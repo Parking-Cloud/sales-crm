@@ -27,5 +27,5 @@ test("CSV file: English headers in a fixed order, CRLF lines, one row per contac
       'Mario,Esempio,"Resp. ""acquisti"", sede",mario@example.com,,Azienda Esempio Srl,,Forlì,,Da contattare,sì - richiesta in chiamata\r\n' +
       ",,,,,Studio Prova,,,,,no\r\n",
   );
-  assert.equal(exportFileName("2026-10-15"), "soggetti-2026-10-15.csv");
+  assert.equal(exportFileName("2026-10-15"), "prospect-2026-10-15.csv");
 });

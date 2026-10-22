@@ -54,7 +54,7 @@ export async function saveMaxParkingDistance(previous: SettingFormState, form: F
   }
 
   revalidatePath("/impostazioni");
-  revalidatePath("/soggetti", "layout");
+  revalidatePath("/prospect", "layout");
   return { version, status: "saved" };
 }
 

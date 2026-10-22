@@ -50,7 +50,7 @@ function PartyItem({ group }: { group: PartyGroup }) {
   return (
     <li className="py-2">
       {group.partyId ? (
-        <Link href={`/soggetti/${group.partyId}`} className="rounded-xs font-semibold text-blue-ink underline underline-offset-2">
+        <Link href={`/prospect/${group.partyId}`} className="rounded-xs font-semibold text-blue-ink underline underline-offset-2">
           {group.soggetto}
         </Link>
       ) : (

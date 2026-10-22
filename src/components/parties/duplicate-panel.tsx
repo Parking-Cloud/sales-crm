@@ -14,10 +14,10 @@ function MatchList({ matches, warning }: { matches: DuplicateMatch[]; warning: b
           </span>
           {match.party_id && (
             <Link
-              href={`/soggetti/${match.party_id}`}
+              href={`/prospect/${match.party_id}`}
               className="rounded-xs font-semibold text-blue-ink underline underline-offset-2"
             >
-              {warning ? "È lo stesso: apri" : "Apri il soggetto esistente"}
+              {warning ? "È lo stesso: apri" : "Apri il prospect esistente"}
               {match.nome && <span className="sr-only"> {match.nome}</span>}
             </Link>
           )}
@@ -40,14 +40,14 @@ export function DuplicatePanel({
 }) {
   if (level === "blocco") {
     return (
-      <Alert tone="critical" title="Non si può salvare: il soggetto esiste già o non va contattato">
+      <Alert tone="critical" title="Non si può salvare: il prospect esiste già o non va contattato">
         <MatchList matches={matches} warning={false} />
       </Alert>
     );
   }
   return (
     <Alert tone="warning" title="Possibile doppione">
-      <p>Controlla se è lo stesso soggetto prima di continuare.</p>
+      <p>Controlla se è lo stesso prospect prima di continuare.</p>
       <MatchList matches={matches} warning />
       <div className="mt-3">
         <Button type="submit" name="ignora_avvisi" value="1" disabled={pending}>

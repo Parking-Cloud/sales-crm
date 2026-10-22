@@ -7,7 +7,7 @@ import {
   proposeAddressCoordinates,
   refreshLocationCoordinates,
   type AddressProposal,
-} from "@/app/(app)/soggetti/[id]/sedi/actions";
+} from "@/app/(app)/prospect/[id]/sedi/actions";
 import { Alert } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { safeCall } from "@/lib/import/safe-call";

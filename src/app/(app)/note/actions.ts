@@ -18,6 +18,6 @@ export async function saveNotes(entita: "parties" | "parking_facilities", id: st
   const supabase = await createClient();
   const { error } = await supabase.rpc("save_notes", { p_entita: entita, p_id: id, p_note: text });
   if (error) return { ok: false, message: "Note non salvate. Riprova." };
-  revalidatePath(entita === "parties" ? `/soggetti/${id}` : `/parcheggi/${id}`);
+  revalidatePath(entita === "parties" ? `/prospect/${id}` : `/parcheggi/${id}`);
   return { ok: true };
 }

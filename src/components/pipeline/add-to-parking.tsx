@@ -57,7 +57,7 @@ export function AddToParkingButton({
       const row = result.data[0];
       if (row?.esito !== "creata") {
         setExisting(row?.opportunityId ?? null);
-        return setError(row?.motivo ?? "Opportunità non creata.");
+        return setError(row?.motivo ?? "Parcheggio non aggiunto.");
       }
       router.refresh();
       close();
@@ -78,15 +78,15 @@ export function AddToParkingButton({
               Annulla
             </Button>
             <Button variant="primary" size="md" disabled={pending} aria-busy={pending || undefined} onClick={submit}>
-              {pending ? "Creazione..." : "Crea opportunità"}
+              {pending ? "Aggiunta..." : "Aggiungi"}
             </Button>
           </>
         }
       >
         <div className="flex flex-col gap-4">
           <p className="text-body text-black-80">
-            Nasce un&apos;opportunità in fase &ldquo;Individuata&rdquo;, assegnata a te. I parcheggi più vicini alla sede sono in
-            cima.
+            Il parcheggio si aggiunge al prospect, assegnato a te; se il prospect è interessato entra subito in Pipeline. I parcheggi più
+            vicini alla sede sono in cima.
           </p>
           {choices.length === 0 ? (
             <Alert tone="info">Nessun parcheggio attivo.</Alert>
@@ -165,7 +165,7 @@ export function SelectPartyCheckbox({ formId, partyId, label, name = "soggetto" 
 }
 
 // "Seleziona tutti" of the page, in the table header.
-export function SelectAllCheckbox({ formId, label = "Seleziona tutti i soggetti della pagina" }: { formId: string; label?: string }) {
+export function SelectAllCheckbox({ formId, label = "Seleziona tutti i prospect della pagina" }: { formId: string; label?: string }) {
   return (
     <input
       type="checkbox"
@@ -219,7 +219,7 @@ export function BulkAddToParking({
     const data = new FormData(event.currentTarget);
     const partyIds = data.getAll("soggetto").map(String);
     const parkingId = String(data.get("parcheggio") ?? "");
-    if (partyIds.length === 0) return setError("Seleziona almeno un soggetto nella tabella.");
+    if (partyIds.length === 0) return setError("Seleziona almeno un prospect nella tabella.");
     if (!parkingId) return setError("Scegli il parcheggio.");
     startTransition(async () => {
       const result = await safeCall(() => action({ partyIds, parkingId }));
@@ -241,11 +241,11 @@ export function BulkAddToParking({
       <form
         id={formId}
         onSubmit={submit}
-        aria-label="Aggiungi i soggetti selezionati a un parcheggio"
+        aria-label="Aggiungi i prospect selezionati a un parcheggio"
         className="flex flex-col gap-3 rounded-md border border-grey-60 bg-white p-4 sm:flex-row sm:items-end"
       >
         <p className="text-body sm:mr-auto sm:self-center" aria-live="polite">
-          <span className="font-semibold">{selected === 1 ? "1 soggetto selezionato" : `${selected} soggetti selezionati`}</span>
+          <span className="font-semibold">{selected === 1 ? "1 prospect selezionato" : `${selected} prospect selezionati`}</span>
           <span className="block text-caption text-black-60">Spunta le righe della tabella, poi scegli il parcheggio.</span>
         </p>
         <div className="sm:w-64">
@@ -279,13 +279,13 @@ export function BulkAddToParking({
         <div className="flex flex-col gap-4">
           <p className="text-body">
             <strong>{created.length === 1 ? "1 opportunità creata" : `${created.length} opportunità create`}</strong>,{" "}
-            <strong>{skipped.length === 1 ? "1 soggetto saltato" : `${skipped.length} soggetti saltati`}</strong>.
+            <strong>{skipped.length === 1 ? "1 prospect saltato" : `${skipped.length} prospect saltati`}</strong>.
           </p>
           {skipped.length > 0 && (
             <ul className="flex flex-col gap-2">
               {skipped.map((row) => (
                 <li key={row.partyId} className="text-body">
-                  <span className="font-semibold">{names[row.partyId] ?? "Soggetto"}</span>: {row.motivo}
+                  <span className="font-semibold">{names[row.partyId] ?? "Prospect"}</span>: {row.motivo}
                   {row.opportunityId && (
                     <>
                       {" "}

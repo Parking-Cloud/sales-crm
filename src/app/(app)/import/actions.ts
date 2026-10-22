@@ -203,7 +203,7 @@ export async function runImport(fileName: string, rows: PlanRow[]): Promise<Resu
       };
     }
     revalidatePath("/import");
-    revalidatePath("/soggetti");
+    revalidatePath("/prospect");
     return { ok: true, data: { batchId: (data as { batch_id: string }).batch_id } };
   } catch {
     time.log({ righe: rows.length, errore: 1 });
@@ -246,7 +246,7 @@ export async function undoImport(batchId: string): Promise<Result<UndoResult>> {
     if (!result.blocked) {
       revalidatePath("/import");
       revalidatePath(`/import/${batchId}`);
-      revalidatePath("/soggetti", "layout");
+      revalidatePath("/prospect", "layout");
     }
     return { ok: true, data: result };
   } catch {
