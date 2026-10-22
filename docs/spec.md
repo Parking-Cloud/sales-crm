@@ -23,6 +23,46 @@ Il Sales CRM è una web app interna per 4 utenti che sostituisce l'Excel commerc
 
 Nel documento ogni requisito riporta l'origine: **DOC** (allegati), **PROMPT** (prompt master), **PROP** (proposta), **IPOTESI** (da verificare).
 
+## Revisione 22/10/2026
+
+Obiettivo: lavorare quasi tutto dalle tabelle, entrando il meno possibile nelle schede. Dove questa revisione contraddice il resto della specifica, vale la revisione.
+
+### Navigazione
+
+Menu, in quest'ordine: Promemoria (pagina iniziale, sostituisce Oggi), Parcheggi, Ricerca su mappa, Prospect (sostituisce Soggetti), Pipeline, Template email, Analytics (in arrivo), Impostazioni. La lista di esclusione si apre da Impostazioni. I vecchi indirizzi /oggi e /soggetti portano ai nuovi. Nell'interfaccia "soggetto" diventa "prospect"; tabelle e codice del database mantengono i nomi attuali.
+
+### Stato del prospect
+
+Ogni prospect ha uno stato: Da contattare (predefinito), Interessato, Molto interessato, Non interessato. "Non interessato" ha un motivo facoltativo (lista dei motivi di perdita) e chiude le opportunità aperte che non hanno un'offerta già inviata. La data dell'ultimo contatto si compila a mano (vuota di default).
+
+Telefono, email e referente mostrati nelle tabelle sono quelli del contatto principale del prospect (il primo creato), con il telefono e l'email dell'azienda quando il contatto non li ha; modificarli in tabella scrive sul contatto principale e lo crea se manca.
+
+### Pipeline e stato dell'offerta
+
+La pipeline contiene le coppie prospect + parcheggio dei lead, una riga per coppia. Quando un prospect diventa Interessato o Molto interessato, ogni sua coppia entra in pipeline con stato offerta "Offerta da inviare" (mai due righe per la stessa coppia; un parcheggio aggiunto dopo entra subito). Tornando a Da contattare o Non interessato, escono le righe con offerta da inviare; restano quelle con offerta inviata, accettata o rifiutata.
+
+Stato offerta: Offerta da inviare (predefinito), Offerta inviata, Accettata, Rifiutata (con motivo facoltativo). Lo stato dell'offerta aggiorna fase ed esito dell'opportunità (da inviare = Interessata, inviata = Offerta inviata, accettata = Vinta, rifiutata = Persa), così lo storico resta coerente. Kanban, prossima attività, menu di fase, "Registra chiamata" e le fasi Passata al BO e Attivata non sono più nell'interfaccia.
+
+Il motivo di una perdita è facoltativo: senza scelta vale "motivo non indicato"; "Altro" non richiede più una nota.
+
+### Promemoria manuale
+
+Ogni riga della pipeline ha una data di promemoria scelta a mano e una nota. Accanto alla data: "tra N giorni" (verde oltre 3 giorni), "oggi" o entro 3 giorni (tono di avviso dell'UI Kit), "scaduto da N giorni" (rosso); i giorni si contano sul calendario di Europe/Rome. La pagina Promemoria mostra solo i lead con la data, quelli scaduti in alto; "Fatto" svuota la data. Il menu mostra il numero dei promemoria scaduti.
+
+### Tabelle
+
+Prospect, Pipeline e Promemoria usano la stessa tabella: al massimo 50 righe per pagina con frecce e numero di pagina, "seleziona tutti" sulle righe della pagina, scorrimento orizzontale con il nome dell'azienda sempre visibile, filtri per colonna e ordinamento dalle intestazioni conservati nell'indirizzo, celle modificabili (testo, data, menu) salvate con Invio o uscendo dalla cella, con l'errore visibile se il salvataggio non riesce. Ogni modifica resta nell'audit con l'autore. Gli stati sono badge con il testo, mai solo colore.
+
+"Invio email" nella tabella Prospect apre "Prepara email" in un pop-up con tutti i controlli di ammissibilità. Se manca solo il permesso, il pop-up chiede "Ha chiesto di ricevere l'email?" (richiesta in chiamata, ha scritto per primo) e lo registra con un clic; lista di esclusione e "Non contattare" restano bloccanti.
+
+### Cadenze e import disattivati
+
+Cadenze e Import escono dal menu; pagine e dati restano, e i link diretti mostrano "Funzione disattivata".
+
+### Dati esistenti
+
+Al passaggio, ogni prospect ha preso lo stato dalle sue opportunità: Individuata, Da contattare e Contattata = Da contattare; Interessata, Offerta inviata e Vinta = Interessato; persa prima dell'offerta = Non interessato; persa dopo l'offerta = Interessato con offerta Rifiutata. Le coppie dei prospect Interessato sono entrate in pipeline con lo stato dell'offerta corrispondente (Offerta inviata, Accettata, Rifiutata, altrimenti Offerta da inviare).
+
 ## Utenti, ruoli e parcheggi pilota
 
 Due ruoli bastano per l'MVP: l'amministratore configura, gli operatori vendono. Ogni operatore vede tutto il database (team piccolo, lead condivisi), ma ogni lead ha un responsabile.
