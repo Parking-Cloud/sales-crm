@@ -6,8 +6,11 @@ import { countOverdueReminders } from "@/lib/prospect/queries";
 
 export default async function AppLayout({
   children,
+  modal,
 }: Readonly<{
   children: React.ReactNode;
+  // "Prepara email" opened from a table, as a pop-up over it.
+  modal: React.ReactNode;
 }>) {
   const user = await getCurrentUser();
   if (!user) redirect(SIGN_IN_PATH);
@@ -20,6 +23,7 @@ export default async function AppLayout({
       counts={{ "/promemoria": { count: overdue, label: overdue === 1 ? "promemoria scaduto" : "promemoria scaduti" } }}
     >
       {children}
+      {modal}
     </AppShell>
   );
 }

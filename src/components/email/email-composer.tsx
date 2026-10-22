@@ -57,6 +57,7 @@ export function EmailComposer({
   allowed,
   taskId = null,
   nextHref = null,
+  backLink = true,
   action = recordSentEmail,
 }: {
   partyId: string;
@@ -72,6 +73,8 @@ export function EmailComposer({
   // email of the cadence, if any (block 1a-8, B5).
   taskId?: string | null;
   nextHref?: string | null;
+  // "Torna al prospect" after the email is recorded (not in the pop-up).
+  backLink?: boolean;
   // For previews and end-to-end tests only.
   action?: typeof recordSentEmail;
 }) {
@@ -113,7 +116,7 @@ export function EmailComposer({
       setNotice({
         tone: "success",
         text: taskId
-          ? "Email registrata come inviata e passo della cadenza chiuso: il prossimo passo è in Oggi."
+          ? "Email registrata come inviata e passo della cadenza chiuso: il prossimo passo è in Promemoria."
           : "Email registrata come inviata: è nello storico, con il controllo di ammissibilità.",
       });
       router.refresh();
@@ -161,10 +164,10 @@ export function EmailComposer({
           </ButtonLink>
         </div>
       )}
-      {sent && (
+      {sent && backLink && (
         <p className="text-body">
-          <Link href={opportunityId ? `/opportunita/${opportunityId}` : `/soggetti/${partyId}`} className="rounded-xs font-semibold text-blue-ink underline underline-offset-2">
-            Torna {opportunityId ? "all'opportunità" : "al soggetto"}
+          <Link href={opportunityId ? `/opportunita/${opportunityId}` : `/prospect/${partyId}`} className="rounded-xs font-semibold text-blue-ink underline underline-offset-2">
+            Torna {opportunityId ? "all'opportunità" : "al prospect"}
           </Link>
         </p>
       )}
