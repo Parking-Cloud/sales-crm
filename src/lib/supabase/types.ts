@@ -726,6 +726,7 @@ export type Database = {
           nome: string | null
           non_contattare: boolean
           party_id: string
+          principale: boolean
           ruolo: string | null
           telefono: string | null
           updated_at: string
@@ -744,6 +745,7 @@ export type Database = {
           nome?: string | null
           non_contattare?: boolean
           party_id: string
+          principale?: boolean
           ruolo?: string | null
           telefono?: string | null
           updated_at?: string
@@ -762,6 +764,7 @@ export type Database = {
           nome?: string | null
           non_contattare?: boolean
           party_id?: string
+          principale?: boolean
           ruolo?: string | null
           telefono?: string | null
           updated_at?: string
@@ -1205,14 +1208,19 @@ export type Database = {
           import_batch_id: string | null
           motivo_perdita: Database["public"]["Enums"]["loss_reason"] | null
           nota_perdita: string | null
+          note: string | null
           origine: string | null
           parking_id: string
           party_id: string
           posti_richiesti: number | null
           prezzo_concorrente: number | null
           prodotto_interesse_id: string | null
+          promemoria_il: string | null
           prossima_attivita_il: string | null
           responsabile_id: string | null
+          stato_offerta:
+            | Database["public"]["Enums"]["pipeline_offer_status"]
+            | null
           updated_at: string
           valore_mensile_stimato: number | null
         }
@@ -1227,14 +1235,19 @@ export type Database = {
           import_batch_id?: string | null
           motivo_perdita?: Database["public"]["Enums"]["loss_reason"] | null
           nota_perdita?: string | null
+          note?: string | null
           origine?: string | null
           parking_id: string
           party_id: string
           posti_richiesti?: number | null
           prezzo_concorrente?: number | null
           prodotto_interesse_id?: string | null
+          promemoria_il?: string | null
           prossima_attivita_il?: string | null
           responsabile_id?: string | null
+          stato_offerta?:
+            | Database["public"]["Enums"]["pipeline_offer_status"]
+            | null
           updated_at?: string
           valore_mensile_stimato?: number | null
         }
@@ -1249,14 +1262,19 @@ export type Database = {
           import_batch_id?: string | null
           motivo_perdita?: Database["public"]["Enums"]["loss_reason"] | null
           nota_perdita?: string | null
+          note?: string | null
           origine?: string | null
           parking_id?: string
           party_id?: string
           posti_richiesti?: number | null
           prezzo_concorrente?: number | null
           prodotto_interesse_id?: string | null
+          promemoria_il?: string | null
           prossima_attivita_il?: string | null
           responsabile_id?: string | null
+          stato_offerta?:
+            | Database["public"]["Enums"]["pipeline_offer_status"]
+            | null
           updated_at?: string
           valore_mensile_stimato?: number | null
         }
@@ -1507,6 +1525,9 @@ export type Database = {
           id: string
           import_batch_id: string | null
           merged_into_id: string | null
+          motivo_non_interesse:
+            | Database["public"]["Enums"]["loss_reason"]
+            | null
           nome: string | null
           non_contattare: boolean
           note: string | null
@@ -1515,8 +1536,10 @@ export type Database = {
           parcheggio_privato: Database["public"]["Enums"]["private_parking"]
           piva: string | null
           sito: string | null
+          stato_prospect: Database["public"]["Enums"]["prospect_status"]
           telefono: string | null
           tipo: Database["public"]["Enums"]["party_type"]
+          ultimo_contatto_il: string | null
           updated_at: string
         }
         Insert: {
@@ -1534,6 +1557,9 @@ export type Database = {
           id?: string
           import_batch_id?: string | null
           merged_into_id?: string | null
+          motivo_non_interesse?:
+            | Database["public"]["Enums"]["loss_reason"]
+            | null
           nome?: string | null
           non_contattare?: boolean
           note?: string | null
@@ -1542,8 +1568,10 @@ export type Database = {
           parcheggio_privato?: Database["public"]["Enums"]["private_parking"]
           piva?: string | null
           sito?: string | null
+          stato_prospect?: Database["public"]["Enums"]["prospect_status"]
           telefono?: string | null
           tipo: Database["public"]["Enums"]["party_type"]
+          ultimo_contatto_il?: string | null
           updated_at?: string
         }
         Update: {
@@ -1561,6 +1589,9 @@ export type Database = {
           id?: string
           import_batch_id?: string | null
           merged_into_id?: string | null
+          motivo_non_interesse?:
+            | Database["public"]["Enums"]["loss_reason"]
+            | null
           nome?: string | null
           non_contattare?: boolean
           note?: string | null
@@ -1569,8 +1600,10 @@ export type Database = {
           parcheggio_privato?: Database["public"]["Enums"]["private_parking"]
           piva?: string | null
           sito?: string | null
+          stato_prospect?: Database["public"]["Enums"]["prospect_status"]
           telefono?: string | null
           tipo?: Database["public"]["Enums"]["party_type"]
+          ultimo_contatto_il?: string | null
           updated_at?: string
         }
         Relationships: [
@@ -1989,6 +2022,7 @@ export type Database = {
         }
         Returns: Json
       }
+      count_overdue_reminders: { Args: never; Returns: number }
       delete_cadence_step: { Args: { p_step: string }; Returns: undefined }
       delete_party: { Args: { p_party: string }; Returns: Json }
       do_not_contact_values: {
@@ -2078,6 +2112,7 @@ export type Database = {
       is_generic_domain: { Args: { domain: string }; Returns: boolean }
       is_suppressed: { Args: { p_values: string[] }; Returns: boolean }
       is_valid_email: { Args: { value: string }; Returns: boolean }
+      like_contains: { Args: { p_text: string }; Returns: string }
       log_activity: {
         Args: {
           p_esito?: string
@@ -2099,6 +2134,7 @@ export type Database = {
         Args: { p_reason: Database["public"]["Enums"]["loss_reason"] }
         Returns: string
       }
+      map_prospect_status: { Args: { p_parties?: string[] }; Returns: Json }
       mark_do_not_contact: {
         Args: {
           p_canale?: string
@@ -2120,6 +2156,10 @@ export type Database = {
       normalize_phone: { Args: { raw: string }; Returns: string }
       normalize_phone_list: { Args: { raw: string }; Returns: string }
       normalize_piva: { Args: { raw: string }; Returns: string }
+      offer_status_label: {
+        Args: { p_stato: Database["public"]["Enums"]["pipeline_offer_status"] }
+        Returns: string
+      }
       party_delete_summary: { Args: { p_party: string }; Returns: Json }
       party_location_distances: {
         Args: { p_max_m?: number; p_party_id: string }
@@ -2145,6 +2185,91 @@ export type Database = {
       }
       party_tracked_fields: { Args: never; Returns: string[] }
       pause_cadence: { Args: { p_enrollment: string }; Returns: undefined }
+      phone_matches: {
+        Args: { p_filter: string; p_phone: string }
+        Returns: boolean
+      }
+      pipeline_rows: {
+        Args: {
+          p_desc?: boolean
+          p_email?: string
+          p_limit?: number
+          p_nome?: string
+          p_note?: string
+          p_offset?: number
+          p_ordina?: string
+          p_parcheggio?: string
+          p_promemoria?: string
+          p_referente?: string
+          p_responsabile?: string
+          p_senza_responsabile?: boolean
+          p_stati?: Database["public"]["Enums"]["pipeline_offer_status"][]
+          p_telefono?: string
+        }
+        Returns: {
+          contatti: Json
+          contatto_id: string
+          email: string
+          giorni: number
+          id: string
+          motivo_rifiuto: Database["public"]["Enums"]["loss_reason"]
+          nome: string
+          non_contattare: boolean
+          note: string
+          parcheggio: string
+          parking_id: string
+          party_id: string
+          promemoria_il: string
+          referente: string
+          responsabile: string
+          responsabile_id: string
+          stato_offerta: Database["public"]["Enums"]["pipeline_offer_status"]
+          telefono: string
+          totale: number
+        }[]
+      }
+      primary_contact: { Args: { p_party: string }; Returns: string }
+      prospect_rows: {
+        Args: {
+          p_categoria?: string
+          p_desc?: boolean
+          p_email?: string
+          p_limit?: number
+          p_nome?: string
+          p_note?: string
+          p_offset?: number
+          p_ordina?: string
+          p_parcheggio?: string
+          p_referente?: string
+          p_senza_parcheggio?: boolean
+          p_stati?: Database["public"]["Enums"]["prospect_status"][]
+          p_telefono?: string
+          p_ultimo_contatto?: string
+        }
+        Returns: {
+          altri_contatti: number
+          cancellato: boolean
+          categoria: string
+          contatto_id: string
+          email: string
+          id: string
+          motivo_non_interesse: Database["public"]["Enums"]["loss_reason"]
+          nome: string
+          non_contattare: boolean
+          note: string
+          parcheggi: Json
+          referente: string
+          stato: Database["public"]["Enums"]["prospect_status"]
+          telefono: string
+          tipo: Database["public"]["Enums"]["party_type"]
+          totale: number
+          ultimo_contatto_il: string
+        }[]
+      }
+      prospect_status_label: {
+        Args: { p_stato: Database["public"]["Enums"]["prospect_status"] }
+        Returns: string
+      }
       record_sent_email: {
         Args: {
           p_contact: string
@@ -2169,11 +2294,22 @@ export type Database = {
         }
         Returns: string
       }
+      reminder_days: { Args: { p_data: string }; Returns: number }
+      remove_parking_from_prospect: {
+        Args: { p_parking: string; p_party: string }
+        Returns: number
+      }
       remove_suppression: {
         Args: { p_id: string; p_motivo: string }
         Returns: undefined
       }
       resume_cadence: { Args: { p_enrollment: string }; Returns: undefined }
+      rome_day: { Args: { p_at: string }; Returns: string }
+      rome_today: { Args: never; Returns: string }
+      save_contact_field: {
+        Args: { p_campo: string; p_contact: string; p_valore: string }
+        Returns: undefined
+      }
       save_email_template: {
         Args: {
           p_corpo: string
@@ -2196,6 +2332,10 @@ export type Database = {
       save_notes: {
         Args: { p_entita: string; p_id: string; p_note: string }
         Returns: undefined
+      }
+      save_primary_contact: {
+        Args: { p_campo: string; p_party: string; p_valore: string }
+        Returns: string
       }
       search_parties: {
         Args: {
@@ -2226,6 +2366,23 @@ export type Database = {
           tipo: Database["public"]["Enums"]["party_type"]
           totale: number
         }[]
+      }
+      set_offer_status: {
+        Args: {
+          p_motivo?: Database["public"]["Enums"]["loss_reason"]
+          p_opportunity: string
+          p_stato: Database["public"]["Enums"]["pipeline_offer_status"]
+        }
+        Returns: undefined
+      }
+      set_primary_contact: { Args: { p_contact: string }; Returns: undefined }
+      set_prospect_status: {
+        Args: {
+          p_motivo?: Database["public"]["Enums"]["loss_reason"]
+          p_party: string
+          p_stato: Database["public"]["Enums"]["prospect_status"]
+        }
+        Returns: Json
       }
       skip_cadence_step: {
         Args: { p_motivo?: string; p_task: string }
@@ -2271,6 +2428,7 @@ export type Database = {
         | "non_raggiungibile"
         | "altro"
         | "non_contattare"
+        | "non_indicato"
       offer_status: "bozza" | "inviata" | "accettata" | "rifiutata" | "scaduta"
       opportunity_outcome: "aperta" | "vinta" | "persa"
       opportunity_stage:
@@ -2289,6 +2447,11 @@ export type Database = {
         | "contatto_in_entrata"
         | "consenso"
       permission_status: "attivo" | "revocato"
+      pipeline_offer_status:
+        | "da_inviare"
+        | "inviata"
+        | "accettata"
+        | "rifiutata"
       private_parking: "si" | "no" | "non_noto"
       product_period: "ora" | "giorno" | "mese" | "anno"
       product_type:
@@ -2297,6 +2460,11 @@ export type Database = {
         | "carnet"
         | "convenzione"
         | "servizio_aggiuntivo"
+      prospect_status:
+        | "da_contattare"
+        | "interessato"
+        | "molto_interessato"
+        | "non_interessato"
       suppression_type: "email" | "telefono" | "dominio" | "piva" | "place_id"
       template_use: "uffici" | "attivita_commerciali" | "offerta"
       user_role: "admin" | "operatore"
@@ -2449,6 +2617,7 @@ export const Constants = {
         "non_raggiungibile",
         "altro",
         "non_contattare",
+        "non_indicato",
       ],
       offer_status: ["bozza", "inviata", "accettata", "rifiutata", "scaduta"],
       opportunity_outcome: ["aperta", "vinta", "persa"],
@@ -2470,6 +2639,12 @@ export const Constants = {
         "consenso",
       ],
       permission_status: ["attivo", "revocato"],
+      pipeline_offer_status: [
+        "da_inviare",
+        "inviata",
+        "accettata",
+        "rifiutata",
+      ],
       private_parking: ["si", "no", "non_noto"],
       product_period: ["ora", "giorno", "mese", "anno"],
       product_type: [
@@ -2478,6 +2653,12 @@ export const Constants = {
         "carnet",
         "convenzione",
         "servizio_aggiuntivo",
+      ],
+      prospect_status: [
+        "da_contattare",
+        "interessato",
+        "molto_interessato",
+        "non_interessato",
       ],
       suppression_type: ["email", "telefono", "dominio", "piva", "place_id"],
       template_use: ["uffici", "attivita_commerciali", "offerta"],

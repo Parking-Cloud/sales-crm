@@ -1,4 +1,6 @@
 import type { Metadata } from "next";
+import { FeatureDisabled } from "@/components/feature-disabled";
+import { DISABLED_FEATURES } from "@/lib/features";
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { CadenceEditor } from "@/components/cadences/cadence-editor";
@@ -19,6 +21,7 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
 
 export default async function CadencePage({ params }: { params: Promise<{ id: string }> }) {
   if (!(await getCurrentUser())) redirect(SIGN_IN_PATH);
+  if (DISABLED_FEATURES.cadenze) return <FeatureDisabled title="Cadenze" />;
   const { id } = await params;
   if (!UUID.test(id)) notFound();
   const [cadence, templates] = await Promise.all([getCadence(id), listTemplates({ onlyActive: true })]);

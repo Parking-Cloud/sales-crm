@@ -2,7 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
-import { deleteParty, partyDeleteSummary, type DeleteSummary } from "@/app/(app)/soggetti/actions";
+import { deleteParty, partyDeleteSummary, type DeleteSummary } from "@/app/(app)/prospect/actions";
 import { Alert } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
@@ -12,7 +12,7 @@ function count(n: number, one: string, many: string): string {
   return `${n} ${n === 1 ? one : many}`;
 }
 
-// "Elimina soggetto" (administrators): the confirmation names the party and
+// "Elimina prospect" (administrators): the confirmation names the party and
 // says what goes with it.
 export function DeletePartyControl({ partyId, partyName }: { partyId: string; partyName: string }) {
   const router = useRouter();
@@ -36,14 +36,14 @@ export function DeletePartyControl({ partyId, partyName }: { partyId: string; pa
         setSummary(null);
         return setError(result.message);
       }
-      router.push("/soggetti");
+      router.push("/prospect");
     });
   }
 
   return (
     <>
       <Button variant="destructive" onClick={open} disabled={pending}>
-        Elimina soggetto
+        Elimina prospect
       </Button>
       {error && (
         <Alert tone="critical" className="basis-full">
@@ -62,14 +62,14 @@ export function DeletePartyControl({ partyId, partyName }: { partyId: string; pa
       >
         {summary && (
           <>
-            <p>Si cancellano insieme al soggetto, senza possibilità di recupero:</p>
+            <p>Si cancellano insieme al prospect, senza possibilità di recupero:</p>
             <ul className="mt-2 list-disc pl-5">
               <li>{count(summary.sedi, "sede", "sedi")}</li>
               <li>{count(summary.contatti, "contatto", "contatti")}</li>
               <li>{count(summary.opportunita, "opportunità", "opportunità")}</li>
               <li>{count(summary.attivita, "attività", "attività")}</li>
               {summary.offerte > 0 && <li>{count(summary.offerte, "offerta", "offerte")}</li>}
-              {summary.uniti > 0 && <li>{count(summary.uniti, "soggetto unito a questo", "soggetti uniti a questo")}</li>}
+              {summary.uniti > 0 && <li>{count(summary.uniti, "prospect unito a questo", "prospect uniti a questo")}</li>}
             </ul>
             <p className="mt-2">L&apos;eliminazione resta nel registro delle modifiche con il tuo nome.</p>
           </>

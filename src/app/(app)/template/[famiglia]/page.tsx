@@ -9,7 +9,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Field, Input, Select } from "@/components/ui/field";
 import { getCurrentUser } from "@/lib/auth/current-user";
-import { SIGN_IN_PATH } from "@/lib/auth/routes";
+import { HOME_PATH, SIGN_IN_PATH } from "@/lib/auth/routes";
 import {
   getEmailSettings,
   getSignature,
@@ -41,7 +41,7 @@ const one = (value: string | string[] | undefined) => (typeof value === "string"
 export default async function TemplatePage({ params, searchParams }: { params: Params; searchParams: Search }) {
   const user = await getCurrentUser();
   if (!user) redirect(SIGN_IN_PATH);
-  if (!user.isAdmin) redirect("/oggi");
+  if (!user.isAdmin) redirect(HOME_PATH);
   const { famiglia } = await params;
   if (!UUID.test(famiglia)) notFound();
   const versions = await listTemplateVersions(famiglia);
@@ -121,16 +121,16 @@ export default async function TemplatePage({ params, searchParams }: { params: P
       <div className="mt-6 flex flex-col gap-6">
         <section aria-labelledby="anteprima-titolo" className="rounded-md border border-grey-60 bg-white p-5 shadow-sm sm:p-6">
           <h2 id="anteprima-titolo" className="text-h4 font-semibold">
-            Anteprima con un soggetto reale
+            Anteprima con un prospect reale
           </h2>
           <p className="mt-1 text-caption text-black-60">
-            Versione {shown.versione}. Variabili compilate con i dati del soggetto, del suo primo contatto, del parcheggio e con la
+            Versione {shown.versione}. Variabili compilate con i dati del prospect, del suo primo contatto, del parcheggio e con la
             tua firma.
           </p>
-          <form method="get" action={base} role="search" aria-label="Cerca il soggetto per l'anteprima" className="mt-4 flex flex-col gap-3 sm:flex-row sm:items-end">
+          <form method="get" action={base} role="search" aria-label="Cerca il prospect per l'anteprima" className="mt-4 flex flex-col gap-3 sm:flex-row sm:items-end">
             {shown.versione !== latest.versione && <input type="hidden" name="versione" value={shown.versione} />}
             <div className="sm:w-96">
-              <Field id="q" label="Soggetto">
+              <Field id="q" label="Prospect">
                 <Input id="q" name="q" type="search" defaultValue={query} placeholder="Nome, P.IVA o telefono" autoComplete="off" />
               </Field>
             </div>
@@ -138,7 +138,7 @@ export default async function TemplatePage({ params, searchParams }: { params: P
           </form>
           {query && (
             <ul className="mt-3 flex flex-col gap-1">
-              {matches.length === 0 && <li className="text-body text-black-60">Nessun soggetto trovato.</li>}
+              {matches.length === 0 && <li className="text-body text-black-60">Nessun prospect trovato.</li>}
               {matches.map((item) => (
                 <li key={item.id}>
                   <Link
@@ -172,7 +172,7 @@ export default async function TemplatePage({ params, searchParams }: { params: P
                 <Button type="submit">Aggiorna l&apos;anteprima</Button>
               </form>
               {preview.missing.length > 0 && (
-                <Alert tone="warning">Senza valore per questo soggetto: {preview.missing.join(", ")}. Nell&apos;email restano vuote.</Alert>
+                <Alert tone="warning">Senza valore per questo prospect: {preview.missing.join(", ")}. Nell&apos;email restano vuote.</Alert>
               )}
               <div className="rounded-sm border border-grey-60">
                 <p className="border-b border-grey-60 px-4 py-2 text-body">

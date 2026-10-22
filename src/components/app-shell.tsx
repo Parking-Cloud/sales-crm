@@ -21,7 +21,7 @@ function Brand() {
   );
 }
 
-// Counters next to menu entries, by href (e.g. overdue reminders on "Oggi").
+// Counters next to menu entries, by href (e.g. overdue reminders on "Promemoria").
 export type NavCounts = Record<string, { count: number; label: string }>;
 
 function NavList({ counts, isAdmin, onNavigate }: { counts: NavCounts; isAdmin: boolean; onNavigate?: () => void }) {

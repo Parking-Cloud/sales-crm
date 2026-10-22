@@ -1,7 +1,7 @@
 // Route groups for authentication. Every page is protected unless listed here.
 
 export const SIGN_IN_PATH = "/accedi";
-export const HOME_PATH = "/oggi";
+export const HOME_PATH = "/promemoria";
 
 // Query parameter read by the sign-in page to show why access was refused.
 export const SIGN_IN_ERROR_PARAM = "errore";

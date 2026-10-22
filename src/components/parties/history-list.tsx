@@ -17,11 +17,11 @@ const FIELD_LABELS: Record<string, string> = {
   dipendenti_stimati: "Dipendenti stimati",
   parcheggio_privato: "Parcheggio privato",
   non_contattare: "Non contattare",
-  merged_into_id: "Unito in un altro soggetto",
+  merged_into_id: "Unito in un altro prospect",
   form_web_url: "Form sul sito",
   ruolo: "Ruolo",
   canale_preferito: "Canale preferito",
-  party_id: "Soggetto",
+  party_id: "Prospect",
   indirizzo: "Indirizzo",
   cap: "CAP",
   citta: "Città",
@@ -55,7 +55,7 @@ function show(value: unknown): string {
 }
 
 export function describe(entry: HistoryEntry): { title: string; changes: string[] } {
-  const subject = entry.entita === "contacts" ? "il contatto" : entry.entita === "party_locations" ? "la sede" : "il soggetto";
+  const subject = entry.entita === "contacts" ? "il contatto" : entry.entita === "party_locations" ? "la sede" : "il prospect";
   const name = (row: Record<string, unknown> | null) =>
     !row
       ? ""

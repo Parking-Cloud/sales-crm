@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import { downloadCsvExport, previewCsvExport, type CsvExportInput, type CsvExportSummary } from "@/app/(app)/soggetti/export-actions";
+import { downloadCsvExport, previewCsvExport, type CsvExportInput, type CsvExportSummary } from "@/app/(app)/prospect/export-actions";
 import { Alert } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Dialog } from "@/components/ui/dialog";
@@ -85,7 +85,7 @@ export function CsvExportButton({
       </Button>
       <Dialog
         open={open}
-        title="Esporta soggetti e contatti"
+        title="Esporta prospect e contatti"
         busy={pending}
         onClose={() => setOpen(false)}
         footer={
@@ -113,25 +113,25 @@ export function CsvExportButton({
               <div className="mt-2 flex flex-col gap-2">
                 <label className="flex min-h-10 cursor-pointer items-center gap-2 rounded-sm border border-grey-60 px-3 text-body has-checked:border-brand-blue has-checked:bg-blue-20 has-disabled:cursor-not-allowed has-disabled:opacity-60">
                   <input type="radio" name="ambito" checked={scope === "selezionati"} disabled={selected.length === 0} onChange={() => setScope("selezionati")} className="size-4 accent-brand-blue" />
-                  Soggetti selezionati ({selected.length})
+                  Prospect selezionati ({selected.length})
                 </label>
                 <label className="flex min-h-10 cursor-pointer items-center gap-2 rounded-sm border border-grey-60 px-3 text-body has-checked:border-brand-blue has-checked:bg-blue-20">
                   <input type="radio" name="ambito" checked={scope === "filtrati"} onChange={() => setScope("filtrati")} className="size-4 accent-brand-blue" />
-                  Tutti i soggetti filtrati ({total.toLocaleString("it-IT")})
+                  Tutti i prospect filtrati ({total.toLocaleString("it-IT")})
                 </label>
               </div>
             </fieldset>
           )}
           <p className="text-caption text-black-80">
             Una riga per contatto, colonne first_name, last_name, job_title, email, phone, company, website, city, parking, stage,
-            email_permission. Mai esportati: soggetti o contatti in lista di esclusione e soggetti cancellati per GDPR.
+            email_permission. Mai esportati: prospect o contatti in lista di esclusione e prospect cancellati per GDPR.
             L&apos;esportazione resta nel registro (chi, quando, quante righe); il file non viene salvato sul server.
           </p>
           {summary && (
             <div className="flex flex-col gap-2">
               <p className="text-body">
                 <strong>{summary.esportate === 1 ? "1 riga esportata" : `${summary.esportate} righe esportate`}</strong> da{" "}
-                {summary.soggetti === 1 ? "1 soggetto" : `${summary.soggetti} soggetti`};{" "}
+                {summary.soggetti === 1 ? "1 prospect" : `${summary.soggetti} prospect`};{" "}
                 <strong>{summary.escluse.length === 1 ? "1 esclusa" : `${summary.escluse.length} escluse`}</strong>.
               </p>
               {summary.escluse.length > 0 && (

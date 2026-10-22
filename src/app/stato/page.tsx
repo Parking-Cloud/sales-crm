@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { createClient } from "@supabase/supabase-js";
+import { HOME_PATH } from "@/lib/auth/routes";
 import type { Database } from "@/lib/supabase/types";
 
 export const metadata: Metadata = { title: "Stato" };
@@ -90,7 +91,7 @@ export default async function StatusPage() {
   return (
     <main className="mx-auto max-w-(--funnel-max) px-4 py-8 lg:py-12">
       <p className="text-caption text-black-60">
-        <Link href="/oggi" className="rounded-xs text-blue-ink underline underline-offset-2">
+        <Link href={HOME_PATH} className="rounded-xs text-blue-ink underline underline-offset-2">
           Torna all&apos;app
         </Link>
       </p>

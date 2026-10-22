@@ -341,7 +341,7 @@ export function MapSearch({
         onClose={() => {
           if (dialog?.step === "done") {
             const { creati, aggiunti } = dialog.summary;
-            setNotice(`Import completato: ${creati} ${creati === 1 ? "soggetto creato" : "soggetti creati"}, ${aggiunti} ${aggiunti === 1 ? "aggiunto" : "aggiunti"} a soggetti esistenti.`);
+            setNotice(`Import completato: ${creati} ${creati === 1 ? "prospect creato" : "prospect creati"}, ${aggiunti} ${aggiunti === 1 ? "aggiunto" : "aggiunti"} a prospect esistenti.`);
           }
           setDialog(null);
         }}
@@ -448,8 +448,8 @@ function ResultsTable({
                       {STATUS_LABELS[row.status].label}
                     </Badge>
                     {row.partyId && (
-                      <Link href={`/soggetti/${row.partyId}`} className="rounded-xs text-caption text-blue-ink underline underline-offset-2">
-                        Apri {row.partyName ?? "il soggetto"}
+                      <Link href={`/prospect/${row.partyId}`} className="rounded-xs text-caption text-blue-ink underline underline-offset-2">
+                        Apri {row.partyName ?? "il prospect"}
                       </Link>
                     )}
                   </span>

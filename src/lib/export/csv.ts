@@ -29,7 +29,7 @@ export function toCsv<C extends string>(columns: readonly C[], rows: Record<C, s
   return [columns.join(","), ...rows.map((row) => columns.map((column) => csvField(row[column])).join(","))].join("\r\n") + "\r\n";
 }
 
-// File name with the day, for example "soggetti-2026-10-15.csv".
+// File name with the day, for example "prospect-2026-10-15.csv".
 export function exportFileName(day: string): string {
-  return `soggetti-${day}.csv`;
+  return `prospect-${day}.csv`;
 }

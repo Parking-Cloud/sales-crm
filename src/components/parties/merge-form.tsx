@@ -2,7 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
-import { mergeParties } from "@/app/(app)/soggetti/actions";
+import { mergeParties } from "@/app/(app)/prospect/actions";
 import { Alert } from "@/components/ui/alert";
 import { Button, ButtonLink } from "@/components/ui/button";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
@@ -76,7 +76,7 @@ export function MergeForm({
         setError(result.message ?? "Unione non riuscita.");
         return;
       }
-      router.push(`/soggetti/${keep.id}`);
+      router.push(`/prospect/${keep.id}`);
     });
   }
 
@@ -87,7 +87,7 @@ export function MergeForm({
       {error && <Alert tone="critical">{error}</Alert>}
 
       <fieldset className="rounded-md border border-grey-60 bg-white p-5 shadow-sm sm:p-6">
-        <legend className="px-1 text-h4 font-semibold">Soggetto che resta</legend>
+        <legend className="px-1 text-h4 font-semibold">Prospect che resta</legend>
         <div className="mt-2 grid gap-3 sm:grid-cols-2">
           {[a, b].map((party) => (
             <label
@@ -156,23 +156,23 @@ export function MergeForm({
       </section>
 
       <Alert tone="info" title="Cosa succede">
-        Sul soggetto che resta si spostano {moved.sedi} sedi e {moved.contatti} contatti di {partyName(drop)}, insieme a
+        Sul prospect che resta si spostano {moved.sedi} sedi e {moved.contatti} contatti di {partyName(drop)}, insieme a
         provenienze dei dati e riferimenti esterni. {partyName(drop)} sparisce dagli elenchi e il suo indirizzo porta
-        al soggetto che resta. L&apos;operazione è registrata nella cronologia.
+        al prospect che resta. L&apos;operazione è registrata nella cronologia.
       </Alert>
 
       <div className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
-        <ButtonLink href={`/soggetti/${a.id}`} size="md">
+        <ButtonLink href={`/prospect/${a.id}`} size="md">
           Annulla
         </ButtonLink>
         <Button variant="primary" size="md" onClick={() => setOpen(true)}>
-          Unisci i soggetti
+          Unisci i prospect
         </Button>
       </div>
 
       <ConfirmDialog
         open={open}
-        title="Unire i due soggetti?"
+        title="Unire i due prospect?"
         confirmLabel="Unisci"
         pending={pending}
         onConfirm={confirm}

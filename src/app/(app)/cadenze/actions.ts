@@ -24,9 +24,9 @@ function refreshCadence(id?: string) {
 }
 
 function refreshWork() {
-  revalidatePath("/oggi");
+  revalidatePath("/promemoria");
   revalidatePath("/pipeline");
-  revalidatePath("/soggetti");
+  revalidatePath("/prospect");
 }
 
 function stepMessage(error: { code?: string; message?: string }): string {

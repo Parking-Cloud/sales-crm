@@ -16,7 +16,7 @@ const UUID = /^[0-9a-f-]{36}$/i;
 const BASES: PermissionBasis[] = ["richiesta_in_chiamata", "contatto_in_entrata", "consenso"];
 
 function refresh(partyId: string, opportunityId?: string | null) {
-  revalidatePath(`/soggetti/${partyId}`);
+  revalidatePath(`/prospect/${partyId}`);
   if (opportunityId) revalidatePath(`/opportunita/${opportunityId}`);
   revalidatePath("/email/prepara");
 }
@@ -59,45 +59,6 @@ export async function registerPermission(input: {
   return { ok: true, data: null };
 }
 
-// Recipients offered by the call dialog for "Ha chiesto di ricevere l'email":
-// the contacts of the party and its general address.
-export type CallRecipient = { id: string | null; nome: string; email: string | null; disponibile: boolean };
-
-export async function listCallRecipients(input: { partyId: string | null; opportunityId: string | null }): Promise<Result<{ partyId: string; contactId: string | null; recipients: CallRecipient[] }>> {
-  if (!(await getCurrentUser())) return { ok: false, message: NOT_ALLOWED };
-  const supabase = await createClient();
-  let partyId = input?.partyId && UUID.test(input.partyId) ? input.partyId : null;
-  let contactId: string | null = null;
-  if (input?.opportunityId && UUID.test(input.opportunityId)) {
-    const { data } = await supabase.from("opportunities").select("party_id, contact_id").eq("id", input.opportunityId).maybeSingle();
-    partyId = data?.party_id ?? partyId;
-    contactId = data?.contact_id ?? null;
-  }
-  if (!partyId) return { ok: false, message: "Soggetto non trovato." };
-  const [{ data: party }, { data: contacts }] = await Promise.all([
-    supabase.from("parties").select("denominazione, nome, cognome, email, non_contattare").eq("id", partyId).maybeSingle(),
-    supabase.from("contacts").select("id, nome, cognome, ruolo, email, non_contattare").eq("party_id", partyId).order("created_at"),
-  ]);
-  if (!party) return { ok: false, message: "Soggetto non trovato." };
-  const partyLabel = party.denominazione ?? ([party.nome, party.cognome].filter(Boolean).join(" ") || "Soggetto");
-  return {
-    ok: true,
-    data: {
-      partyId,
-      contactId,
-      recipients: [
-        ...(contacts ?? []).map((contact) => ({
-          id: contact.id,
-          nome: [contact.nome, contact.cognome].filter(Boolean).join(" ") || contact.ruolo || "Contatto",
-          email: contact.email,
-          disponibile: !contact.non_contattare && !party.non_contattare,
-        })),
-        { id: null, nome: `${partyLabel} (indirizzo generale)`, email: party.email, disponibile: !party.non_contattare },
-      ],
-    },
-  };
-}
-
 export async function recordSentEmail(input: {
   partyId: string;
   contactId: string | null;
@@ -110,7 +71,7 @@ export async function recordSentEmail(input: {
 }): Promise<Result<{ communicationId: string }>> {
   if (!(await getCurrentUser())) return { ok: false, message: NOT_ALLOWED };
   const id = (value: string | null) => (value && UUID.test(value) ? value : null);
-  if (!id(input?.partyId)) return { ok: false, message: "Soggetto non trovato." };
+  if (!id(input?.partyId)) return { ok: false, message: "Prospect non trovato." };
   if (!input.oggetto?.trim() || !input.corpo?.trim()) return { ok: false, message: "Oggetto e testo sono obbligatori." };
   const supabase = await createClient();
   const { data, error } = await supabase.rpc("record_sent_email", {
@@ -131,6 +92,6 @@ export async function recordSentEmail(input: {
   }
   refresh(input.partyId, input.opportunityId);
   revalidatePath("/pipeline");
-  revalidatePath("/oggi");
+  revalidatePath("/promemoria");
   return { ok: true, data: { communicationId: data as string } };
 }

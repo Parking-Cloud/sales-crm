@@ -394,7 +394,7 @@ select pg_temp.record(
 select pg_temp.record(
   'esportazione: escluso il contatto da non contattare, il soggetto in lista di esclusione e quello cancellato per GDPR',
   (select escluso and motivo like 'Contatto%' from export_rows where contact_id = pg_temp.id('ca'))
-  and (select bool_and(escluso) and bool_and(motivo like 'Soggetto%') from export_rows where party_id = pg_temp.id('c'))
+  and (select bool_and(escluso) and bool_and(motivo like 'Prospect%') from export_rows where party_id = pg_temp.id('c'))
   and (select bool_and(escluso) and bool_and(motivo = 'Cancellato per richiesta GDPR') from export_rows where party_id = pg_temp.id('g'))
 );
 select public.log_csv_export(2, 3);

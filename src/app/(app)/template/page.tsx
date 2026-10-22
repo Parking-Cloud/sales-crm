@@ -6,7 +6,7 @@ import { ButtonLink } from "@/components/ui/button";
 import { EmptyState } from "@/components/ui/empty-state";
 import { Table, Td, Th, Tr } from "@/components/ui/table";
 import { getCurrentUser } from "@/lib/auth/current-user";
-import { SIGN_IN_PATH } from "@/lib/auth/routes";
+import { HOME_PATH, SIGN_IN_PATH } from "@/lib/auth/routes";
 import { listTemplates } from "@/lib/email/queries";
 import { TEMPLATE_USE_LABELS } from "@/lib/email/template";
 import { formatDate } from "@/lib/format";
@@ -17,7 +17,7 @@ export const metadata: Metadata = { title: "Template email" };
 export default async function TemplatesPage() {
   const user = await getCurrentUser();
   if (!user) redirect(SIGN_IN_PATH);
-  if (!user.isAdmin) redirect("/oggi");
+  if (!user.isAdmin) redirect(HOME_PATH);
   const templates = await listTemplates();
   return (
     <>

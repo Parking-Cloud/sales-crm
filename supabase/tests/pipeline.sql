@@ -154,10 +154,19 @@ select pg_temp.expect_error(
   'persa senza motivo rifiutata',
   format('update public.opportunities set esito = %L where id = %L', 'persa', pg_temp.id('o1')), '23514'
 );
-select pg_temp.expect_error(
-  'persa con motivo "altro" senza nota rifiutata',
-  format('update public.opportunities set esito = %L, motivo_perdita = %L where id = %L', 'persa', 'altro', pg_temp.id('o1')), '23514'
-);
+-- Since block 1a-9 the reason is optional: "altro" without a note is
+-- accepted (checked and rolled back here).
+do $$
+declare v_ok boolean;
+begin
+  begin
+    update public.opportunities set esito = 'persa', motivo_perdita = 'altro' where id = pg_temp.id('o1');
+    select esito = 'persa' and motivo_perdita = 'altro' into v_ok from public.opportunities where id = pg_temp.id('o1');
+    raise exception using errcode = 'P0001', message = coalesce(v_ok, false)::text;
+  exception when sqlstate 'P0001' then
+    perform pg_temp.record('persa con motivo "altro" senza nota ammessa (motivo facoltativo dal blocco 1a-9)', sqlerrm = 'true');
+  end;
+end $$;
 update public.opportunities set esito = 'persa', motivo_perdita = 'prezzo', prezzo_concorrente = 80, nota_perdita = 'Trovato altro garage'
 where id = pg_temp.id('o1');
 reset role;

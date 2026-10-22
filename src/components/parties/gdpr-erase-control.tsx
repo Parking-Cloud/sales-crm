@@ -2,7 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useId, useState, useTransition } from "react";
-import { gdprErase } from "@/app/(app)/soggetti/actions";
+import { gdprErase } from "@/app/(app)/prospect/actions";
 import { Alert } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
@@ -79,7 +79,7 @@ export function GdprEraseControl({
         <ul className="mt-2 list-disc pl-5">
           {entita === "parties" ? (
             <>
-              <li>il nome diventa &ldquo;Soggetto cancellato (GDPR)&rdquo;; recapiti, P.IVA, sito e note si cancellano;</li>
+              <li>il nome diventa &ldquo;Prospect cancellato (GDPR)&rdquo;; recapiti, P.IVA, sito e note si cancellano;</li>
               <li>si cancellano contatti, sedi, permessi email e provenienza dei dati;</li>
               <li>le opportunità aperte si chiudono come perse; attività ed email restano senza testo né destinatario;</li>
             </>

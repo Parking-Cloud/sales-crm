@@ -136,3 +136,60 @@ export function RegisterPermissionButton({
     </>
   );
 }
+
+// "Ha chiesto di ricevere l'email?" (block 1a-9): when only the permission is
+// missing, one click registers it (basis, today, the user's name) and the
+// email unlocks. The suppression list and "Non contattare" stay blocking:
+// then this question is not shown.
+export function QuickPermission({
+  partyId,
+  contactId,
+  name,
+  action = registerPermission,
+}: {
+  partyId: string;
+  contactId: string | null;
+  name: string;
+  // For previews and end-to-end tests only.
+  action?: typeof registerPermission;
+}) {
+  const router = useRouter();
+  const [error, setError] = useState<string | null>(null);
+  const [pending, setPending] = useState<PermissionBasis | null>(null);
+  const [, startTransition] = useTransition();
+
+  function register(base: PermissionBasis) {
+    setError(null);
+    setPending(base);
+    startTransition(async () => {
+      const result = await safeCall(() => action({ partyId, contactId, base, fonte: "", giorno: romeDay(new Date()), email: "" }));
+      setPending(null);
+      if (!result.ok) return setError(result.message);
+      router.refresh();
+    });
+  }
+
+  return (
+    <div className="rounded-sm border border-blue-40 bg-info-surface p-4" role="group" aria-labelledby="permesso-rapido">
+      <p id="permesso-rapido" className="text-body font-semibold text-info-ink">
+        Ha chiesto di ricevere l&apos;email?
+      </p>
+      <p className="mt-1 text-caption text-black-80">
+        Manca solo il permesso. Se {name} l&apos;ha chiesto, registralo con un clic (data di oggi e il tuo nome): poi il testo si sblocca.
+      </p>
+      <div className="mt-3 flex flex-col gap-2 sm:flex-row sm:flex-wrap">
+        <Button size="sm" disabled={pending !== null} aria-busy={pending === "richiesta_in_chiamata" || undefined} onClick={() => register("richiesta_in_chiamata")}>
+          {pending === "richiesta_in_chiamata" ? "Registrazione..." : "Sì, l'ha chiesto in chiamata"}
+        </Button>
+        <Button size="sm" disabled={pending !== null} aria-busy={pending === "contatto_in_entrata" || undefined} onClick={() => register("contatto_in_entrata")}>
+          {pending === "contatto_in_entrata" ? "Registrazione..." : "Sì, ha scritto per primo"}
+        </Button>
+      </div>
+      {error && (
+        <Alert tone="critical" className="mt-3">
+          {error}
+        </Alert>
+      )}
+    </div>
+  );
+}

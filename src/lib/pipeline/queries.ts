@@ -1,10 +1,10 @@
-import { activeEnrollments } from "@/lib/cadences/queries";
 import { partyName } from "@/lib/parties/labels";
 import { createClient } from "@/lib/supabase/server";
-import { nextActivityRange, type PipelineFilters } from "./filters";
+import type { OfferStatus } from "@/lib/prospect/labels";
 import type { ActivityKind, LossReasonKey, Outcome, Stage } from "./labels";
 
-// Reads for the pipeline, the opportunity page and "Oggi" (RLS applies).
+// Reads for the prospect and opportunity pages (RLS applies). The tables of
+// Prospect, Pipeline and Promemoria read from lib/prospect/queries.ts.
 
 function fail(table: string, error: { code?: string; message: string }): never {
   throw new Error(`${table}: ${error.code ?? error.message}`);
@@ -29,77 +29,10 @@ export type PipelineItem = {
   prossimaIl: string | null;
   next: NextTask | null;
   motivoPerdita: LossReasonKey | null;
-  // Active or paused cadence (block 1a-8), on the pipeline only.
-  cadenza?: { nome: string; passo: number | null; passi: number; stato: "attiva" | "in_pausa" | "completata" | "fermata" } | null;
+  // Offer status when the pair is in the pipeline (block 1a-9).
+  statoOfferta?: OfferStatus | null;
 };
 
-const MAX_ITEMS = 500;
-
-export async function listPipeline(filters: PipelineFilters, userId: string, now: Date): Promise<{ items: PipelineItem[]; truncated: boolean }> {
-  const supabase = await createClient();
-  let query = supabase
-    .from("opportunities")
-    .select(
-      "id, fase, esito, prossima_attivita_il, motivo_perdita, responsabile_id, parking_id, party_id, " +
-        "party:parties!opportunities_party_id_fkey(denominazione, nome, cognome), " +
-        "parking:parking_facilities!opportunities_parking_id_fkey(nome, nome_breve), " +
-        "responsabile:users!opportunities_responsabile_id_fkey(id, nome, email)",
-    )
-    .order("prossima_attivita_il", { ascending: true, nullsFirst: false })
-    .order("updated_at", { ascending: false })
-    .limit(MAX_ITEMS + 1);
-  if (filters.parcheggio) query = query.eq("parking_id", filters.parcheggio);
-  if (filters.responsabile === "mie") query = query.eq("responsabile_id", userId);
-  else if (filters.responsabile !== "tutti") query = query.eq("responsabile_id", filters.responsabile);
-  if (filters.fase) query = query.eq("fase", filters.fase);
-  if (filters.esito !== "tutte") query = query.eq("esito", filters.esito === "aperte" ? "aperta" : filters.esito === "vinte" ? "vinta" : "persa");
-  const range = nextActivityRange(filters.prossima, now);
-  if (range?.none) query = query.is("prossima_attivita_il", null);
-  if (range?.from) query = query.gte("prossima_attivita_il", range.from);
-  if (range?.to) query = query.lt("prossima_attivita_il", range.to);
-
-  const { data, error } = await query;
-  if (error) fail("opportunities", error);
-  const rows = (data ?? []) as unknown as {
-    id: string;
-    fase: Stage;
-    esito: Outcome;
-    prossima_attivita_il: string | null;
-    motivo_perdita: LossReasonKey | null;
-    responsabile_id: string | null;
-    parking_id: string;
-    party_id: string;
-    party: { denominazione: string | null; nome: string | null; cognome: string | null } | null;
-    parking: { nome: string; nome_breve: string | null } | null;
-    responsabile: UserRef;
-  }[];
-  const truncated = rows.length > MAX_ITEMS;
-  const items = rows.slice(0, MAX_ITEMS);
-  const [next, cadences] = await Promise.all([nextTasks(items.map((row) => row.id)), activeEnrollments(items.map((row) => row.id))]);
-  return {
-    truncated,
-    items: items.map((row) => ({
-      id: row.id,
-      fase: row.fase,
-      esito: row.esito,
-      partyId: row.party_id,
-      party: row.party ? partyName(row.party) : "Soggetto",
-      parkingId: row.parking_id,
-      parking: parkingName(row.parking),
-      responsabileId: row.responsabile_id,
-      responsabile: userName(row.responsabile),
-      prossimaIl: row.prossima_attivita_il,
-      next: next.get(row.id) ?? null,
-      motivoPerdita: row.motivo_perdita,
-      cadenza: (() => {
-        const enrollment = cadences.get(row.id);
-        return enrollment ? { nome: enrollment.cadenza, passo: enrollment.passo, passi: enrollment.passi, stato: enrollment.stato } : null;
-      })(),
-    })),
-  };
-}
-
-// Earliest open reminder of each opportunity.
 async function nextTasks(opportunityIds: string[]): Promise<Map<string, NextTask>> {
   const out = new Map<string, NextTask>();
   if (opportunityIds.length === 0) return out;
@@ -175,6 +108,10 @@ export type OpportunityDetail = {
   prossimaIl: string | null;
   importBatchId: string | null;
   createdAt: string;
+  // Pipeline row (block 1a-9).
+  statoOfferta: OfferStatus | null;
+  promemoria: string | null;
+  note: string | null;
 };
 
 export async function getOpportunity(id: string): Promise<OpportunityDetail | null> {
@@ -197,7 +134,7 @@ export async function getOpportunity(id: string): Promise<OpportunityDetail | nu
     prezzoConcorrente: data.prezzo_concorrente,
     notaPerdita: data.nota_perdita,
     partyId: data.party_id,
-    party: party ? partyName(party) : "Soggetto",
+    party: party ? partyName(party) : "Prospect",
     partyNonContattare: party?.non_contattare ?? false,
     parkingId: data.parking_id,
     parking: parkingName(data.parking as { nome: string; nome_breve: string | null } | null),
@@ -209,6 +146,9 @@ export async function getOpportunity(id: string): Promise<OpportunityDetail | nu
     prossimaIl: data.prossima_attivita_il,
     importBatchId: data.import_batch_id,
     createdAt: data.created_at,
+    statoOfferta: data.stato_offerta,
+    promemoria: data.promemoria_il,
+    note: data.note,
   };
 }
 
@@ -217,7 +157,7 @@ export async function listPartyOpportunities(partyId: string): Promise<PipelineI
   const { data, error } = await supabase
     .from("opportunities")
     .select(
-      "id, fase, esito, prossima_attivita_il, motivo_perdita, responsabile_id, parking_id, party_id, " +
+      "id, fase, esito, prossima_attivita_il, motivo_perdita, responsabile_id, parking_id, party_id, stato_offerta, " +
         "parking:parking_facilities!opportunities_parking_id_fkey(nome, nome_breve), " +
         "responsabile:users!opportunities_responsabile_id_fkey(id, nome, email)",
     )
@@ -233,6 +173,7 @@ export async function listPartyOpportunities(partyId: string): Promise<PipelineI
     responsabile_id: string | null;
     parking_id: string;
     party_id: string;
+    stato_offerta: OfferStatus | null;
     parking: { nome: string; nome_breve: string | null } | null;
     responsabile: UserRef;
   }[];
@@ -250,6 +191,7 @@ export async function listPartyOpportunities(partyId: string): Promise<PipelineI
     prossimaIl: row.prossima_attivita_il,
     next: next.get(row.id) ?? null,
     motivoPerdita: row.motivo_perdita,
+    statoOfferta: row.stato_offerta,
   }));
 }
 
@@ -272,90 +214,4 @@ export async function listContactOptions(partyId: string): Promise<ContactOption
     id: row.id,
     nome: [row.nome, row.cognome].filter(Boolean).join(" ") + (row.ruolo ? ` (${row.ruolo})` : "") || "Contatto senza nome",
   }));
-}
-
-// ---------------------------------------------------------------------------
-// "Oggi" (B4)
-// ---------------------------------------------------------------------------
-
-export type TodayTask = {
-  id: string;
-  tipo: ActivityKind;
-  titolo: string;
-  nota: string | null;
-  scadenza: string | null;
-  opportunityId: string | null;
-  partyId: string | null;
-  party: string;
-  parking: string | null;
-  fase: Stage | null;
-  // Step of a cadence (block 1a-8): the title says which ("Cadenza · passo 2/4").
-  cadenceEnrollmentId: string | null;
-};
-
-export async function listMyOpenTasks(userId: string, until: Date): Promise<TodayTask[]> {
-  const supabase = await createClient();
-  const { data, error } = await supabase
-    .from("tasks")
-    .select(
-      "id, tipo, titolo, nota, scadenza, opportunity_id, party_id, cadence_enrollment_id, " +
-        "party:parties!tasks_party_id_fkey(denominazione, nome, cognome), " +
-        "opportunity:opportunities!tasks_opportunity_id_fkey(fase, party:parties!opportunities_party_id_fkey(denominazione, nome, cognome), parking:parking_facilities!opportunities_parking_id_fkey(nome, nome_breve))",
-    )
-    .eq("assegnatario_id", userId)
-    .is("completata_il", null)
-    .lt("scadenza", until.toISOString())
-    .order("scadenza")
-    .limit(500);
-  if (error) fail("tasks", error);
-  type Named = { denominazione: string | null; nome: string | null; cognome: string | null } | null;
-  return ((data ?? []) as unknown as {
-    id: string;
-    tipo: ActivityKind;
-    titolo: string;
-    nota: string | null;
-    scadenza: string | null;
-    opportunity_id: string | null;
-    party_id: string | null;
-    cadence_enrollment_id: string | null;
-    party: Named;
-    opportunity: { fase: Stage; party: Named; parking: { nome: string; nome_breve: string | null } | null } | null;
-  }[]).map((row) => {
-    const named = row.opportunity?.party ?? row.party;
-    return {
-      id: row.id,
-      tipo: row.tipo,
-      titolo: row.titolo,
-      nota: row.nota,
-      scadenza: row.scadenza,
-      opportunityId: row.opportunity_id,
-      partyId: row.party_id,
-      party: named ? partyName(named) : "Soggetto",
-      parking: row.opportunity ? parkingName(row.opportunity.parking) : null,
-      fase: row.opportunity?.fase ?? null,
-      cadenceEnrollmentId: row.cadence_enrollment_id,
-    };
-  });
-}
-
-// Open opportunities of the user with no next activity (CRM-19 warning).
-export async function listMyOpportunitiesWithoutNext(userId: string): Promise<PipelineItem[]> {
-  const { items } = await listPipeline(
-    { vista: "tabella", parcheggio: null, responsabile: userId, fase: null, esito: "aperte", prossima: "nessuna" },
-    userId,
-    new Date(),
-  );
-  return items;
-}
-
-export async function countMyOverdue(userId: string, now: Date): Promise<number> {
-  const supabase = await createClient();
-  const { count, error } = await supabase
-    .from("tasks")
-    .select("id", { count: "exact", head: true })
-    .eq("assegnatario_id", userId)
-    .is("completata_il", null)
-    .lt("scadenza", now.toISOString());
-  if (error) return 0;
-  return count ?? 0;
 }

@@ -1,7 +1,7 @@
 "use client";
 
 import { useActionState } from "react";
-import { saveLocation } from "@/app/(app)/soggetti/actions";
+import { saveLocation } from "@/app/(app)/prospect/actions";
 import { Alert } from "@/components/ui/alert";
 import { Button, ButtonLink } from "@/components/ui/button";
 import { Checkbox, Field, Input } from "@/components/ui/field";
@@ -66,7 +66,7 @@ export function LocationForm({
           {text("cap", "CAP", undefined, "numeric")}
           {text("citta", "Città")}
           <div className="sm:col-span-2">
-            <Checkbox name="principale" defaultChecked={values.principale === "on"} label="Sede principale" hint="Una sola sede principale per soggetto." />
+            <Checkbox name="principale" defaultChecked={values.principale === "on"} label="Sede principale" hint="Una sola sede principale per prospect." />
           </div>
         </div>
       </section>
@@ -118,7 +118,7 @@ export function LocationForm({
         </div>
       ) : (
         <div className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
-          <ButtonLink href={`/soggetti/${partyId}#sedi`} size="md">
+          <ButtonLink href={`/prospect/${partyId}#sedi`} size="md">
             Annulla
           </ButtonLink>
           {state.status === "geocode-failed" && <input type="hidden" name="geo" value="skip" />}

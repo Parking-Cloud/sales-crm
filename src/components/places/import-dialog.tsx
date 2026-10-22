@@ -85,8 +85,8 @@ export function ImportDialog({
       {state?.step === "choose" && (
         <div className="flex flex-col gap-5">
           <p className="text-body text-black-80">
-            Per ogni risultato importato si crea il soggetto (azienda) con la sede e un&apos;opportunità &ldquo;Individuata&rdquo; sul parcheggio,
-            assegnata a te. I dati arrivano da Google Places e restano &ldquo;da verificare&rdquo;.
+            Per ogni risultato importato si crea il prospect (azienda), &ldquo;Da contattare&rdquo;, con la sede e il parcheggio,
+            assegnato a te. I dati arrivano da Google Places e restano &ldquo;da verificare&rdquo;.
           </p>
 
           {warned.length > 0 && (
@@ -111,7 +111,7 @@ export function ImportDialog({
                         />
                         <span>
                           Aggiungi all&apos;esistente:{" "}
-                          <Link href={`/soggetti/${candidate.partyId}`} target="_blank" className="rounded-xs font-semibold text-blue-ink underline underline-offset-2">
+                          <Link href={`/prospect/${candidate.partyId}`} target="_blank" className="rounded-xs font-semibold text-blue-ink underline underline-offset-2">
                             {candidate.name}
                             <span className="sr-only"> (si apre in una nuova scheda)</span>
                           </Link>
@@ -127,7 +127,7 @@ export function ImportDialog({
                         checked={picks[item.placeId] === "crea"}
                         onChange={() => setPicks((current) => ({ ...current, [item.placeId]: "crea" }))}
                       />
-                      Crea comunque un nuovo soggetto
+                      Crea comunque un nuovo prospect
                     </label>
                     <label className="flex items-center gap-2">
                       <input
@@ -198,7 +198,7 @@ export function ImportDialog({
               <li key={row.placeId} className="flex flex-wrap items-center justify-between gap-2 py-2">
                 <span>
                   {row.partyId ? (
-                    <Link href={`/soggetti/${row.partyId}`} className="rounded-xs font-semibold text-blue-ink underline underline-offset-2">
+                    <Link href={`/prospect/${row.partyId}`} className="rounded-xs font-semibold text-blue-ink underline underline-offset-2">
                       {row.name}
                     </Link>
                   ) : (

@@ -1,7 +1,7 @@
 "use client";
 
 import { useActionState } from "react";
-import { saveContact } from "@/app/(app)/soggetti/actions";
+import { saveContact } from "@/app/(app)/prospect/actions";
 import { Alert } from "@/components/ui/alert";
 import { Button, ButtonLink } from "@/components/ui/button";
 import { Field, Input, Select } from "@/components/ui/field";
@@ -92,7 +92,7 @@ export function ContactForm({
         </div>
       </section>
       <div className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
-        <ButtonLink href={`/soggetti/${partyId}#contatti`} size="md">
+        <ButtonLink href={`/prospect/${partyId}#contatti`} size="md">
           Annulla
         </ButtonLink>
         <Button type="submit" variant="primary" size="md" disabled={pending} aria-busy={pending || undefined}>

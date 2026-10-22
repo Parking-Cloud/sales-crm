@@ -49,7 +49,7 @@ export function phoneError(raw: string, { allowMany = false } = {}): string | nu
   if (raw === "") return null;
   const parts = raw.split(PHONE_SEPARATORS).map((part) => part.trim()).filter(Boolean);
   if (!allowMany && parts.length > 1) {
-    return "Un solo numero per il soggetto: aggiungi gli altri nei contatti.";
+    return "Un solo numero per il prospect: aggiungi gli altri nei contatti.";
   }
   for (const part of parts) {
     const digits = phoneDigits(part);

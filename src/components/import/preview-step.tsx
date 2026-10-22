@@ -181,7 +181,7 @@ export function PreviewStep({ rows, onChange }: { rows: PlanRow[]; onChange: (ro
                       <p>
                         <strong>Esclusa: {toText(block.motivo)}.</strong>{" "}
                         {block.party_id && (
-                          <Link href={`/soggetti/${block.party_id}`} className="rounded-xs text-blue-ink underline underline-offset-2">
+                          <Link href={`/prospect/${block.party_id}`} className="rounded-xs text-blue-ink underline underline-offset-2">
                             Apri {toText(block.nome) || "il soggetto"}
                           </Link>
                         )}

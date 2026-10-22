@@ -245,7 +245,7 @@ export async function prepareImport(input: { places: ChosenPlace[] }): Promise<R
       const byParty = new Map<string, DuplicateCandidate>();
       warnings.forEach((row) => {
         if (row.party_id && !byParty.has(row.party_id)) {
-          byParty.set(row.party_id, { partyId: row.party_id, name: row.nome ?? "Soggetto senza nome", reason: row.motivo });
+          byParty.set(row.party_id, { partyId: row.party_id, name: row.nome ?? "Prospect senza nome", reason: row.motivo });
         }
       });
       const list = [...byParty.values()];
@@ -312,7 +312,7 @@ export async function confirmImport(input: {
     time.step("database");
     if (error) {
       time.log({ righe: rows.length, errore: 1 });
-      return { ok: false, message: "Import non riuscito: nessun soggetto è stato creato. Riprova." };
+      return { ok: false, message: "Import non riuscito: nessun prospect è stato creato. Riprova." };
     }
     const raw = (data ?? {}) as { creati?: number; aggiunti?: number; saltati?: number; righe?: Record<string, unknown>[] };
     const righe: ImportOutcome[] = (raw.righe ?? []).map((row) => ({
@@ -324,10 +324,10 @@ export async function confirmImport(input: {
     }));
     const summary = { creati: raw.creati ?? 0, aggiunti: raw.aggiunti ?? 0, saltati: raw.saltati ?? 0, righe };
     time.log({ righe: rows.length, creati: summary.creati, aggiunti: summary.aggiunti, saltati: summary.saltati });
-    revalidatePath("/soggetti");
+    revalidatePath("/prospect");
     return { ok: true, data: summary };
   } catch {
     time.log({ righe: rows.length, errore: 1 });
-    return { ok: false, message: "Import non riuscito: nessun soggetto è stato creato. Riprova." };
+    return { ok: false, message: "Import non riuscito: nessun prospect è stato creato. Riprova." };
   }
 }
