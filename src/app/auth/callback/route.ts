@@ -9,7 +9,7 @@ import {
 import { createClient } from "@/lib/supabase/server";
 
 // Google OAuth return point: exchanges the code for a session, then sends
-// enabled users to "Oggi" and everyone else back to the sign-in page.
+// enabled users to "Promemoria" and everyone else back to the sign-in page.
 export async function GET(request: NextRequest) {
   const code = request.nextUrl.searchParams.get("code");
   if (!code) {

@@ -1,4 +1,6 @@
 import type { Metadata } from "next";
+import { FeatureDisabled } from "@/components/feature-disabled";
+import { DISABLED_FEATURES } from "@/lib/features";
 import { redirect } from "next/navigation";
 import { BatchHistory } from "@/components/import/batch-history";
 import { ImportWizard } from "@/components/import/import-wizard";
@@ -12,6 +14,7 @@ export const metadata: Metadata = { title: "Import" };
 export default async function ImportPage() {
   const user = await getCurrentUser();
   if (!user) redirect(SIGN_IN_PATH);
+  if (DISABLED_FEATURES.import) return <FeatureDisabled title="Import" />;
 
   const batches = await listBatches();
   const [parkings, mappings] = user.isAdmin ? await Promise.all([listParkingOptions(), listMappings()]) : [[], []];

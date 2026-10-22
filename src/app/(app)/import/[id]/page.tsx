@@ -1,4 +1,6 @@
 import type { Metadata } from "next";
+import { FeatureDisabled } from "@/components/feature-disabled";
+import { DISABLED_FEATURES } from "@/lib/features";
 import { notFound, redirect } from "next/navigation";
 import { BatchSummary } from "@/components/import/batch-summary";
 import { getCurrentUser } from "@/lib/auth/current-user";
@@ -12,6 +14,7 @@ const UUID = /^[0-9a-f-]{36}$/i;
 export default async function BatchPage({ params }: { params: Promise<{ id: string }> }) {
   const user = await getCurrentUser();
   if (!user) redirect(SIGN_IN_PATH);
+  if (DISABLED_FEATURES.import) return <FeatureDisabled title="Import" />;
   const { id } = await params;
   if (!UUID.test(id)) notFound();
   const batch = await getBatch(id);

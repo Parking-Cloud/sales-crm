@@ -5,16 +5,16 @@ export type NavItem = {
   adminOnly?: boolean;
 };
 
-// Sidebar entries. Every href must point to an existing page.
+// Sidebar entries (block 1a-9). Every href must point to an existing page.
+// Cadences and import are disabled: their pages stay, out of the menu.
+// The suppression list is reached from Impostazioni.
 export const NAV_ITEMS: NavItem[] = [
-  { href: "/oggi", label: "Oggi" },
+  { href: "/promemoria", label: "Promemoria" },
   { href: "/parcheggi", label: "Parcheggi" },
   { href: "/ricerca-mappa", label: "Ricerca su mappa" },
-  { href: "/soggetti", label: "Soggetti" },
+  { href: "/prospect", label: "Prospect" },
   { href: "/pipeline", label: "Pipeline" },
-  { href: "/cadenze", label: "Cadenze" },
-  { href: "/import", label: "Import" },
   { href: "/template", label: "Template email", adminOnly: true },
-  { href: "/esclusioni", label: "Esclusioni" },
+  { href: "/analytics", label: "Analytics" },
   { href: "/impostazioni", label: "Impostazioni" },
 ];

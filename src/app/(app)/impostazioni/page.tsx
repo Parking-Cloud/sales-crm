@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { ButtonLink } from "@/components/ui/button";
 import { redirect } from "next/navigation";
 import { EmailSettingsForm, SignatureForm } from "@/components/settings/email-settings";
 import { GoogleUsageSection } from "@/components/settings/google-usage";
@@ -75,7 +76,7 @@ export default async function SettingsPage() {
           Distanze dai parcheggi
         </h2>
         <p className="mt-2 text-body text-black-80">
-          Nella scheda di un soggetto, per ogni sede si vedono solo i parcheggi attivi entro questa distanza in linea
+          Nella scheda di un prospect, per ogni sede si vedono solo i parcheggi attivi entro questa distanza in linea
           d&apos;aria, dal più vicino.
         </p>
         <div className="mt-4">
@@ -96,6 +97,18 @@ export default async function SettingsPage() {
             {distance.updatedAt && `Ultima modifica: ${formatDate(distance.updatedAt)}.`}
           </p>
         )}
+      </section>
+
+      <section aria-labelledby="esclusioni-titolo" className="mb-6 max-w-3xl rounded-md border border-grey-60 bg-white p-5 shadow-sm sm:p-6">
+        <h2 id="esclusioni-titolo" className="text-h4 font-semibold">
+          Lista di esclusione
+        </h2>
+        <p className="mt-1 text-body text-black-80">
+          Recapiti di chi non vuole essere contattato: sempre controllati prima di ogni email.
+        </p>
+        <p className="mt-3">
+          <ButtonLink href="/esclusioni">Apri la lista di esclusione</ButtonLink>
+        </p>
       </section>
 
       <GoogleUsageSection isAdmin={user.isAdmin} limits={limits} usage={usage} />

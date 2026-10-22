@@ -1,4 +1,5 @@
 import { type NextRequest } from "next/server";
+import { DISABLED_FEATURES } from "@/lib/features";
 import { getCurrentUser } from "@/lib/auth/current-user";
 import { getBatch } from "@/lib/import/queries";
 
@@ -14,6 +15,7 @@ function csvField(value: unknown): string {
 
 export async function GET(_request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   if (!(await getCurrentUser())) return new Response("Non autorizzato", { status: 401 });
+  if (DISABLED_FEATURES.import) return new Response("Funzione disattivata", { status: 404 });
   const { id } = await params;
   if (!UUID.test(id)) return new Response("Non trovato", { status: 404 });
   const batch = await getBatch(id);

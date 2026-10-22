@@ -1,4 +1,6 @@
 import type { Metadata } from "next";
+import { FeatureDisabled } from "@/components/feature-disabled";
+import { DISABLED_FEATURES } from "@/lib/features";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { NewCadenceForm } from "@/components/cadences/new-cadence-form";
@@ -24,6 +26,7 @@ const STAT_LABELS: [keyof Cadence["stats"], string][] = [
 // automatically, every step is a reminder in "Oggi".
 export default async function CadencesPage({ searchParams }: { searchParams: Promise<{ archiviate?: string }> }) {
   if (!(await getCurrentUser())) redirect(SIGN_IN_PATH);
+  if (DISABLED_FEATURES.cadenze) return <FeatureDisabled title="Cadenze" />;
   const { archiviate } = await searchParams;
   const showArchived = archiviate === "1";
   const cadences = await listCadences({ withArchived: showArchived });
