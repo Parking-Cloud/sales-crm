@@ -1944,6 +1944,22 @@ export type Database = {
           party_id: string
         }[]
       }
+      analytics_events: {
+        Args: {
+          p_a: string
+          p_citta?: string
+          p_da: string
+          p_parcheggio?: string
+          p_responsabile?: string
+        }
+        Returns: {
+          giorno: string
+          opportunity_id: string
+          parking_id: string
+          party_id: string
+          tipo: string
+        }[]
+      }
       apply_google_coordinates: { Args: { p_rows: Json }; Returns: Json }
       cadence_clear_open_tasks: {
         Args: { p_enrollment: string }

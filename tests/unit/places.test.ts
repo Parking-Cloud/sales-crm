@@ -2,24 +2,26 @@
 // FAKE Google answers, limits.  Run: npm run test:unit
 import assert from "node:assert/strict";
 import { test } from "node:test";
-import { readAddressComponents } from "../../src/lib/google/places-api";
+import { NEARBY_FIELD_MASK, boundingBox, readAddressComponents, textSearch } from "../../src/lib/google/places-api";
+import { isPartyCategory } from "../../src/lib/parties/labels";
 import { refreshGoogleData, type RpcClient } from "../../src/lib/google/refresh";
 import { CATEGORY_TYPES, SEARCH_CATEGORIES, categoryForPlace, typesFor } from "../../src/lib/places/categories";
 import { distanceMeters, offset, splitCircle, type Circle } from "../../src/lib/places/geo";
-import { MAX_CALLS, capAndCity, searchArea, type NearbyPlace } from "../../src/lib/places/search";
+import { MAX_CALLS, MAX_KEYWORD, capAndCity, cleanKeyword, searchArea, type NearbyPlace } from "../../src/lib/places/search";
 
 const CENTER = { lat: 45.4642, lng: 9.19 };
 
 test("categories: every search category has types; Google type back to our category", () => {
-  assert.equal(SEARCH_CATEGORIES.length, 9);
+  assert.equal(SEARCH_CATEGORIES.length, 17);
   for (const category of SEARCH_CATEGORIES) assert.ok(CATEGORY_TYPES[category].length > 0, category);
   assert.deepEqual(typesFor(["Ristoranti", "Hotel"]), ["restaurant", "cafe", "bar", "hotel", "bed_and_breakfast"]);
   assert.equal(categoryForPlace("lawyer", ["lawyer", "point_of_interest"]), "Studi professionali");
   assert.equal(categoryForPlace("hotel", ["hotel", "lodging"]), "Hotel");
   assert.equal(categoryForPlace("guest_house", ["lodging"]), "Strutture ricettive");
-  assert.equal(categoryForPlace("museum", ["tourist_attraction"]), "Altro");
-  // corporate_office is both "Uffici" and "Aziende": the searched one wins.
-  assert.equal(categoryForPlace("corporate_office", [], ["Aziende"]), "Aziende");
+  assert.equal(categoryForPlace("museum", ["tourist_attraction"]), "Musei e cultura");
+  assert.equal(categoryForPlace("tourist_attraction", ["point_of_interest"]), "Altro");
+  // corporate_office is both "Uffici" and "Sedi aziendali": the searched one wins.
+  assert.equal(categoryForPlace("corporate_office", [], ["Sedi aziendali"]), "Sedi aziendali");
   assert.equal(categoryForPlace("corporate_office", []), "Uffici");
   // Primary type before the other types.
   assert.equal(categoryForPlace("cafe", ["store", "cafe"]), "Ristoranti");
@@ -179,4 +181,64 @@ test("30-day refresh: Google errors left for the next night, quota reached stops
   assert.equal(result.errori, 1);
   assert.equal(result.aggiornate, 7);
   assert.equal(result.limite, true);
+});
+
+test("categories: every search category is also a prospect category", () => {
+  for (const category of SEARCH_CATEGORIES) assert.ok(isPartyCategory(category), category);
+  assert.deepEqual(CATEGORY_TYPES["Sedi aziendali"], ["corporate_office"]);
+});
+
+test("keyword search (Text Search): rectangle around the circle, Pro field mask, keyword in textQuery, 20 per page", async () => {
+  const box = boundingBox({ center: CENTER, radius: 1000 });
+  assert.ok(Math.abs(distanceMeters(CENTER, { lat: box.high.lat, lng: CENTER.lng }) - 1000) <= 2);
+  assert.ok(Math.abs(distanceMeters(CENTER, { lat: CENTER.lat, lng: box.high.lng }) - 1000) <= 2);
+  const saved = { fetch: globalThis.fetch, key: process.env.GOOGLE_MAPS_SERVER_KEY };
+  const seen: { url: string; headers: Record<string, string>; body: Record<string, unknown> }[] = [];
+  process.env.GOOGLE_MAPS_SERVER_KEY = "chiave-finta";
+  globalThis.fetch = (async (url: string, init: RequestInit) => {
+    seen.push({ url, headers: init.headers as Record<string, string>, body: JSON.parse(String(init.body)) });
+    return new Response(JSON.stringify({ places: [{ id: "finto1", displayName: { text: "Sede Finta Srl" }, location: { latitude: 45.465, longitude: 9.191 }, types: ["corporate_office"], primaryType: "corporate_office" }] }), { status: 200 });
+  }) as typeof fetch;
+  try {
+    const places = await textSearch({ center: CENTER, radius: 1000 }, "sede centrale");
+    assert.equal(seen[0].url, "https://places.googleapis.com/v1/places:searchText");
+    assert.equal(seen[0].headers["X-Goog-FieldMask"], NEARBY_FIELD_MASK);
+    assert.equal(seen[0].body.textQuery, "sede centrale");
+    assert.equal(seen[0].body.pageSize, 20);
+    assert.ok((seen[0].body.locationRestriction as { rectangle?: unknown }).rectangle);
+    assert.deepEqual(places.map((place) => place.name), ["Sede Finta Srl"]);
+  } finally {
+    globalThis.fetch = saved.fetch;
+    if (saved.key === undefined) delete process.env.GOOGLE_MAPS_SERVER_KEY;
+    else process.env.GOOGLE_MAPS_SERVER_KEY = saved.key;
+  }
+});
+
+test("keyword search over an area: 20 results -> the keyword again on 4 smaller circles", async () => {
+  const queries: string[] = [];
+  let first = true;
+  const result = await searchArea<string>({
+    center: CENTER,
+    radius: 1000,
+    typeGroups: ["sede centrale"],
+    call: async (circle, keyword) => {
+      queries.push(keyword);
+      if (first) {
+        first = false;
+        return Array.from({ length: 20 }, (_, i) => ({ id: `k${i}`, name: `Finto ${i}`, address: null, location: offset(circle.center, i * 10, 0), types: [], primaryType: null }));
+      }
+      return [];
+    },
+    reserve: async () => true,
+  });
+  assert.equal(result.calls, 5);
+  assert.deepEqual([...new Set(queries)], ["sede centrale"]);
+  assert.equal(result.places.length, 20);
+});
+
+test("keyword: spaces collapsed, at most 100 characters, empty when missing", () => {
+  assert.equal(cleanKeyword("  sede   centrale \n"), "sede centrale");
+  assert.equal(cleanKeyword("x".repeat(150)).length, MAX_KEYWORD);
+  assert.equal(cleanKeyword(undefined), "");
+  assert.equal(cleanKeyword(42), "");
 });

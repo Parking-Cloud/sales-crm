@@ -6,6 +6,7 @@ import { test } from "node:test";
 import { pageCount, pageOffset, pageRange, readPage, TABLE_PAGE_SIZE } from "../../src/lib/tables/paging";
 import { hasFilters, nextSort, readTableQuery, tableSearch, withFilter } from "../../src/lib/tables/query";
 import { daysBetween, reminderDue } from "../../src/lib/tables/reminders";
+import { pageRows, pageSelection, toggleSelection } from "../../src/lib/tables/selection";
 import {
   OFFER_STATUSES,
   OFFER_STATUS_LABELS,
@@ -87,4 +88,28 @@ test("statuses: every value has a text label and a tone (grey, light blue, green
   assert.equal(reasonLabel("prezzo"), "Prezzo");
   assert.equal(reasonLabel("non_indicato"), null);
   assert.equal(reasonLabel(null), null);
+});
+
+test("selection across pages: kept when the page changes, select all = the rows of the page, at most 50", () => {
+  const ids = Array.from({ length: 120 }, (_, i) => `p${i + 1}`);
+  const page1 = pageRows(ids, 1, 50);
+  const page2 = pageRows(ids, 2, 50);
+  const page3 = pageRows(ids, 3, 50);
+  assert.equal(page1.length, 50);
+  assert.equal(page3.length, 20);
+  assert.deepEqual([page2[0], page2[49]], ["p51", "p100"]);
+  let selected = toggleSelection(new Set(), ["p3", "p60"], true, 50);
+  assert.equal(pageSelection(selected, page1), "some");
+  selected = toggleSelection(selected, page1, true, 50);
+  // 50 at most: the whole page 1 would make 51, so p50 stays out; p60 (page 2) kept.
+  assert.equal(selected.size, 50);
+  assert.ok(selected.has("p60") && selected.has("p49") && !selected.has("p50"));
+  assert.equal(pageSelection(selected, page1), "some");
+  selected = toggleSelection(selected, ["p70"], true, 50);
+  assert.equal(selected.has("p70"), false);
+  selected = toggleSelection(selected, page1, false, 50);
+  assert.deepEqual([...selected], ["p60"]);
+  assert.equal(pageSelection(selected, page2), "some");
+  assert.equal(pageSelection(toggleSelection(new Set(), page3, true), page3), "all");
+  assert.equal(pageSelection(new Set(), page3), "none");
 });

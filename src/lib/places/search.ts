@@ -1,5 +1,6 @@
-// Nearby search over an area with the 20-results limit of Places API (New).
-// One request per category; a circle that returns 20 results is split into
+// Search over an area with the 20-results limit of Places API (New):
+// Nearby Search (one request per category, `query` = its types) or Text
+// Search (`query` = the keyword). A circle that returns 20 results is split into
 // 4 smaller circles and searched again, down to 3 levels and at most 60
 // requests per search. Results are deduplicated by place id, those outside
 // the requested radius dropped, and the distance is ours (straight line).
@@ -13,6 +14,14 @@ export const MAX_LEVELS = 3;
 export const MAX_CALLS = 60;
 const PARALLEL = 8;
 
+export const MAX_KEYWORD = 100;
+
+// Keyword of a Text Search: spaces collapsed, at most 100 characters; empty
+// when missing.
+export function cleanKeyword(value: unknown): string {
+  return typeof value === "string" ? value.replace(/\s+/g, " ").trim().slice(0, MAX_KEYWORD) : "";
+}
+
 export type NearbyPlace = {
   id: string;
   name: string;
@@ -22,7 +31,7 @@ export type NearbyPlace = {
   primaryType: string | null;
 };
 
-export type NearbyCall = (circle: Circle, types: readonly string[]) => Promise<NearbyPlace[]>;
+export type NearbyCall<Q = readonly string[]> = (circle: Circle, query: Q) => Promise<NearbyPlace[]>;
 // Reserves n requests on the daily limit; false when over it.
 export type Reserve = (n: number) => Promise<boolean>;
 
@@ -35,16 +44,18 @@ export type AreaResult = {
   quotaExceeded: boolean;
 };
 
-type Job = { circle: Circle; level: number; types: readonly string[] };
+type Job<Q> = { circle: Circle; level: number; types: Q };
 
-export async function searchArea(options: {
+// typeGroups: one query per request series (a group of types, or a keyword);
+// empty ones are skipped.
+export async function searchArea<Q extends { length: number } = readonly string[]>(options: {
   center: LatLng;
   radius: number;
-  typeGroups: readonly (readonly string[])[];
-  call: NearbyCall;
+  typeGroups: readonly Q[];
+  call: NearbyCall<Q>;
   reserve: Reserve;
 }): Promise<AreaResult> {
-  const queue: Job[] = options.typeGroups
+  const queue: Job<Q>[] = options.typeGroups
     .filter((types) => types.length > 0)
     .map((types) => ({ circle: { center: options.center, radius: options.radius }, level: 1, types }));
   const found = new Map<string, NearbyPlace>();

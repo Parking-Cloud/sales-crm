@@ -7,12 +7,16 @@ import { Alert } from "@/components/ui/alert";
 import { Badge, type BadgeTone } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Checkbox, Field, Input, Select } from "@/components/ui/field";
-import { Th } from "@/components/ui/table";
+import { DataTable, type Column } from "@/components/data-table/data-table";
 import { formatNumber } from "@/lib/format";
 import { googleMapsPlaceUrl } from "@/lib/google/maps-link";
 import { safeCall } from "@/lib/import/safe-call";
+import { TABLE_PAGE_SIZE } from "@/lib/tables/paging";
+import type { TableQuery } from "@/lib/tables/query";
+import { pageRows, toggleSelection } from "@/lib/tables/selection";
 import { SEARCH_CATEGORIES, type SearchCategory } from "@/lib/places/categories";
 import { MAX_IMPORT, MAX_RADIUS, MAX_WALKING, MIN_RADIUS } from "@/lib/places/limits";
+import { MAX_KEYWORD } from "@/lib/places/search";
 import type { SearchParking } from "@/lib/places/queries";
 import type { ImportCandidate, ImportChoice, ImportSummary, ResultStatus, SearchResponse, SearchResult, WalkingDistance } from "@/lib/places/types";
 import { ImportDialog } from "./import-dialog";
@@ -59,9 +63,8 @@ export function MapSearch({
   const [response, setResponse] = useState<SearchResponse | null>(initial?.response ?? null);
   const [error, setError] = useState<string | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
-  const [filterCategory, setFilterCategory] = useState("");
-  const [filterStatus, setFilterStatus] = useState("");
-  const [descending, setDescending] = useState(false);
+  const [keyword, setKeyword] = useState(initial?.response?.keyword ?? "");
+  const [query, setQuery] = useState<TableQuery>({ filters: {}, sort: null, desc: false, page: 1 });
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [checked, setChecked] = useState<Set<string>>(new Set(initial?.checked ?? []));
   const [walking, setWalking] = useState<Map<string, WalkingDistance>>(
@@ -78,18 +81,27 @@ export function MapSearch({
       ? "Il raggio va da 100 a 5.000 metri."
       : undefined;
 
+  // Filters and sorting of the results (in the page, not in the URL).
   const visible = useMemo(() => {
-    const rows = (response?.results ?? []).filter(
-      (row) => (!filterCategory || row.category === filterCategory) && (!filterStatus || row.status === filterStatus),
-    );
-    return descending ? [...rows].reverse() : rows;
-  }, [response, filterCategory, filterStatus, descending]);
+    const { categoria, stato } = query.filters;
+    const rows = (response?.results ?? []).filter((row) => (!categoria || row.category === categoria) && (!stato || row.status === stato));
+    const sorted = query.sort === "nome" ? [...rows].sort((a, b) => a.name.localeCompare(b.name, "it")) : rows;
+    return query.desc ? [...sorted].reverse() : sorted;
+  }, [response, query]);
+  const numbers = useMemo(() => new Map(visible.map((row, index) => [row.placeId, index + 1])), [visible]);
+  const page = pageRows(visible, query.page, TABLE_PAGE_SIZE).map((row) => ({ ...row, id: row.placeId }));
   const chosen = (response?.results ?? []).filter((row) => checked.has(row.placeId));
 
-  const onSelect = useCallback((placeId: string) => {
-    setSelectedId(placeId);
-    document.getElementById(`risultato-${placeId}`)?.scrollIntoView({ behavior: "smooth", block: "nearest" });
-  }, []);
+  // A marker clicked on the map: its page of the table, then the row.
+  const onSelect = useCallback(
+    (placeId: string) => {
+      setSelectedId(placeId);
+      const index = visible.findIndex((row) => row.placeId === placeId);
+      if (index >= 0) setQuery((current) => ({ ...current, page: Math.floor(index / TABLE_PAGE_SIZE) + 1 }));
+      requestAnimationFrame(() => document.getElementById(`risultato-${placeId}`)?.scrollIntoView({ behavior: "smooth", block: "nearest" }));
+    },
+    [visible],
+  );
 
   function toggleCategory(category: SearchCategory, on: boolean) {
     setCategories((current) => {
@@ -105,16 +117,17 @@ export function MapSearch({
     setNotice(null);
     if (!parking) return setError("Scegli un parcheggio.");
     if (radiusError || radius === "") return setError("Il raggio va da 100 a 5.000 metri.");
-    if (categories.size === 0) return setError("Scegli almeno una categoria.");
+    if (categories.size === 0 && !keyword.trim()) return setError("Scegli almeno una categoria o scrivi una parola chiave.");
     startTransition(async () => {
-      const result = await safeCall(() => actions.search({ parkingId: parking.id, radius: radiusValue, categories: [...categories] }));
+      const result = await safeCall(() =>
+        actions.search({ parkingId: parking.id, radius: radiusValue, categories: [...categories], keyword: keyword.trim() || undefined }),
+      );
       if (!result.ok) return setError(result.message);
       setResponse(result.data);
       setChecked(new Set());
       setWalking(new Map());
       setSelectedId(null);
-      setFilterCategory("");
-      setFilterStatus("");
+      setQuery({ filters: {}, sort: null, desc: false, page: 1 });
     });
   }
 
@@ -172,7 +185,7 @@ export function MapSearch({
   }
 
   const allCategories = categories.size === SEARCH_CATEGORIES.length;
-  const tooMany = { walking: chosen.length > MAX_WALKING, import: chosen.length > MAX_IMPORT };
+  const tooMany = { walking: chosen.length > MAX_WALKING };
 
   return (
     <div className="flex flex-col gap-6">
@@ -231,6 +244,15 @@ export function MapSearch({
             ))}
           </div>
         </fieldset>
+        <div className="sm:max-w-md">
+          <Field
+            id="parola-chiave"
+            label="Parola chiave"
+            hint="Facoltativa, per esempio: sede centrale. Se la scrivi si cerca questa parola nel raggio; le categorie servono solo a classificare i risultati."
+          >
+            <Input id="parola-chiave" value={keyword} maxLength={MAX_KEYWORD} autoComplete="off" onChange={(event) => setKeyword(event.target.value)} hasDescription />
+          </Field>
+        </div>
         <div className="flex justify-end">
           <Button type="submit" variant={response ? "secondary" : "primary"} size="md" disabled={pending || parkings.length === 0}>
             {pending && !dialog ? "Ricerca..." : response ? "Cerca di nuovo" : "Cerca"}
@@ -247,13 +269,18 @@ export function MapSearch({
             <h2 id="risultati" className="text-h3 font-semibold">
               {formatNumber(response.results.length)} {response.results.length === 1 ? "risultato" : "risultati"} entro {formatMeters(response.radius)} da{" "}
               {response.parkingName}
+              {response.keyword && <> per &ldquo;{response.keyword}&rdquo;</>}
             </h2>
             <p className="text-caption text-black-60">
               {formatNumber(response.calls)} {response.calls === 1 ? "chiamata" : "chiamate"} a Google. I risultati restano solo in questa pagina:
               si salvano soltanto quelli importati.
             </p>
           </div>
-          {response.partial && <Alert tone="warning">Risultati parziali: restringi il raggio o le categorie.</Alert>}
+          {response.partial && (
+            <Alert tone="warning">
+              {response.keyword ? "Risultati parziali: restringi il raggio o usa una parola chiave più precisa." : "Risultati parziali: restringi il raggio o le categorie."}
+            </Alert>
+          )}
 
           <ResultsMap
             center={response.center}
@@ -264,68 +291,40 @@ export function MapSearch({
             onSelect={onSelect}
           />
 
-          <div className="flex flex-col gap-3 lg:flex-row lg:items-end lg:justify-between">
-            <div className="grid grid-cols-2 gap-3 sm:flex sm:flex-wrap">
-              <div className="sm:w-56">
-                <Field id="filtro-categoria" label="Categoria">
-                  <Select id="filtro-categoria" value={filterCategory} onChange={(event) => setFilterCategory(event.target.value)}>
-                    <option value="">Tutte</option>
-                    {[...new Set(response.results.map((row) => row.category))].map((category) => (
-                      <option key={category} value={category}>
-                        {category}
-                      </option>
-                    ))}
-                  </Select>
-                </Field>
-              </div>
-              <div className="sm:w-56">
-                <Field id="filtro-stato" label="Stato">
-                  <Select id="filtro-stato" value={filterStatus} onChange={(event) => setFilterStatus(event.target.value)}>
-                    <option value="">Tutti</option>
-                    {(Object.keys(STATUS_LABELS) as ResultStatus[]).map((status) => (
-                      <option key={status} value={status}>
-                        {STATUS_LABELS[status].label}
-                      </option>
-                    ))}
-                  </Select>
-                </Field>
-              </div>
-            </div>
+          <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
+            <p className="text-body" aria-live="polite">
+              <span className="font-semibold">{chosen.length === 1 ? "1 risultato selezionato" : `${chosen.length} risultati selezionati`}</span>
+              <span className="block text-caption text-black-60">
+                Puoi selezionare fino a {MAX_IMPORT} risultati alla volta; la selezione resta cambiando pagina.
+              </span>
+            </p>
             <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap">
               <Button onClick={computeWalking} disabled={pending || chosen.length === 0 || tooMany.walking}>
                 Calcola distanza a piedi{chosen.length > 0 ? ` (${chosen.length})` : ""}
               </Button>
-              <Button variant="primary" onClick={startImport} disabled={pending || chosen.length === 0 || tooMany.import}>
+              <Button variant="primary" onClick={startImport} disabled={pending || chosen.length === 0}>
                 Importa selezionati{chosen.length > 0 ? ` (${chosen.length})` : ""}
               </Button>
             </div>
           </div>
-          {(tooMany.walking || tooMany.import) && (
-            <p className="text-caption text-black-80">
-              {tooMany.import
-                ? `Hai selezionato ${chosen.length} risultati: si importano al massimo ${MAX_IMPORT} per volta e la distanza a piedi si calcola per al massimo ${MAX_WALKING}.`
-                : `La distanza a piedi si calcola per al massimo ${MAX_WALKING} risultati per volta.`}
-            </p>
-          )}
+          {tooMany.walking && <p className="text-caption text-black-80">La distanza a piedi si calcola per al massimo {MAX_WALKING} risultati per volta.</p>}
 
-          <ResultsTable
-            rows={visible}
-            numbers={new Map(visible.map((row, index) => [row.placeId, index + 1]))}
-            checked={checked}
-            onCheck={(placeId, on) =>
-              setChecked((current) => {
-                const next = new Set(current);
-                if (on) next.add(placeId);
-                else next.delete(placeId);
-                return next;
-              })
-            }
-            onCheckAll={(on) => setChecked(on ? new Set(visible.map((row) => row.placeId)) : new Set())}
-            selectedId={selectedId}
-            onSelect={setSelectedId}
-            walking={walking}
-            descending={descending}
-            onSort={() => setDescending((value) => !value)}
+          <DataTable
+            caption="Risultati della ricerca"
+            columns={resultColumns({ numbers, walking, selectedId, onSelect: setSelectedId, categories: [...new Set(response.results.map((row) => row.category))] })}
+            rows={page}
+            total={visible.length}
+            query={query}
+            onQueryChange={setQuery}
+            empty="Nessun risultato."
+            rowId={(row) => `risultato-${row.placeId}`}
+            rowClassName={(row) => (row.placeId === selectedId ? "!bg-blue-20" : "")}
+            selection={{
+              selected: checked,
+              full: checked.size >= MAX_IMPORT,
+              label: (row) => row.name,
+              onChange: (ids, on) => setChecked((current) => toggleSelection(current, ids, on, MAX_IMPORT)),
+            }}
           />
           <p className="text-caption text-black-60">
             Dati dei luoghi: <span className="font-semibold">Google Maps</span>. Distanze in linea d&apos;aria dal parcheggio; quelle a piedi da Google,
@@ -350,115 +349,99 @@ export function MapSearch({
   );
 }
 
-function ResultsTable({
-  rows,
+type ResultRow = SearchResult & { id: string };
+
+// Columns of the results table: number, name (with the Google Maps link),
+// category, address, distance, status. Category and status are filters,
+// distance and name sort.
+function resultColumns({
   numbers,
-  checked,
-  onCheck,
-  onCheckAll,
+  walking,
   selectedId,
   onSelect,
-  walking,
-  descending,
-  onSort,
+  categories,
 }: {
-  rows: SearchResult[];
   numbers: Map<string, number>;
-  checked: Set<string>;
-  onCheck: (placeId: string, on: boolean) => void;
-  onCheckAll: (on: boolean) => void;
+  walking: Map<string, WalkingDistance>;
   selectedId: string | null;
   onSelect: (placeId: string) => void;
-  walking: Map<string, WalkingDistance>;
-  descending: boolean;
-  onSort: () => void;
-}) {
-  if (rows.length === 0) return <p className="text-body text-black-60">Nessun risultato con questi filtri.</p>;
-  const allChecked = rows.every((row) => checked.has(row.placeId));
-  return (
-    <div className="relative max-w-full overflow-x-auto rounded-md border border-grey-60 bg-white">
-      <table className="w-full border-separate border-spacing-0 text-[14px] leading-snug text-brand-black">
-        <caption className="sr-only">Risultati della ricerca, ordinati per distanza</caption>
-        <thead>
-          <tr>
-            <Th>
-              <input
-                type="checkbox"
-                aria-label="Seleziona tutti i risultati visibili"
-                className="size-5 cursor-pointer accent-brand-blue align-middle"
-                checked={allChecked}
-                onChange={(event) => onCheckAll(event.target.checked)}
-              />
-            </Th>
-            <Th>N.</Th>
-            <Th>Nome</Th>
-            <Th>Categoria</Th>
-            <Th>Indirizzo</Th>
-            <Th align="end">
-              <button type="button" onClick={onSort} className="rounded-xs uppercase underline-offset-2 hover:underline" aria-label={`Ordina per distanza, ora ${descending ? "dal più lontano" : "dal più vicino"}`}>
-                Distanza {descending ? "↓" : "↑"}
-              </button>
-            </Th>
-            <Th>Stato</Th>
-          </tr>
-        </thead>
-        <tbody>
-          {rows.map((row) => {
-            const selected = row.placeId === selectedId;
-            const walk = walking.get(row.placeId);
-            const cell = `border-b border-grey-60 px-3 py-2.5 align-middle ${selected ? "bg-blue-20" : "bg-white"}`;
-            return (
-              <tr key={row.placeId} id={`risultato-${row.placeId}`} aria-selected={selected} className="scroll-mt-24">
-                <td className={`${cell} max-md:sticky max-md:left-0 max-md:z-[1]`}>
-                  <input
-                    type="checkbox"
-                    aria-label={`Seleziona ${row.name}`}
-                    className="size-5 cursor-pointer accent-brand-blue align-middle"
-                    checked={checked.has(row.placeId)}
-                    onChange={(event) => onCheck(row.placeId, event.target.checked)}
-                  />
-                </td>
-                <td className={`${cell} tabular-nums text-black-60`}>{numbers.get(row.placeId)}</td>
-                <td className={`${cell} min-w-48`}>
-                  <button type="button" onClick={() => onSelect(row.placeId)} className="rounded-xs text-left font-semibold underline-offset-2 hover:underline">
-                    {row.name}
-                  </button>
-                  <a
-                    href={googleMapsPlaceUrl({ name: row.name, address: row.address, placeId: row.placeId }) ?? undefined}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="block rounded-xs text-caption text-blue-ink underline underline-offset-2"
-                  >
-                    Apri in Google Maps<span className="sr-only"> (si apre in una nuova scheda)</span>
-                  </a>
-                </td>
-                <td className={`${cell} whitespace-nowrap`}>{row.category}</td>
-                <td className={`${cell} min-w-56 text-black-80`}>{row.address ?? "–"}</td>
-                <td className={`${cell} whitespace-nowrap text-right tabular-nums`}>
-                  {formatMeters(row.distance)}
-                  {walk && (
-                    <span className="block text-caption text-black-80">
-                      {walk.meters === null ? "a piedi: percorso non trovato" : `a piedi ${formatMeters(walk.meters)}, ${walk.minutes} min`}
-                    </span>
-                  )}
-                </td>
-                <td className={`${cell} min-w-40`}>
-                  <span className="flex flex-col items-start gap-1">
-                    <Badge tone={STATUS_LABELS[row.status].tone} icon={row.status === "esclusione" ? "ban" : undefined}>
-                      {STATUS_LABELS[row.status].label}
-                    </Badge>
-                    {row.partyId && (
-                      <Link href={`/prospect/${row.partyId}`} className="rounded-xs text-caption text-blue-ink underline underline-offset-2">
-                        Apri {row.partyName ?? "il prospect"}
-                      </Link>
-                    )}
-                  </span>
-                </td>
-              </tr>
-            );
-          })}
-        </tbody>
-      </table>
-    </div>
-  );
+  categories: string[];
+}): Column<ResultRow>[] {
+  return [
+    { key: "numero", label: "N.", cell: (row) => <span className="tabular-nums text-black-60">{numbers.get(row.placeId)}</span> },
+    {
+      key: "nome",
+      label: "Nome",
+      sort: "nome",
+      sticky: true,
+      width: "min-w-48 max-w-64",
+      cell: (row) => (
+        <span className="flex flex-col items-start">
+          <button
+            type="button"
+            onClick={() => onSelect(row.placeId)}
+            aria-pressed={row.placeId === selectedId}
+            className="rounded-xs text-left font-semibold break-words underline-offset-2 hover:underline"
+          >
+            {row.name}
+          </button>
+          <a
+            href={googleMapsPlaceUrl({ name: row.name, address: row.address, placeId: row.placeId }) ?? undefined}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="rounded-xs text-caption text-blue-ink underline underline-offset-2"
+          >
+            Apri in Google Maps<span className="sr-only"> (si apre in una nuova scheda)</span>
+          </a>
+        </span>
+      ),
+    },
+    {
+      key: "categoria",
+      label: "Categoria",
+      filter: { param: "categoria", type: "select", options: categories.map((value) => ({ value, label: value })), allLabel: "Tutte" },
+      cell: (row) => <span className="whitespace-nowrap">{row.category}</span>,
+    },
+    { key: "indirizzo", label: "Indirizzo", width: "min-w-56", cell: (row) => <span className="text-black-80">{row.address ?? "–"}</span> },
+    {
+      key: "distanza",
+      label: "Distanza",
+      sort: "distanza",
+      cell: (row) => {
+        const walk = walking.get(row.placeId);
+        return (
+          <span className="whitespace-nowrap tabular-nums">
+            {formatMeters(row.distance)}
+            {walk && (
+              <span className="block text-caption text-black-80">
+                {walk.meters === null ? "a piedi: percorso non trovato" : `a piedi ${formatMeters(walk.meters)}, ${walk.minutes} min`}
+              </span>
+            )}
+          </span>
+        );
+      },
+    },
+    {
+      key: "stato",
+      label: "Stato",
+      width: "min-w-40",
+      filter: {
+        param: "stato",
+        type: "select",
+        options: (Object.keys(STATUS_LABELS) as ResultStatus[]).map((value) => ({ value, label: STATUS_LABELS[value].label })),
+      },
+      cell: (row) => (
+        <span className="flex flex-col items-start gap-1">
+          <Badge tone={STATUS_LABELS[row.status].tone} icon={row.status === "esclusione" ? "ban" : undefined}>
+            {STATUS_LABELS[row.status].label}
+          </Badge>
+          {row.partyId && (
+            <Link href={`/prospect/${row.partyId}`} className="rounded-xs text-caption text-blue-ink underline underline-offset-2">
+              Apri {row.partyName ?? "il prospect"}
+            </Link>
+          )}
+        </span>
+      ),
+    },
+  ];
 }

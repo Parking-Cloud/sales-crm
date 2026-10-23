@@ -26,6 +26,8 @@ export type SearchResponse = {
   parkingId: string;
   parkingName: string;
   categories: SearchCategory[];
+  // Keyword of a Text Search, when used.
+  keyword: string | null;
   results: SearchResult[];
   calls: number;
   partial: boolean;

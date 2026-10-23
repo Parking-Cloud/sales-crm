@@ -29,7 +29,7 @@ Obiettivo: lavorare quasi tutto dalle tabelle, entrando il meno possibile nelle 
 
 ### Navigazione
 
-Menu, in quest'ordine: Promemoria (pagina iniziale, sostituisce Oggi), Parcheggi, Ricerca su mappa, Prospect (sostituisce Soggetti), Pipeline, Template email, Analytics (in arrivo), Impostazioni. La lista di esclusione si apre da Impostazioni. I vecchi indirizzi /oggi e /soggetti portano ai nuovi. Nell'interfaccia "soggetto" diventa "prospect"; tabelle e codice del database mantengono i nomi attuali.
+Menu, in quest'ordine: Promemoria (pagina iniziale, sostituisce Oggi), Parcheggi, Ricerca su mappa, Prospect (sostituisce Soggetti), Pipeline, Template email, Analytics, Impostazioni. La lista di esclusione si apre da Impostazioni. I vecchi indirizzi /oggi e /soggetti portano ai nuovi. Nell'interfaccia "soggetto" diventa "prospect"; tabelle e codice del database mantengono i nomi attuali.
 
 ### Stato del prospect
 
@@ -58,6 +58,24 @@ Ogni riga della pipeline ha una data di promemoria scelta a mano e una nota. Acc
 Prospect, Pipeline e Promemoria usano la stessa tabella: al massimo 50 righe per pagina con frecce e numero di pagina, "seleziona tutti" sulle righe della pagina, scorrimento orizzontale con il nome dell'azienda sempre visibile, filtri per colonna e ordinamento dalle intestazioni conservati nell'indirizzo, celle modificabili (testo, data, menu) salvate con Invio o uscendo dalla cella, con l'errore visibile se il salvataggio non riesce. Ogni modifica resta nell'audit con l'autore. Gli stati sono badge con il testo, mai solo colore.
 
 "Invio email" nella tabella Prospect apre "Prepara email" in un pop-up con tutti i controlli di ammissibilità. Se manca solo il permesso, il pop-up chiede "Ha chiesto di ricevere l'email?" (richiesta in chiamata, ha scritto per primo) e lo registra con un clic; lista di esclusione e "Non contattare" restano bloccanti.
+
+### Ricerca su mappa (blocco 1a-10)
+
+I risultati stanno nella tabella comune: 50 righe per pagina con le frecce, "seleziona tutti" sulle 50 della pagina, al massimo 50 risultati scelti alla volta ("Puoi selezionare fino a 50 risultati alla volta"). La selezione resta cambiando pagina e "Importa selezionati" importa tutto ciò che è scelto, con i controlli dei doppioni di sempre.
+
+Categorie di ricerca, ognuna con i suoi tipi ufficiali di Places API (New), controllati con `npm run google:check-types`: Uffici, Sedi aziendali, Studi professionali, Banche e assicurazioni, Uffici pubblici, Ospedali e cliniche, Centri medici, Università e scuole, Musei e cultura, Centri congressi ed eventi, Hotel, Strutture ricettive, Ristoranti, Negozi, Centri commerciali e supermercati, Concessionarie, Palestre. Le stesse categorie si usano per i prospect, più Aziende (dati precedenti) e Altro.
+
+Parola chiave facoltativa (per esempio "sede centrale"): se compilata la ricerca usa Text Search (New) nel rettangolo che contiene il cerchio del raggio scelto, poi tiene solo i risultati dentro il cerchio; le categorie servono solo a classificare i risultati. Stessa field mask minima della ricerca per categorie, stessa suddivisione dell'area quando una chiamata arriva a 20 risultati, conteggio in api_usage con il suo SKU (text\_search\_pro). Il limite giornaliero delle ricerche vale per Nearby Search e Text Search insieme.
+
+### Analytics (blocco 1a-10)
+
+In alto sei numeri: Prospect contattati (data ultimo contatto nel periodo), Interessati e Molto interessati, Offerte inviate, Offerte accettate, Offerte rifiutate, Tasso di accettazione (accettate nel periodo su inviate nel periodo; "–" se nel periodo non è stata inviata nessuna offerta).
+
+Filtri: periodo (questo mese, mese scorso, ultimi 90 giorni, personalizzato; giorni di Europe/Rome), parcheggio, città del parcheggio, responsabile del lead. Con un filtro sul parcheggio o sulla città i prospect senza parcheggio non sono contati; con il responsabile contano solo i suoi lead.
+
+I conteggi usano la data del cambio di stato presa dallo storico (audit), non lo stato di oggi: un prospect conta quando passa a Interessato o Molto interessato (non da Interessato a Molto interessato), un'offerta quando passa a inviata, accettata o rifiutata, anche se la riga nasce già in quello stato. I cambi fatti senza utente (migrazioni dei dati) non contano; i prospect eliminati non contano, quelli uniti contano per il prospect in cui sono stati uniti. Un prospect conta una volta; un'offerta una volta per parcheggio.
+
+Sotto ai numeri: un grafico a barre per settimana (da lunedì a domenica) per ogni cambio di stato, con la tabella degli stessi numeri, e una tabella per parcheggio con gli stessi numeri (un prospect su più parcheggi conta in ognuno). Nessun dato inventato: un periodo senza eventi mostra zero.
 
 ### Cadenze e import disattivati
 

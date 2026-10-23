@@ -124,8 +124,12 @@ select pg_temp.record(
 -- API usage and daily limits
 -- ---------------------------------------------------------------------------
 
--- The limit is set 3 calls above today's real use on the database.
+-- The limit is set 3 calls above today's real use on the database (Nearby
+-- and Text Search share it since block 1a-10).
 insert into test_json select 'usate_prima', to_jsonb(coalesce((
+  select sum(chiamate)::int from public.api_usage
+  where giorno = (now() at time zone 'Europe/Rome')::date and sku in ('nearby_search_pro', 'text_search_pro')), 0));
+insert into test_json select 'nearby_prima', to_jsonb(coalesce((
   select chiamate from public.api_usage where giorno = (now() at time zone 'Europe/Rome')::date and sku = 'nearby_search_pro'), 0));
 update public.app_settings set valore = to_jsonb(pg_temp.j('usate_prima')::text::int + 3) where chiave = 'limite_giornaliero_nearby';
 select pg_temp.act_as(pg_temp.id('operatore'));
@@ -140,8 +144,20 @@ select pg_temp.record(
   (pg_temp.j('q1') ->> 'ok')::boolean and not (pg_temp.j('q2') ->> 'ok')::boolean and (pg_temp.j('q3') ->> 'ok')::boolean
   and (pg_temp.j('q3') ->> 'usate')::int = pg_temp.j('usate_prima')::text::int + 3
   and (select chiamate from public.api_usage where giorno = (now() at time zone 'Europe/Rome')::date and sku = 'nearby_search_pro')
-      = pg_temp.j('usate_prima')::text::int + 3,
+      = pg_temp.j('nearby_prima')::text::int + 3,
   concat_ws(' | ', pg_temp.j('q1'), pg_temp.j('q2'), pg_temp.j('q3'))
+);
+update public.app_settings set valore = to_jsonb(pg_temp.j('usate_prima')::text::int + 5) where chiave = 'limite_giornaliero_nearby';
+select pg_temp.act_as(pg_temp.id('operatore'));
+insert into test_json select 't1', public.use_api_quota('text_search_pro', 2);
+insert into test_json select 't2', public.use_api_quota('text_search_pro', 1);
+reset role;
+select pg_temp.record(
+  'limiti: Text Search contato col suo SKU, sullo stesso limite giornaliero delle ricerche',
+  (pg_temp.j('t1') ->> 'ok')::boolean and not (pg_temp.j('t2') ->> 'ok')::boolean
+  and (pg_temp.j('t1') ->> 'usate')::int = pg_temp.j('usate_prima')::text::int + 5
+  and (select chiamate from public.api_usage where giorno = (now() at time zone 'Europe/Rome')::date and sku = 'text_search_pro') >= 2,
+  concat_ws(' | ', pg_temp.j('t1'), pg_temp.j('t2'))
 );
 select pg_temp.record(
   'limiti: Route Matrix contato per elementi, senza limite',

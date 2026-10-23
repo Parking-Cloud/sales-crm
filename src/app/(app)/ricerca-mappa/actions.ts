@@ -2,10 +2,10 @@
 
 import { revalidatePath } from "next/cache";
 import { getCurrentUser } from "@/lib/auth/current-user";
-import { GoogleApiError, importDetails, nearbySearch, walkingMatrix } from "@/lib/google/places-api";
+import { GoogleApiError, importDetails, nearbySearch, textSearch, walkingMatrix } from "@/lib/google/places-api";
 import { CATEGORY_TYPES, SEARCH_CATEGORIES, categoryForPlace, isSearchCategory, type SearchCategory } from "@/lib/places/categories";
 import { MAX_IMPORT, MAX_RADIUS, MAX_WALKING, MIN_RADIUS } from "@/lib/places/limits";
-import { capAndCity, searchArea } from "@/lib/places/search";
+import { capAndCity, cleanKeyword, searchArea } from "@/lib/places/search";
 import type {
   DuplicateCandidate,
   ImportCandidate,
@@ -34,7 +34,7 @@ const QUOTA_NEARBY = "Limite giornaliero delle ricerche Google raggiunto: la ric
 const QUOTA_DETAILS = "Limite giornaliero dei dettagli Google raggiunto: l'import è bloccato fino a domani. L'amministratore può alzare il limite in Impostazioni.";
 const UUID = /^[0-9a-f-]{36}$/i;
 
-type Sku = "nearby_search_pro" | "place_details_enterprise" | "route_matrix_essentials";
+type Sku = "nearby_search_pro" | "text_search_pro" | "place_details_enterprise" | "route_matrix_essentials";
 
 async function reserve(sku: Sku, n: number): Promise<boolean> {
   const supabase = await createClient();
@@ -77,7 +77,9 @@ function typeGroups(categories: readonly SearchCategory[]): string[][] {
 // Search
 // ---------------------------------------------------------------------------
 
-export async function searchPlaces(input: { parkingId: string; radius: number; categories: string[] }): Promise<Result<SearchResponse>> {
+// Categories, or a keyword (Text Search, block 1a-10): with a keyword the
+// categories are not needed; they only decide the category shown.
+export async function searchPlaces(input: { parkingId: string; radius: number; categories: string[]; keyword?: string }): Promise<Result<SearchResponse>> {
   const time = stopwatch("ricerca.mappa");
   if (!(await getCurrentUser())) return { ok: false, message: NOT_ALLOWED };
   const radius = Math.round(Number(input?.radius));
@@ -86,7 +88,8 @@ export async function searchPlaces(input: { parkingId: string; radius: number; c
   }
   const chosen = Array.isArray(input?.categories) ? input.categories.filter(isSearchCategory) : [];
   const categories = chosen.length > 0 ? SEARCH_CATEGORIES.filter((category) => chosen.includes(category)) : [];
-  if (categories.length === 0) return { ok: false, message: "Scegli almeno una categoria." };
+  const keyword = cleanKeyword(input?.keyword);
+  if (categories.length === 0 && !keyword) return { ok: false, message: "Scegli almeno una categoria o scrivi una parola chiave." };
   if (typeof input?.parkingId !== "string" || !UUID.test(input.parkingId)) return { ok: false, message: "Scegli un parcheggio." };
 
   try {
@@ -94,13 +97,10 @@ export async function searchPlaces(input: { parkingId: string; radius: number; c
     if (!parking) return { ok: false, message: "Parcheggio non trovato o senza coordinate." };
     time.step("parcheggio");
 
-    const area = await searchArea({
-      center: { lat: parking.lat, lng: parking.lng },
-      radius,
-      typeGroups: typeGroups(categories),
-      call: nearbySearch,
-      reserve: (n) => reserve("nearby_search_pro", n),
-    });
+    const center = { lat: parking.lat, lng: parking.lng };
+    const area = keyword
+      ? await searchArea<string>({ center, radius, typeGroups: [keyword], call: textSearch, reserve: (n) => reserve("text_search_pro", n) })
+      : await searchArea({ center, radius, typeGroups: typeGroups(categories), call: nearbySearch, reserve: (n) => reserve("nearby_search_pro", n) });
     time.step("google");
     if (area.quotaExceeded && area.places.length === 0) {
       time.log({ chiamate: area.calls, risultati: 0, limite: 1 });
@@ -124,14 +124,14 @@ export async function searchPlaces(input: { parkingId: string; radius: number; c
         lat: place.location.lat,
         lng: place.location.lng,
         distance: place.distance,
-        category: categoryForPlace(place.primaryType, place.types, categories),
+        category: categoryForPlace(place.primaryType, place.types, categories.length > 0 ? categories : SEARCH_CATEGORIES),
         status: (status?.stato as ResultStatus | undefined) ?? "nuovo",
         partyId: status?.party_id ?? null,
         partyName: status?.nome ?? null,
         reason: status?.motivo ?? null,
       };
     });
-    time.log({ chiamate: area.calls, risultati: results.length, parziale: area.partial ? 1 : 0, limite: area.quotaExceeded ? 1 : 0 });
+    time.log({ chiamate: area.calls, parola_chiave: keyword ? 1 : 0, risultati: results.length, parziale: area.partial ? 1 : 0, limite: area.quotaExceeded ? 1 : 0 });
     return {
       ok: true,
       data: {
@@ -140,6 +140,7 @@ export async function searchPlaces(input: { parkingId: string; radius: number; c
         parkingId: parking.id,
         parkingName: parking.nome,
         categories,
+        keyword: keyword || null,
         results,
         calls: area.calls,
         partial: area.partial || area.quotaExceeded,

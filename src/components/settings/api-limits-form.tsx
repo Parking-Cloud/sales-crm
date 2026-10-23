@@ -28,7 +28,7 @@ export function ApiLimitsForm({
       {state.status === "saved" && <Alert tone="success">Limiti salvati.</Alert>}
       {state.status === "error" && state.message && <Alert tone="critical">{state.message}</Alert>}
       <div className="grid gap-4 sm:grid-cols-2">
-        <Field id="nearby" label="Ricerche al giorno" hint="Chiamate Nearby Search. Oltre il limite la ricerca si blocca." error={errors.nearby} required>
+        <Field id="nearby" label="Ricerche al giorno" hint="Chiamate Nearby Search e Text Search insieme. Oltre il limite la ricerca si blocca." error={errors.nearby} required>
           <Input id="nearby" name="nearby" inputMode="numeric" defaultValue={values.nearby} invalid={Boolean(errors.nearby)} hasDescription />
         </Field>
         <Field id="details" label="Dettagli al giorno" hint="Chiamate Place Details all'import. Oltre il limite l'import si blocca." error={errors.details} required>
